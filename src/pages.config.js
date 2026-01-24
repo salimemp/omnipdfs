@@ -4,6 +4,7 @@ import PDFTools from './pages/PDFTools';
 import Files from './pages/Files';
 import History from './pages/History';
 import Settings from './pages/Settings';
+import AIAssistant from './pages/AIAssistant';
 import __Layout from './Layout.jsx';
 
 
@@ -14,6 +15,7 @@ export const PAGES = {
     "Files": Files,
     "History": History,
     "Settings": Settings,
+    "AIAssistant": AIAssistant,
 }
 
 export const pagesConfig = {

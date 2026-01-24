@@ -1,0 +1,612 @@
+import React, { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Sparkles,
+  FileText,
+  Languages,
+  Tags,
+  Lightbulb,
+  Loader2,
+  Upload,
+  CheckCircle2,
+  Copy,
+  Download,
+  X,
+  Brain,
+  Wand2,
+  BookOpen
+} from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import DropZone from '@/components/shared/DropZone';
+
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'fr', name: 'French' },
+  { code: 'de', name: 'German' },
+  { code: 'it', name: 'Italian' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'zh', name: 'Chinese' },
+  { code: 'ja', name: 'Japanese' },
+  { code: 'ko', name: 'Korean' },
+  { code: 'ar', name: 'Arabic' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'nl', name: 'Dutch' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'tr', name: 'Turkish' },
+  { code: 'vi', name: 'Vietnamese' },
+  { code: 'th', name: 'Thai' },
+  { code: 'sv', name: 'Swedish' },
+  { code: 'da', name: 'Danish' },
+  { code: 'fi', name: 'Finnish' },
+];
+
+export default function AIAssistant({ theme = 'dark' }) {
+  const [activeTab, setActiveTab] = useState('summarize');
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [textInput, setTextInput] = useState('');
+  const [targetLanguage, setTargetLanguage] = useState('es');
+  const [processing, setProcessing] = useState(false);
+  const [result, setResult] = useState(null);
+  const [suggestedTags, setSuggestedTags] = useState([]);
+
+  const isDark = theme === 'dark';
+
+  const handleFileUploaded = async (fileData) => {
+    const document = await base44.entities.Document.create(fileData);
+    setUploadedFile(document);
+    setResult(null);
+  };
+
+  const processWithAI = async (action) => {
+    setProcessing(true);
+    setResult(null);
+
+    try {
+      let prompt = '';
+      let schema = null;
+
+      switch (action) {
+        case 'summarize':
+          prompt = `Analyze and summarize the following document content. Provide:
+1. A concise executive summary (2-3 sentences)
+2. Key points (bullet points)
+3. Main topics covered
+4. Document type/category
+
+${textInput || `Document: ${uploadedFile?.name}`}
+
+Be thorough but concise. Focus on the most important information.`;
+          schema = {
+            type: "object",
+            properties: {
+              executive_summary: { type: "string" },
+              key_points: { type: "array", items: { type: "string" } },
+              main_topics: { type: "array", items: { type: "string" } },
+              document_type: { type: "string" },
+              reading_time: { type: "string" }
+            }
+          };
+          break;
+
+        case 'translate':
+          const targetLang = languages.find(l => l.code === targetLanguage)?.name || 'Spanish';
+          prompt = `Translate the following text to ${targetLang}. Maintain the original formatting, tone, and meaning.
+
+Text to translate:
+${textInput}
+
+Provide a high-quality, natural translation.`;
+          schema = {
+            type: "object",
+            properties: {
+              translated_text: { type: "string" },
+              source_language: { type: "string" },
+              target_language: { type: "string" },
+              translation_notes: { type: "string" }
+            }
+          };
+          break;
+
+        case 'tags':
+          prompt = `Analyze the following document/text and suggest relevant tags for organization and searchability. Consider:
+- Main topics and themes
+- Document type
+- Industry/domain
+- Key entities mentioned
+- Action items or status
+
+${textInput || `Document: ${uploadedFile?.name}`}
+
+Provide 5-10 relevant tags.`;
+          schema = {
+            type: "object",
+            properties: {
+              tags: { type: "array", items: { type: "string" } },
+              category: { type: "string" },
+              confidence: { type: "number" }
+            }
+          };
+          break;
+
+        case 'suggestions':
+          prompt = `Based on the following document content, provide intelligent suggestions:
+1. Recommended next actions
+2. Related documents to review
+3. Missing information that should be added
+4. Formatting improvements
+5. Potential issues or inconsistencies
+
+${textInput || `Document: ${uploadedFile?.name}`}
+
+Be specific and actionable.`;
+          schema = {
+            type: "object",
+            properties: {
+              next_actions: { type: "array", items: { type: "string" } },
+              related_documents: { type: "array", items: { type: "string" } },
+              missing_info: { type: "array", items: { type: "string" } },
+              formatting_tips: { type: "array", items: { type: "string" } },
+              potential_issues: { type: "array", items: { type: "string" } }
+            }
+          };
+          break;
+      }
+
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt,
+        response_json_schema: schema,
+        file_urls: uploadedFile?.file_url ? [uploadedFile.file_url] : undefined
+      });
+
+      setResult({ action, data: response });
+
+      if (action === 'tags' && response.tags) {
+        setSuggestedTags(response.tags);
+      }
+
+      await base44.entities.ActivityLog.create({
+        action: 'convert',
+        document_name: uploadedFile?.name || 'Text Input',
+        details: { ai_action: action }
+      });
+
+    } catch (error) {
+      toast.error('AI processing failed. Please try again.');
+    }
+
+    setProcessing(false);
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard');
+  };
+
+  const clearAll = () => {
+    setUploadedFile(null);
+    setTextInput('');
+    setResult(null);
+    setSuggestedTags([]);
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-10"
+      >
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6">
+          <Brain className="w-4 h-4 text-violet-400" />
+          <span className="text-sm text-violet-300">Powered by Gemini AI</span>
+        </div>
+        <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          AI Document Assistant
+        </h1>
+        <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+          Summarize, translate, auto-tag, and get intelligent suggestions for your documents
+        </p>
+      </motion.div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className={`grid grid-cols-4 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border p-1`}>
+          <TabsTrigger value="summarize" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Summarize
+          </TabsTrigger>
+          <TabsTrigger value="translate" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
+            <Languages className="w-4 h-4 mr-2" />
+            Translate
+          </TabsTrigger>
+          <TabsTrigger value="tags" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
+            <Tags className="w-4 h-4 mr-2" />
+            Auto-Tag
+          </TabsTrigger>
+          <TabsTrigger value="suggestions" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
+            <Lightbulb className="w-4 h-4 mr-2" />
+            Suggestions
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Input Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid md:grid-cols-2 gap-6"
+        >
+          {/* File Upload */}
+          <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+            <CardHeader>
+              <CardTitle className={`flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <Upload className="w-5 h-5 text-violet-400" />
+                Upload Document
+              </CardTitle>
+              <CardDescription className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                Upload a file for AI analysis
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {uploadedFile ? (
+                <div className={`flex items-center justify-between p-4 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-8 h-8 text-violet-400" />
+                    <div>
+                      <p className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{uploadedFile.name}</p>
+                      <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Ready for analysis</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setUploadedFile(null)}
+                    className={isDark ? 'text-slate-400 hover:text-red-400' : 'text-slate-500 hover:text-red-500'}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <DropZone
+                  onFileUploaded={handleFileUploaded}
+                  maxSize={25 * 1024 * 1024}
+                />
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Text Input */}
+          <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+            <CardHeader>
+              <CardTitle className={`flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <FileText className="w-5 h-5 text-cyan-400" />
+                Or Paste Text
+              </CardTitle>
+              <CardDescription className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                Enter text directly for processing
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                placeholder="Paste your document text here..."
+                className={`min-h-[200px] ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
+              />
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Tab Content */}
+        <TabsContent value="summarize" className="mt-6">
+          <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+            <CardContent className="pt-6">
+              <div className="text-center mb-6">
+                <BookOpen className="w-12 h-12 mx-auto text-violet-400 mb-3" />
+                <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Document Summarization
+                </h3>
+                <p className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                  Get an executive summary, key points, and main topics from your document
+                </p>
+              </div>
+              <Button
+                onClick={() => processWithAI('summarize')}
+                disabled={processing || (!uploadedFile && !textInput)}
+                className="w-full bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 text-white py-6"
+              >
+                {processing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="w-5 h-5 mr-2" />
+                    Generate Summary
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="translate" className="mt-6">
+          <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+            <CardContent className="pt-6">
+              <div className="text-center mb-6">
+                <Languages className="w-12 h-12 mx-auto text-cyan-400 mb-3" />
+                <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Document Translation
+                </h3>
+                <p className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                  Translate your document to any language with AI precision
+                </p>
+              </div>
+              <div className="mb-6">
+                <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Target Language</Label>
+                <Select value={targetLanguage} onValueChange={setTargetLanguage}>
+                  <SelectTrigger className={`mt-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
+                    {languages.map(lang => (
+                      <SelectItem key={lang.code} value={lang.code} className={isDark ? 'text-white' : 'text-slate-900'}>
+                        {lang.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                onClick={() => processWithAI('translate')}
+                disabled={processing || !textInput}
+                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white py-6"
+              >
+                {processing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Translating...
+                  </>
+                ) : (
+                  <>
+                    <Languages className="w-5 h-5 mr-2" />
+                    Translate Document
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tags" className="mt-6">
+          <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+            <CardContent className="pt-6">
+              <div className="text-center mb-6">
+                <Tags className="w-12 h-12 mx-auto text-emerald-400 mb-3" />
+                <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Auto-Tagging
+                </h3>
+                <p className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                  Automatically generate relevant tags for organization
+                </p>
+              </div>
+              <Button
+                onClick={() => processWithAI('tags')}
+                disabled={processing || (!uploadedFile && !textInput)}
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-6"
+              >
+                {processing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Generating Tags...
+                  </>
+                ) : (
+                  <>
+                    <Tags className="w-5 h-5 mr-2" />
+                    Generate Tags
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="suggestions" className="mt-6">
+          <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+            <CardContent className="pt-6">
+              <div className="text-center mb-6">
+                <Lightbulb className="w-12 h-12 mx-auto text-amber-400 mb-3" />
+                <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Smart Suggestions
+                </h3>
+                <p className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                  Get AI-powered recommendations and insights
+                </p>
+              </div>
+              <Button
+                onClick={() => processWithAI('suggestions')}
+                disabled={processing || (!uploadedFile && !textInput)}
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-6"
+              >
+                {processing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Lightbulb className="w-5 h-5 mr-2" />
+                    Get Suggestions
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Results Section */}
+      <AnimatePresence>
+        {result && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="mt-8"
+          >
+            <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className={`flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    AI Result
+                  </CardTitle>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => copyToClipboard(JSON.stringify(result.data, null, 2))}
+                      className={isDark ? 'border-slate-700 text-slate-300' : 'border-slate-200 text-slate-600'}
+                    >
+                      <Copy className="w-4 h-4 mr-1" />
+                      Copy
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={clearAll}
+                      className={isDark ? 'border-slate-700 text-slate-300' : 'border-slate-200 text-slate-600'}
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {result.action === 'summarize' && result.data && (
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Executive Summary</h4>
+                      <p className={isDark ? 'text-slate-300' : 'text-slate-700'}>{result.data.executive_summary}</p>
+                    </div>
+                    {result.data.key_points?.length > 0 && (
+                      <div>
+                        <h4 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Key Points</h4>
+                        <ul className="space-y-2">
+                          {result.data.key_points.map((point, i) => (
+                            <li key={i} className={`flex items-start gap-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                              <span className="text-violet-400 mt-1">•</span>
+                              {point}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {result.data.main_topics?.length > 0 && (
+                      <div>
+                        <h4 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Main Topics</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {result.data.main_topics.map((topic, i) => (
+                            <Badge key={i} variant="secondary" className="bg-violet-500/20 text-violet-300">
+                              {topic}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {result.action === 'translate' && result.data && (
+                  <div className="space-y-4">
+                    <div className={`p-4 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+                      <p className={isDark ? 'text-slate-300' : 'text-slate-700'}>{result.data.translated_text}</p>
+                    </div>
+                    {result.data.translation_notes && (
+                      <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                        Note: {result.data.translation_notes}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {result.action === 'tags' && result.data && (
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap gap-2">
+                      {result.data.tags?.map((tag, i) => (
+                        <Badge key={i} className="bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 cursor-pointer">
+                          <Tags className="w-3 h-3 mr-1" />
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                    {result.data.category && (
+                      <p className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                        Category: <span className={isDark ? 'text-white' : 'text-slate-900'}>{result.data.category}</span>
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {result.action === 'suggestions' && result.data && (
+                  <div className="space-y-6">
+                    {result.data.next_actions?.length > 0 && (
+                      <div>
+                        <h4 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Recommended Actions</h4>
+                        <ul className="space-y-2">
+                          {result.data.next_actions.map((action, i) => (
+                            <li key={i} className={`flex items-start gap-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                              {action}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {result.data.potential_issues?.length > 0 && (
+                      <div>
+                        <h4 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Potential Issues</h4>
+                        <ul className="space-y-2">
+                          {result.data.potential_issues.map((issue, i) => (
+                            <li key={i} className={`flex items-start gap-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                              <Lightbulb className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                              {issue}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

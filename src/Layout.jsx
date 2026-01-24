@@ -13,10 +13,14 @@ import {
   X,
   LogOut,
   ChevronRight,
-  Star,
   Shield,
   Layers,
-  FileOutput
+  FileOutput,
+  Moon,
+  Sun,
+  Sparkles,
+  Cloud,
+  GitCompare
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -25,16 +29,25 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const location = useLocation();
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('omnipdf-theme') || 'dark';
+    }
+    return 'dark';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('omnipdf-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const userData = await base44.auth.me();
         setUser(userData);
-      } catch (e) {
-        // User not logged in
-      }
+      } catch (e) {}
     };
     fetchUser();
   }, []);
@@ -43,29 +56,37 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Dashboard', page: 'Dashboard', icon: Home },
     { name: 'Convert', page: 'Convert', icon: Zap },
     { name: 'PDF Tools', page: 'PDFTools', icon: Layers },
+    { name: 'Compare PDFs', page: 'Compare', icon: GitCompare },
+    { name: 'AI Assistant', page: 'AIAssistant', icon: Sparkles },
+    { name: 'Cloud Storage', page: 'CloudStorage', icon: Cloud },
     { name: 'My Files', page: 'Files', icon: FolderOpen },
     { name: 'History', page: 'History', icon: History },
     { name: 'Settings', page: 'Settings', icon: Settings },
   ];
 
   const isActive = (page) => currentPageName === page;
+  const isDark = theme === 'dark';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDark 
+        ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950' 
+        : 'bg-gradient-to-br from-slate-50 via-white to-slate-100'
+    }`}>
       <style>{`
         :root {
           --accent: 139 92 246;
           --accent-light: 167 139 250;
         }
         .glass {
-          background: rgba(15, 23, 42, 0.6);
+          background: ${isDark ? 'rgba(15, 23, 42, 0.6)' : 'rgba(255, 255, 255, 0.8)'};
           backdrop-filter: blur(20px);
-          border: 1px solid rgba(148, 163, 184, 0.1);
+          border: 1px solid ${isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(148, 163, 184, 0.2)'};
         }
         .glass-light {
-          background: rgba(30, 41, 59, 0.5);
+          background: ${isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(255, 255, 255, 0.9)'};
           backdrop-filter: blur(12px);
-          border: 1px solid rgba(148, 163, 184, 0.08);
+          border: 1px solid ${isDark ? 'rgba(148, 163, 184, 0.08)' : 'rgba(148, 163, 184, 0.15)'};
         }
         .glow {
           box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
@@ -75,25 +96,50 @@ export default function Layout({ children, currentPageName }) {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
+        .text-primary {
+          color: ${isDark ? '#ffffff' : '#0f172a'};
+        }
+        .text-secondary {
+          color: ${isDark ? '#94a3b8' : '#64748b'};
+        }
+        .text-muted {
+          color: ${isDark ? '#64748b' : '#94a3b8'};
+        }
+        .bg-card {
+          background: ${isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(255, 255, 255, 0.9)'};
+        }
+        .border-subtle {
+          border-color: ${isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(148, 163, 184, 0.2)'};
+        }
       `}</style>
 
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 glass border-b border-slate-800/50">
+      <header className={`lg:hidden fixed top-0 left-0 right-0 z-50 glass border-b ${isDark ? 'border-slate-800/50' : 'border-slate-200'}`}>
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
               <FileText className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-white text-lg">OmniPDF</span>
+            <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>OmniPDF</span>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-slate-400"
-          >
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className={isDark ? 'text-slate-400' : 'text-slate-600'}
+            >
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className={isDark ? 'text-slate-400' : 'text-slate-600'}
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -112,25 +158,36 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-50 h-full w-72 glass border-r border-slate-800/50
+        fixed top-0 left-0 z-50 h-full w-72 glass border-r
+        ${isDark ? 'border-slate-800/50' : 'border-slate-200'}
         transform transition-transform duration-300 ease-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0
       `}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-slate-800/50">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center glow">
-                <FileText className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="font-bold text-white text-xl">OmniPDF</span>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-xs text-slate-500">Enterprise</span>
-                  <Shield className="w-3 h-3 text-emerald-400" />
+          <div className={`p-6 border-b ${isDark ? 'border-slate-800/50' : 'border-slate-200'}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center glow">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <span className={`font-bold text-xl ${isDark ? 'text-white' : 'text-slate-900'}`}>OmniPDF</span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Enterprise</span>
+                    <Shield className="w-3 h-3 text-emerald-400" />
+                  </div>
                 </div>
               </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                className={`hidden lg:flex ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+              >
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </Button>
             </div>
           </div>
 
@@ -147,8 +204,12 @@ export default function Layout({ children, currentPageName }) {
                   className={`
                     flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
                     ${active
-                      ? 'bg-gradient-to-r from-violet-500/20 to-cyan-500/10 text-white'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      ? 'bg-gradient-to-r from-violet-500/20 to-cyan-500/10'
+                      : isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-100'
+                    }
+                    ${active 
+                      ? isDark ? 'text-white' : 'text-slate-900'
+                      : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                     }
                   `}
                 >
@@ -169,15 +230,15 @@ export default function Layout({ children, currentPageName }) {
           <div className="p-4">
             <Link
               to={createPageUrl('Convert')}
-              className="block p-4 rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/10 border border-violet-500/20 hover:border-violet-500/40 transition-all group"
+              className={`block p-4 rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/10 border border-violet-500/20 hover:border-violet-500/40 transition-all group`}
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
                   <FileOutput className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-white font-semibold">Quick Convert</p>
-                  <p className="text-xs text-slate-400">Drop files to convert</p>
+                  <p className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Quick Convert</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Drop files to convert</p>
                 </div>
               </div>
               <div className="flex items-center text-sm text-violet-400 group-hover:text-violet-300 transition-colors">
@@ -188,7 +249,7 @@ export default function Layout({ children, currentPageName }) {
           </div>
 
           {/* User Section */}
-          <div className="p-4 border-t border-slate-800/50">
+          <div className={`p-4 border-t ${isDark ? 'border-slate-800/50' : 'border-slate-200'}`}>
             {user ? (
               <div className="flex items-center gap-3">
                 <Avatar className="w-10 h-10 border-2 border-violet-500/30">
@@ -197,16 +258,16 @@ export default function Layout({ children, currentPageName }) {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className={`text-sm font-medium truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {user.full_name || 'User'}
                   </p>
-                  <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                  <p className={`text-xs truncate ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{user.email}</p>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => base44.auth.logout()}
-                  className="text-slate-400 hover:text-white shrink-0"
+                  className={`shrink-0 ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
                 >
                   <LogOut className="w-4 h-4" />
                 </Button>
@@ -226,7 +287,7 @@ export default function Layout({ children, currentPageName }) {
       {/* Main Content */}
       <main className="lg:ml-72 min-h-screen pt-16 lg:pt-0">
         <div className="p-4 sm:p-6 lg:p-8">
-          {children}
+          {React.cloneElement(children, { theme })}
         </div>
       </main>
     </div>
