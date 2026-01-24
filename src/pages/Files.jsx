@@ -37,7 +37,8 @@ import { toast } from "sonner";
 import FileCard from '@/components/shared/FileCard';
 import DropZone from '@/components/shared/DropZone';
 
-export default function Files() {
+export default function Files({ theme = 'dark' }) {
+  const isDark = theme === 'dark';
   const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all');
@@ -121,8 +122,8 @@ export default function Files() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">My Files</h1>
-          <p className="text-slate-400 text-sm mt-1">{documents.length} files • Encrypted storage</p>
+          <h1 className={`text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>My Files</h1>
+          <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{documents.length} files • Encrypted storage</p>
         </div>
         <div className="flex gap-3">
           <Button
@@ -144,7 +145,7 @@ export default function Files() {
       </div>
 
       {/* Filters & Search */}
-      <div className="glass-light rounded-2xl p-4 mb-6">
+      <div className={`rounded-2xl p-4 mb-6 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}>
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />

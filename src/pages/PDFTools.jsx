@@ -141,7 +141,8 @@ const categories = [
   { id: 'convert', name: 'Convert' },
 ];
 
-export default function PDFTools() {
+export default function PDFTools({ theme = 'dark' }) {
+  const isDark = theme === 'dark';
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedTool, setSelectedTool] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -203,10 +204,10 @@ export default function PDFTools() {
           <Sparkles className="w-4 h-4 text-violet-400" />
           <span className="text-sm text-violet-300">Professional PDF Tools</span>
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
           PDF Tools Suite
         </h1>
-        <p className="text-slate-400 max-w-lg mx-auto">
+        <p className={`max-w-lg mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
           Everything you need to work with PDFs. Merge, split, compress, protect, and more.
         </p>
       </motion.div>
@@ -244,10 +245,10 @@ export default function PDFTools() {
                   <Icon className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white mb-1 group-hover:text-violet-300 transition-colors">
+                  <h3 className={`font-semibold mb-1 group-hover:text-violet-300 transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {tool.name}
                   </h3>
-                  <p className="text-sm text-slate-400">{tool.description}</p>
+                  <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{tool.description}</p>
                 </div>
               </div>
               <div className="mt-4 flex items-center text-sm text-violet-400 opacity-0 group-hover:opacity-100 transition-opacity">

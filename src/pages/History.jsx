@@ -42,7 +42,8 @@ const actionIcons = {
   protect: { icon: Lock, color: 'text-amber-400', bg: 'bg-amber-500/10' },
 };
 
-export default function History() {
+export default function History({ theme = 'dark' }) {
+  const isDark = theme === 'dark';
   const [searchQuery, setSearchQuery] = useState('');
   const [filterAction, setFilterAction] = useState('all');
   const [dateRange, setDateRange] = useState('all');
@@ -133,8 +134,8 @@ export default function History() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Activity History</h1>
-        <p className="text-slate-400">Track all your document operations and conversions</p>
+        <h1 className={`text-2xl md:text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Activity History</h1>
+        <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>Track all your document operations and conversions</p>
       </motion.div>
 
       {/* Stats */}

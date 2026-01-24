@@ -48,7 +48,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
-export default function Settings() {
+export default function Settings({ theme = 'dark' }) {
+  const isDark = theme === 'dark';
   const [user, setUser] = useState(null);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
@@ -95,8 +96,8 @@ export default function Settings() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Settings</h1>
-        <p className="text-slate-400">Manage your account and preferences</p>
+        <h1 className={`text-2xl md:text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Settings</h1>
+        <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>Manage your account and preferences</p>
       </motion.div>
 
       <Tabs defaultValue="account" className="space-y-6">
