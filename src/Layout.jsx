@@ -20,7 +20,11 @@ import {
   Sun,
   Sparkles,
   Cloud,
-  GitCompare
+  GitCompare,
+  ScanText,
+  LayoutTemplate,
+  Webhook,
+  PenTool
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -56,15 +60,15 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Dashboard', page: 'Dashboard', icon: Home },
     { name: 'Convert', page: 'Convert', icon: Zap },
     { name: 'PDF Tools', page: 'PDFTools', icon: Layers },
-    { name: 'PDF Editor', page: 'PDFEditor', icon: FileText },
-    { name: 'OCR', page: 'OCR', icon: FileText },
-    { name: 'Templates', page: 'Templates', icon: FileText },
+    { name: 'PDF Editor', page: 'PDFEditor', icon: PenTool },
+    { name: 'OCR', page: 'OCR', icon: ScanText },
+    { name: 'Templates', page: 'Templates', icon: LayoutTemplate },
     { name: 'Compare PDFs', page: 'Compare', icon: GitCompare },
     { name: 'AI Assistant', page: 'AIAssistant', icon: Sparkles },
     { name: 'Cloud Storage', page: 'CloudStorage', icon: Cloud },
     { name: 'My Files', page: 'Files', icon: FolderOpen },
     { name: 'History', page: 'History', icon: History },
-    { name: 'Webhooks', page: 'Webhooks', icon: Zap },
+    { name: 'Webhooks', page: 'Webhooks', icon: Webhook },
     { name: 'Settings', page: 'Settings', icon: Settings },
   ];
 
