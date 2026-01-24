@@ -56,11 +56,15 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Dashboard', page: 'Dashboard', icon: Home },
     { name: 'Convert', page: 'Convert', icon: Zap },
     { name: 'PDF Tools', page: 'PDFTools', icon: Layers },
+    { name: 'PDF Editor', page: 'PDFEditor', icon: FileText },
+    { name: 'OCR', page: 'OCR', icon: FileText },
+    { name: 'Templates', page: 'Templates', icon: FileText },
     { name: 'Compare PDFs', page: 'Compare', icon: GitCompare },
     { name: 'AI Assistant', page: 'AIAssistant', icon: Sparkles },
     { name: 'Cloud Storage', page: 'CloudStorage', icon: Cloud },
     { name: 'My Files', page: 'Files', icon: FolderOpen },
     { name: 'History', page: 'History', icon: History },
+    { name: 'Webhooks', page: 'Webhooks', icon: Zap },
     { name: 'Settings', page: 'Settings', icon: Settings },
   ];
 
