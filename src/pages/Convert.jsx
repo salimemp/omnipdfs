@@ -12,7 +12,12 @@ import {
   Settings2,
   Sparkles,
   Shield,
-  ChevronDown
+  ChevronDown,
+  FileText,
+  Image,
+  BookOpen,
+  Cog,
+  Code
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -29,26 +34,89 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import DropZone from '@/components/shared/DropZone';
 import FileIcon from '@/components/shared/FileIcon';
 
-const conversionOptions = {
-  pdf: ['docx', 'xlsx', 'pptx', 'jpg', 'png', 'txt', 'html'],
-  docx: ['pdf', 'txt', 'html'],
-  doc: ['pdf', 'docx', 'txt'],
-  xlsx: ['pdf', 'csv'],
-  xls: ['pdf', 'xlsx', 'csv'],
-  pptx: ['pdf', 'jpg', 'png'],
-  ppt: ['pdf', 'pptx'],
-  jpg: ['pdf', 'png', 'webp'],
-  jpeg: ['pdf', 'png', 'webp'],
-  png: ['pdf', 'jpg', 'webp'],
-  txt: ['pdf', 'docx'],
-  html: ['pdf', 'docx'],
-  epub: ['pdf', 'docx'],
+// Extended format support
+const formatCategories = {
+  documents: {
+    label: 'Documents',
+    icon: FileText,
+    formats: {
+      pdf: ['docx', 'doc', 'xlsx', 'xls', 'pptx', 'ppt', 'txt', 'rtf', 'html', 'md', 'odt'],
+      docx: ['pdf', 'doc', 'txt', 'rtf', 'html', 'md', 'odt'],
+      doc: ['pdf', 'docx', 'txt', 'rtf', 'html'],
+      xlsx: ['pdf', 'xls', 'csv', 'ods'],
+      xls: ['pdf', 'xlsx', 'csv', 'ods'],
+      pptx: ['pdf', 'ppt', 'jpg', 'png', 'odp'],
+      ppt: ['pdf', 'pptx', 'jpg', 'png'],
+      txt: ['pdf', 'docx', 'html', 'md', 'rtf'],
+      rtf: ['pdf', 'docx', 'txt', 'html'],
+      html: ['pdf', 'docx', 'txt', 'md'],
+      md: ['pdf', 'docx', 'html', 'txt'],
+      odt: ['pdf', 'docx', 'txt'],
+    }
+  },
+  images: {
+    label: 'Images',
+    icon: Image,
+    formats: {
+      jpg: ['pdf', 'png', 'tiff', 'bmp', 'webp', 'svg', 'gif'],
+      jpeg: ['pdf', 'png', 'tiff', 'bmp', 'webp', 'svg', 'gif'],
+      png: ['pdf', 'jpg', 'tiff', 'bmp', 'webp', 'svg', 'gif'],
+      tiff: ['pdf', 'jpg', 'png', 'bmp', 'webp'],
+      bmp: ['pdf', 'jpg', 'png', 'tiff', 'webp'],
+      webp: ['pdf', 'jpg', 'png', 'tiff', 'gif'],
+      svg: ['pdf', 'png', 'jpg', 'eps'],
+      gif: ['pdf', 'jpg', 'png', 'webp'],
+      heic: ['pdf', 'jpg', 'png'],
+    }
+  },
+  ebooks: {
+    label: 'E-Books',
+    icon: BookOpen,
+    formats: {
+      epub: ['pdf', 'docx', 'txt', 'html', 'mobi'],
+      mobi: ['pdf', 'epub', 'docx', 'txt'],
+      azw: ['pdf', 'epub', 'mobi', 'docx'],
+      azw3: ['pdf', 'epub', 'mobi', 'docx'],
+      fb2: ['pdf', 'epub', 'docx'],
+    }
+  },
+  cad: {
+    label: 'CAD/Vector',
+    icon: Cog,
+    formats: {
+      dwg: ['pdf', 'dxf', 'svg', 'png', 'jpg'],
+      dxf: ['pdf', 'dwg', 'svg', 'png', 'jpg'],
+      ai: ['pdf', 'svg', 'eps', 'png', 'jpg'],
+      eps: ['pdf', 'svg', 'ai', 'png', 'jpg'],
+      cdr: ['pdf', 'svg', 'ai', 'png'],
+    }
+  },
+  code: {
+    label: 'Code/Text',
+    icon: Code,
+    formats: {
+      json: ['pdf', 'txt', 'xml', 'yaml'],
+      xml: ['pdf', 'json', 'txt', 'html'],
+      yaml: ['pdf', 'json', 'txt'],
+      csv: ['pdf', 'xlsx', 'json', 'txt'],
+    }
+  }
 };
 
-export default function Convert() {
+// Flatten all formats for lookup
+const allFormats = {};
+Object.values(formatCategories).forEach(category => {
+  Object.entries(category.formats).forEach(([source, targets]) => {
+    allFormats[source] = targets;
+  });
+});
+
+export default function Convert({ theme = 'dark' }) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [targetFormat, setTargetFormat] = useState('pdf');
   const [showOptions, setShowOptions] = useState(false);
@@ -56,9 +124,13 @@ export default function Convert() {
     quality: 'high',
     ocr_enabled: false,
     compress: false,
+    dpi: 300,
+    colorMode: 'color',
   });
   const [convertingFiles, setConvertingFiles] = useState({});
+  const [activeCategory, setActiveCategory] = useState('all');
 
+  const isDark = theme === 'dark';
   const queryClient = useQueryClient();
 
   const handleFileUploaded = async (fileData) => {
@@ -66,7 +138,7 @@ export default function Convert() {
     setUploadedFiles(prev => [...prev, document]);
     
     // Set default target format
-    const formats = conversionOptions[fileData.file_type] || ['pdf'];
+    const formats = allFormats[fileData.file_type] || ['pdf'];
     if (!formats.includes(targetFormat)) {
       setTargetFormat(formats[0]);
     }
@@ -80,7 +152,6 @@ export default function Convert() {
     setConvertingFiles(prev => ({ ...prev, [file.id]: 'converting' }));
     
     try {
-      // Create conversion job
       const job = await base44.entities.ConversionJob.create({
         document_id: file.id,
         source_format: file.file_type,
@@ -89,31 +160,29 @@ export default function Convert() {
         options: options
       });
 
-      // Simulate conversion with LLM-based response
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Simulate a file conversion from ${file.file_type} to ${targetFormat}. 
+        prompt: `Simulate a file conversion from ${file.file_type.toUpperCase()} to ${targetFormat.toUpperCase()}. 
                  File name: ${file.name}
-                 Options: Quality=${options.quality}, OCR=${options.ocr_enabled}, Compress=${options.compress}
-                 Return a success message with estimated file size reduction if compression is enabled.`,
+                 Options: Quality=${options.quality}, OCR=${options.ocr_enabled}, Compress=${options.compress}, DPI=${options.dpi}
+                 Return a success message with estimated file size and processing details.`,
         response_json_schema: {
           type: "object",
           properties: {
             success: { type: "boolean" },
             message: { type: "string" },
             estimated_size: { type: "number" },
-            processing_time: { type: "number" }
+            processing_time: { type: "number" },
+            pages_converted: { type: "number" }
           }
         }
       });
 
-      // Update job status
       await base44.entities.ConversionJob.update(job.id, {
         status: 'completed',
-        output_url: file.file_url, // In real app, this would be the converted file
+        output_url: file.file_url,
         processing_time: result.processing_time || 2500
       });
 
-      // Update document with conversion history
       await base44.entities.Document.update(file.id, {
         conversion_history: [
           ...(file.conversion_history || []),
@@ -130,7 +199,6 @@ export default function Convert() {
       queryClient.invalidateQueries(['documents']);
       queryClient.invalidateQueries(['recent-jobs']);
 
-      // Log activity
       await base44.entities.ActivityLog.create({
         action: 'convert',
         document_id: file.id,
@@ -156,8 +224,8 @@ export default function Convert() {
   };
 
   const availableFormats = uploadedFiles.length > 0
-    ? conversionOptions[uploadedFiles[0].file_type] || ['pdf']
-    : Object.keys(conversionOptions);
+    ? allFormats[uploadedFiles[0].file_type] || ['pdf']
+    : ['pdf', 'docx', 'xlsx', 'jpg', 'png'];
 
   const formatFileSize = (bytes) => {
     if (!bytes) return 'N/A';
@@ -166,8 +234,23 @@ export default function Convert() {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
+  const getFormatBadgeColor = (format) => {
+    const imageFormats = ['jpg', 'jpeg', 'png', 'tiff', 'bmp', 'webp', 'svg', 'gif', 'heic'];
+    const docFormats = ['pdf', 'docx', 'doc', 'txt', 'rtf', 'html', 'md', 'odt'];
+    const spreadsheetFormats = ['xlsx', 'xls', 'csv', 'ods'];
+    const ebookFormats = ['epub', 'mobi', 'azw', 'azw3', 'fb2'];
+    const cadFormats = ['dwg', 'dxf', 'ai', 'eps', 'cdr'];
+    
+    if (imageFormats.includes(format)) return 'bg-pink-500/20 text-pink-400';
+    if (docFormats.includes(format)) return 'bg-blue-500/20 text-blue-400';
+    if (spreadsheetFormats.includes(format)) return 'bg-emerald-500/20 text-emerald-400';
+    if (ebookFormats.includes(format)) return 'bg-amber-500/20 text-amber-400';
+    if (cadFormats.includes(format)) return 'bg-purple-500/20 text-purple-400';
+    return 'bg-slate-500/20 text-slate-400';
+  };
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -177,13 +260,42 @@ export default function Convert() {
           <Sparkles className="w-4 h-4 text-violet-400" />
           <span className="text-sm text-violet-300">Universal File Converter</span>
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-          Convert Any File
+        <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          Convert Any File Format
         </h1>
-        <p className="text-slate-400 max-w-lg mx-auto">
-          Support for 50+ formats including PDF, Office, Images, and more.
-          Powered by AI with enterprise-grade security.
+        <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+          Support for 50+ formats: Documents, Images, E-Books, CAD files, and more
         </p>
+      </motion.div>
+
+      {/* Format Categories */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <div className="flex flex-wrap justify-center gap-3">
+          {Object.entries(formatCategories).map(([key, category]) => {
+            const Icon = category.icon;
+            return (
+              <Badge
+                key={key}
+                variant="outline"
+                className={`px-4 py-2 cursor-pointer transition-all ${
+                  isDark 
+                    ? 'border-slate-700 hover:border-violet-500/50 hover:bg-violet-500/10' 
+                    : 'border-slate-200 hover:border-violet-500/50 hover:bg-violet-50'
+                }`}
+              >
+                <Icon className="w-4 h-4 mr-2 text-violet-400" />
+                <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>{category.label}</span>
+              </Badge>
+            );
+          })}
+        </div>
+        <div className={`mt-4 text-center text-sm ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+          <span className="font-medium">Supported formats:</span> PDF, DOCX, XLSX, PPTX, JPG, PNG, TIFF, BMP, SVG, WebP, EPUB, MOBI, DWG, DXF, AI, EPS, HTML, Markdown, and more
+        </div>
       </motion.div>
 
       {/* Upload Zone */}
@@ -217,23 +329,28 @@ export default function Convert() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ delay: index * 0.05 }}
-                  className="glass-light rounded-2xl p-4"
+                  className={`rounded-2xl p-4 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
                 >
                   <div className="flex items-center gap-4">
                     <FileIcon type={file.file_type} size="md" />
                     
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white truncate">{file.name}</p>
+                      <p className={`font-medium truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{file.name}</p>
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="text-slate-500 uppercase">{file.file_type}</span>
-                        <span className="text-slate-600">•</span>
-                        <span className="text-slate-500">{formatFileSize(file.file_size)}</span>
+                        <Badge className={getFormatBadgeColor(file.file_type)}>
+                          {file.file_type?.toUpperCase()}
+                        </Badge>
+                        <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>
+                          {formatFileSize(file.file_size)}
+                        </span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <ArrowRight className="w-5 h-5 text-slate-500" />
-                      <span className="text-sm font-medium text-violet-400 uppercase">{targetFormat}</span>
+                      <ArrowRight className={`w-5 h-5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                      <Badge className={`${getFormatBadgeColor(targetFormat)} font-semibold`}>
+                        {targetFormat?.toUpperCase()}
+                      </Badge>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -241,24 +358,24 @@ export default function Convert() {
                         <Loader2 className="w-5 h-5 text-violet-400 animate-spin" />
                       )}
                       {status === 'completed' && (
-                        <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                      )}
-                      {status === 'completed' && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-violet-400 hover:text-violet-300"
-                          onClick={() => window.open(file.file_url, '_blank')}
-                        >
-                          <Download className="w-4 h-4 mr-1" />
-                          Download
-                        </Button>
+                        <>
+                          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-violet-400 hover:text-violet-300"
+                            onClick={() => window.open(file.file_url, '_blank')}
+                          >
+                            <Download className="w-4 h-4 mr-1" />
+                            Download
+                          </Button>
+                        </>
                       )}
                       {!status && (
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="text-slate-400 hover:text-red-400"
+                          className={isDark ? 'text-slate-400 hover:text-red-400' : 'text-slate-500 hover:text-red-500'}
                           onClick={() => removeFile(file.id)}
                         >
                           <X className="w-4 h-4" />
@@ -278,19 +395,27 @@ export default function Convert() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-light rounded-2xl p-6 mb-6"
+          className={`rounded-2xl p-6 mb-6 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
         >
           <div className="flex flex-col md:flex-row md:items-center gap-6 mb-6">
             <div className="flex-1">
-              <Label className="text-slate-400 text-sm mb-2 block">Convert to</Label>
+              <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Convert to</Label>
               <Select value={targetFormat} onValueChange={setTargetFormat}>
-                <SelectTrigger className="bg-slate-900 border-slate-700 text-white">
+                <SelectTrigger className={`mt-2 ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700">
+                <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
                   {availableFormats.map(format => (
-                    <SelectItem key={format} value={format} className="text-white hover:bg-slate-800">
-                      {format.toUpperCase()}
+                    <SelectItem 
+                      key={format} 
+                      value={format} 
+                      className={isDark ? 'text-white hover:bg-slate-800' : 'text-slate-900 hover:bg-slate-100'}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Badge className={`${getFormatBadgeColor(format)} text-xs`}>
+                          {format.toUpperCase()}
+                        </Badge>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -319,34 +444,52 @@ export default function Convert() {
           {/* Advanced Options */}
           <Collapsible open={showOptions} onOpenChange={setShowOptions}>
             <CollapsibleTrigger asChild>
-              <button className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+              <button className={`flex items-center gap-2 text-sm transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}>
                 <Settings2 className="w-4 h-4" />
                 Advanced Options
                 <ChevronDown className={`w-4 h-4 transition-transform ${showOptions ? 'rotate-180' : ''}`} />
               </button>
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-4">
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-4 gap-6">
                 <div>
-                  <Label className="text-slate-400 text-sm mb-2 block">Quality</Label>
+                  <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Quality</Label>
                   <Select 
                     value={options.quality} 
                     onValueChange={(v) => setOptions({ ...options, quality: v })}
                   >
-                    <SelectTrigger className="bg-slate-900 border-slate-700 text-white">
+                    <SelectTrigger className={`mt-2 ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-700">
-                      <SelectItem value="low" className="text-white">Low (faster)</SelectItem>
-                      <SelectItem value="medium" className="text-white">Medium</SelectItem>
-                      <SelectItem value="high" className="text-white">High</SelectItem>
-                      <SelectItem value="maximum" className="text-white">Maximum</SelectItem>
+                    <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
+                      <SelectItem value="low" className={isDark ? 'text-white' : 'text-slate-900'}>Low (faster)</SelectItem>
+                      <SelectItem value="medium" className={isDark ? 'text-white' : 'text-slate-900'}>Medium</SelectItem>
+                      <SelectItem value="high" className={isDark ? 'text-white' : 'text-slate-900'}>High</SelectItem>
+                      <SelectItem value="maximum" className={isDark ? 'text-white' : 'text-slate-900'}>Maximum</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>DPI (for images)</Label>
+                  <Select 
+                    value={String(options.dpi)} 
+                    onValueChange={(v) => setOptions({ ...options, dpi: parseInt(v) })}
+                  >
+                    <SelectTrigger className={`mt-2 ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
+                      <SelectItem value="72" className={isDark ? 'text-white' : 'text-slate-900'}>72 DPI (web)</SelectItem>
+                      <SelectItem value="150" className={isDark ? 'text-white' : 'text-slate-900'}>150 DPI</SelectItem>
+                      <SelectItem value="300" className={isDark ? 'text-white' : 'text-slate-900'}>300 DPI (print)</SelectItem>
+                      <SelectItem value="600" className={isDark ? 'text-white' : 'text-slate-900'}>600 DPI (high)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="flex items-center justify-between md:flex-col md:items-start gap-2">
-                  <Label className="text-slate-400 text-sm">Enable OCR</Label>
+                  <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Enable OCR</Label>
                   <Switch
                     checked={options.ocr_enabled}
                     onCheckedChange={(v) => setOptions({ ...options, ocr_enabled: v })}
@@ -354,7 +497,7 @@ export default function Convert() {
                 </div>
 
                 <div className="flex items-center justify-between md:flex-col md:items-start gap-2">
-                  <Label className="text-slate-400 text-sm">Compress Output</Label>
+                  <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Compress Output</Label>
                   <Switch
                     checked={options.compress}
                     onCheckedChange={(v) => setOptions({ ...options, compress: v })}
@@ -371,21 +514,21 @@ export default function Convert() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="flex items-center justify-center gap-6 text-sm text-slate-500"
+        className={`flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm ${isDark ? 'text-slate-500' : 'text-slate-400'}`}
       >
         <div className="flex items-center gap-2">
           <Shield className="w-4 h-4 text-emerald-400" />
           <span>AES-256 Encrypted</span>
         </div>
         <div className="hidden md:block w-px h-4 bg-slate-700" />
-        <div className="hidden md:flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-violet-400" />
           <span>AI-Powered</span>
         </div>
         <div className="hidden md:block w-px h-4 bg-slate-700" />
-        <div className="hidden md:flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <Zap className="w-4 h-4 text-cyan-400" />
-          <span>Sub-100ms Processing</span>
+          <span>50+ Formats</span>
         </div>
       </motion.div>
     </div>
