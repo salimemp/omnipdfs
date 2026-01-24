@@ -18,7 +18,8 @@ export default function FileCard({
   onDelete, 
   onShare, 
   onToggleFavorite,
-  delay = 0 
+  delay = 0,
+  isDark = true 
 }) {
   const formatFileSize = (bytes) => {
     if (!bytes) return 'N/A';
@@ -32,7 +33,7 @@ export default function FileCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay }}
-      className="glass-light rounded-2xl p-4 hover:border-violet-500/30 transition-all group"
+      className={`rounded-2xl p-4 hover:border-violet-500/30 transition-all group ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
     >
       <div className="flex items-start gap-4">
         <FileIcon type={file.file_type} size="lg" />
@@ -40,7 +41,7 @@ export default function FileCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <h4 className="font-medium text-white truncate group-hover:text-violet-300 transition-colors">
+              <h4 className={`font-medium truncate group-hover:text-violet-300 transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {file.name}
               </h4>
               <div className="flex items-center gap-2 mt-1">
