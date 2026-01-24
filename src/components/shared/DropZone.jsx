@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, FileUp, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
-export default function DropZone({ onFileUploaded, acceptedTypes, maxSize = 25 * 1024 * 1024, className = '' }) {
+export default function DropZone({ onFileUploaded, acceptedTypes, maxSize = 25 * 1024 * 1024, className = '', isDark = true }) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -90,7 +90,9 @@ export default function DropZone({ onFileUploaded, acceptedTypes, maxSize = 25 *
           transition-all duration-300 cursor-pointer
           ${isDragging
             ? 'border-violet-500 bg-violet-500/10'
-            : 'border-slate-700 hover:border-violet-500/50 bg-slate-900/50 hover:bg-slate-900/80'
+            : isDark 
+              ? 'border-slate-700 hover:border-violet-500/50 bg-slate-900/50 hover:bg-slate-900/80'
+              : 'border-slate-300 hover:border-violet-500/50 bg-slate-50 hover:bg-slate-100'
           }
         `}
       >
@@ -143,7 +145,7 @@ export default function DropZone({ onFileUploaded, acceptedTypes, maxSize = 25 *
                   )}
                 </div>
               </div>
-              <p className="text-white font-medium">
+              <p className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {uploadProgress === 100 ? 'Upload complete!' : 'Uploading...'}
               </p>
             </motion.div>
@@ -158,7 +160,7 @@ export default function DropZone({ onFileUploaded, acceptedTypes, maxSize = 25 *
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-violet-500/20 flex items-center justify-center">
                 <FileUp className="w-8 h-8 text-violet-400" />
               </div>
-              <p className="text-white font-medium">Drop your files here</p>
+              <p className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>Drop your files here</p>
             </motion.div>
           ) : (
             <motion.div
@@ -171,13 +173,13 @@ export default function DropZone({ onFileUploaded, acceptedTypes, maxSize = 25 *
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center">
                 <Upload className="w-8 h-8 text-violet-400" />
               </div>
-              <p className="text-white font-medium mb-1">
+              <p className={`font-medium mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 Drag & drop files here
               </p>
-              <p className="text-sm text-slate-400">
+              <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                 or click to browse
               </p>
-              <p className="text-xs text-slate-500 mt-2">
+              <p className={`text-xs mt-2 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                 Max file size: {maxSize / 1024 / 1024}MB
               </p>
             </motion.div>
