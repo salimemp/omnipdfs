@@ -5,6 +5,8 @@ import Files from './pages/Files';
 import History from './pages/History';
 import Settings from './pages/Settings';
 import AIAssistant from './pages/AIAssistant';
+import Compare from './pages/Compare';
+import CloudStorage from './pages/CloudStorage';
 import __Layout from './Layout.jsx';
 
 
@@ -16,6 +18,8 @@ export const PAGES = {
     "History": History,
     "Settings": Settings,
     "AIAssistant": AIAssistant,
+    "Compare": Compare,
+    "CloudStorage": CloudStorage,
 }
 
 export const pagesConfig = {
