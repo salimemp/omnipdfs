@@ -144,7 +144,7 @@ export default function History({ theme = 'dark' }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="glass-light rounded-2xl p-5"
+          className={`rounded-2xl p-5 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
         >
           <p className="text-sm text-slate-400 mb-1">Total Actions</p>
           <p className="text-2xl font-bold text-white">{totalFilesProcessed}</p>
@@ -153,7 +153,7 @@ export default function History({ theme = 'dark' }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="glass-light rounded-2xl p-5"
+          className={`rounded-2xl p-5 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
         >
           <p className="text-sm text-slate-400 mb-1">Conversions</p>
           <p className="text-2xl font-bold text-gradient">{completedConversions}</p>
@@ -162,7 +162,7 @@ export default function History({ theme = 'dark' }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="glass-light rounded-2xl p-5"
+          className={`rounded-2xl p-5 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
         >
           <p className="text-sm text-slate-400 mb-1">Uploads</p>
           <p className="text-2xl font-bold text-white">
@@ -173,7 +173,7 @@ export default function History({ theme = 'dark' }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="glass-light rounded-2xl p-5"
+          className={`rounded-2xl p-5 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
         >
           <p className="text-sm text-slate-400 mb-1">Shares</p>
           <p className="text-2xl font-bold text-white">

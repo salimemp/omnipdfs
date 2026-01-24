@@ -238,7 +238,7 @@ export default function PDFTools({ theme = 'dark' }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               onClick={() => setSelectedTool(tool)}
-              className="glass-light rounded-2xl p-6 hover:border-violet-500/30 transition-all cursor-pointer group"
+              className={`rounded-2xl p-6 hover:border-violet-500/30 transition-all cursor-pointer group ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm hover:shadow-md'}`}
             >
               <div className="flex items-start gap-4">
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${tool.color} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
