@@ -7,6 +7,10 @@ import Settings from './pages/Settings';
 import AIAssistant from './pages/AIAssistant';
 import Compare from './pages/Compare';
 import CloudStorage from './pages/CloudStorage';
+import OCR from './pages/OCR';
+import PDFEditor from './pages/PDFEditor';
+import Templates from './pages/Templates';
+import Webhooks from './pages/Webhooks';
 import __Layout from './Layout.jsx';
 
 
@@ -20,6 +24,10 @@ export const PAGES = {
     "AIAssistant": AIAssistant,
     "Compare": Compare,
     "CloudStorage": CloudStorage,
+    "OCR": OCR,
+    "PDFEditor": PDFEditor,
+    "Templates": Templates,
+    "Webhooks": Webhooks,
 }
 
 export const pagesConfig = {
