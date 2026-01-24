@@ -25,8 +25,9 @@ import { Button } from "@/components/ui/button";
 import StatsCard from '@/components/shared/StatsCard';
 import FileCard from '@/components/shared/FileCard';
 
-export default function Dashboard() {
+export default function Dashboard({ theme = 'dark' }) {
   const [user, setUser] = useState(null);
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -116,10 +117,10 @@ export default function Dashboard() {
             <span className="text-sm text-violet-300">Enterprise-grade PDF tools</span>
           </div>
           
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h1 className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Welcome back{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}
           </h1>
-          <p className="text-lg text-slate-400 mb-8">
+          <p className={`text-lg mb-8 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
             Convert, edit, and manage your documents with military-grade security and blazing-fast performance.
           </p>
           
@@ -200,7 +201,7 @@ export default function Dashboard() {
       {/* Quick Actions */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">Quick Actions</h2>
+          <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Quick Actions</h2>
           <Link 
             to={createPageUrl('PDFTools')}
             className="text-sm text-violet-400 hover:text-violet-300 flex items-center gap-1"
@@ -225,7 +226,7 @@ export default function Dashboard() {
                     <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <p className="font-medium text-white text-sm mb-1">{action.name}</p>
+                    <p className={`font-medium text-sm mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{action.name}</p>
                     <p className="text-xs text-slate-500">{action.formats}</p>
                   </div>
                 </Link>
@@ -238,7 +239,7 @@ export default function Dashboard() {
       {/* Recent Files */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">Recent Files</h2>
+          <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Recent Files</h2>
           <Link 
             to={createPageUrl('Files')}
             className="text-sm text-violet-400 hover:text-violet-300 flex items-center gap-1"
@@ -268,8 +269,8 @@ export default function Dashboard() {
             <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center mb-4">
               <FolderOpen className="w-8 h-8 text-violet-400" />
             </div>
-            <h3 className="text-white font-medium mb-2">No files yet</h3>
-            <p className="text-slate-400 text-sm mb-6">Upload your first document to get started</p>
+            <h3 className={`font-medium mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>No files yet</h3>
+            <p className={`text-sm mb-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Upload your first document to get started</p>
             <Link to={createPageUrl('Convert')}>
               <Button className="bg-gradient-to-r from-violet-500 to-cyan-500 text-white">
                 <Zap className="w-4 h-4 mr-2" />
@@ -292,8 +293,8 @@ export default function Dashboard() {
             <Shield className="w-6 h-6 text-emerald-400" />
           </div>
           <div>
-            <p className="font-medium text-white">Zero-Knowledge Security</p>
-            <p className="text-sm text-slate-400">End-to-end encrypted</p>
+            <p className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>Zero-Knowledge Security</p>
+            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>End-to-end encrypted</p>
           </div>
         </div>
         
@@ -302,8 +303,8 @@ export default function Dashboard() {
             <Zap className="w-6 h-6 text-cyan-400" />
           </div>
           <div>
-            <p className="font-medium text-white">Blazing Fast</p>
-            <p className="text-sm text-slate-400">&lt;100ms global latency</p>
+            <p className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>Blazing Fast</p>
+            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>&lt;100ms global latency</p>
           </div>
         </div>
         
@@ -312,8 +313,8 @@ export default function Dashboard() {
             <Clock className="w-6 h-6 text-violet-400" />
           </div>
           <div>
-            <p className="font-medium text-white">99.9% Uptime</p>
-            <p className="text-sm text-slate-400">Enterprise SLA</p>
+            <p className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>99.9% Uptime</p>
+            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Enterprise SLA</p>
           </div>
         </div>
       </motion.div>
