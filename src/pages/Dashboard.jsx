@@ -112,9 +112,9 @@ export default function Dashboard({ theme = 'dark' }) {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-50" />
         
         <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/20 border border-violet-500/30 mb-6">
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${isDark ? 'bg-violet-500/20' : 'bg-violet-100'} border border-violet-500/30 mb-6`}>
             <Sparkles className="w-4 h-4 text-violet-400" />
-            <span className="text-sm text-violet-300">Enterprise-grade PDF tools</span>
+            <span className={`text-sm ${isDark ? 'text-violet-300' : 'text-violet-600'}`}>Enterprise-grade PDF tools</span>
           </div>
           
           <h1 className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -132,7 +132,7 @@ export default function Dashboard({ theme = 'dark' }) {
               </Button>
             </Link>
             <Link to={createPageUrl('PDFTools')}>
-              <Button variant="outline" className="border-slate-700 text-white hover:bg-slate-800 px-6 py-6 text-base rounded-xl">
+              <Button variant="outline" className={`px-6 py-6 text-base rounded-xl ${isDark ? 'border-slate-700 text-white hover:bg-slate-800' : 'border-slate-300 text-slate-900 hover:bg-slate-100'}`}>
                 <Layers className="w-5 h-5 mr-2" />
                 PDF Tools
               </Button>
@@ -222,7 +222,7 @@ export default function Dashboard({ theme = 'dark' }) {
                 transition={{ delay: index * 0.05 }}
               >
                 <Link to={createPageUrl(action.name === 'Merge PDFs' ? 'PDFTools' : 'Convert')}>
-                  <div className="glass-light rounded-2xl p-5 hover:border-violet-500/30 transition-all group cursor-pointer text-center">
+                  <div className={`rounded-2xl p-5 hover:border-violet-500/30 transition-all group cursor-pointer text-center ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}>
                     <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
@@ -264,7 +264,7 @@ export default function Dashboard({ theme = 'dark' }) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="glass-light rounded-2xl p-12 text-center"
+            className={`rounded-2xl p-12 text-center ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
           >
             <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center mb-4">
               <FolderOpen className="w-8 h-8 text-violet-400" />
@@ -288,7 +288,7 @@ export default function Dashboard({ theme = 'dark' }) {
         transition={{ delay: 0.5 }}
         className="grid md:grid-cols-3 gap-4"
       >
-        <div className="glass-light rounded-2xl p-6 flex items-center gap-4">
+        <div className={`rounded-2xl p-6 flex items-center gap-4 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}>
           <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
             <Shield className="w-6 h-6 text-emerald-400" />
           </div>
@@ -298,7 +298,7 @@ export default function Dashboard({ theme = 'dark' }) {
           </div>
         </div>
         
-        <div className="glass-light rounded-2xl p-6 flex items-center gap-4">
+        <div className={`rounded-2xl p-6 flex items-center gap-4 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}>
           <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center shrink-0">
             <Zap className="w-6 h-6 text-cyan-400" />
           </div>
@@ -308,7 +308,7 @@ export default function Dashboard({ theme = 'dark' }) {
           </div>
         </div>
         
-        <div className="glass-light rounded-2xl p-6 flex items-center gap-4">
+        <div className={`rounded-2xl p-6 flex items-center gap-4 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}>
           <div className="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center shrink-0">
             <Clock className="w-6 h-6 text-violet-400" />
           </div>
