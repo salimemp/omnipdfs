@@ -34,7 +34,11 @@ import {
   Underline,
   Palette,
   Move,
-  MousePointer2
+  MousePointer2,
+  Sparkles,
+  Wand2,
+  Loader2,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,6 +71,7 @@ const tools = [
   { id: 'stamp', icon: Stamp, label: 'Stamp', shortcut: 'P' },
   { id: 'signature', icon: Signature, label: 'Signature', shortcut: 'G' },
   { id: 'eraser', icon: Eraser, label: 'Eraser', shortcut: 'E' },
+  { id: 'ai', icon: Sparkles, label: 'AI Tools', shortcut: 'A' },
 ];
 
 const shapes = [
@@ -109,6 +114,8 @@ export default function PDFEditor({ theme = 'dark' }) {
     italic: false,
     underline: false,
   });
+  const [aiProcessing, setAiProcessing] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState(null);
 
   const isDark = theme === 'dark';
   const queryClient = useQueryClient();
@@ -536,6 +543,80 @@ export default function PDFEditor({ theme = 'dark' }) {
                       </Button>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* AI Tools */}
+              {activeTool === 'ai' && (
+                <div className="space-y-3">
+                  <Label className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>AI Features</Label>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`w-full justify-start ${isDark ? 'border-slate-700' : ''}`}
+                    disabled={aiProcessing}
+                    onClick={async () => {
+                      setAiProcessing(true);
+                      try {
+                        const response = await base44.integrations.Core.InvokeLLM({
+                          prompt: `Suggest 3 professional improvements for a PDF document that currently has ${elements.length} annotations. Be concise.`,
+                          response_json_schema: {
+                            type: "object",
+                            properties: {
+                              suggestions: { type: "array", items: { type: "string" } }
+                            }
+                          }
+                        });
+                        setAiSuggestion(response.suggestions);
+                        toast.success('AI suggestions ready');
+                      } catch (e) {
+                        toast.error('AI processing failed');
+                      }
+                      setAiProcessing(false);
+                    }}
+                  >
+                    {aiProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Wand2 className="w-4 h-4 mr-2" />}
+                    Get Suggestions
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`w-full justify-start ${isDark ? 'border-slate-700' : ''}`}
+                    disabled={aiProcessing}
+                    onClick={async () => {
+                      setAiProcessing(true);
+                      try {
+                        const response = await base44.integrations.Core.InvokeLLM({
+                          prompt: 'Generate a brief professional summary text (2-3 sentences) that could be added to a business document.',
+                          response_json_schema: {
+                            type: "object",
+                            properties: {
+                              text: { type: "string" }
+                            }
+                          }
+                        });
+                        addElement('text', { content: response.text, width: 300, height: 60 });
+                        toast.success('AI text added to document');
+                      } catch (e) {
+                        toast.error('AI generation failed');
+                      }
+                      setAiProcessing(false);
+                    }}
+                  >
+                    {aiProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <MessageSquare className="w-4 h-4 mr-2" />}
+                    Generate Text
+                  </Button>
+
+                  {aiSuggestion && (
+                    <div className={`mt-3 p-3 rounded-lg ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}>
+                      <p className={`text-xs font-medium mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>AI Suggestions:</p>
+                      <ul className="space-y-1">
+                        {aiSuggestion.map((s, i) => (
+                          <li key={i} className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>• {s}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
