@@ -200,9 +200,9 @@ export default function OCR({ theme = 'dark' }) {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-10"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6">
+        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${isDark ? 'bg-violet-500/10' : 'bg-violet-100'} border border-violet-500/20 mb-6`}>
           <ScanText className="w-4 h-4 text-violet-400" />
-          <span className="text-sm text-violet-300">Advanced OCR Engine</span>
+          <span className={`text-sm ${isDark ? 'text-violet-300' : 'text-violet-600'}`}>Advanced OCR Engine</span>
         </div>
         <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
           Intelligent Text Recognition

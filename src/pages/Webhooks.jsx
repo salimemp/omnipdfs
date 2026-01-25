@@ -206,7 +206,7 @@ export default function Webhooks({ theme = 'dark' }) {
             className={`p-4 rounded-2xl ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
           >
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-700 flex items-center justify-center`}>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-gradient-to-br from-slate-800 to-slate-700' : 'bg-slate-100'}`}>
                 <item.icon className={`w-5 h-5 ${item.color}`} />
               </div>
               <div>
@@ -268,12 +268,12 @@ export default function Webhooks({ theme = 'dark' }) {
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {webhook.events?.slice(0, 3).map((event) => (
-                        <Badge key={event} variant="outline" className={`text-xs ${isDark ? 'border-slate-600' : ''}`}>
+                        <Badge key={event} variant="outline" className={`text-xs ${isDark ? 'border-slate-600 text-slate-300' : 'text-slate-600'}`}>
                           {event}
                         </Badge>
                       ))}
                       {webhook.events?.length > 3 && (
-                        <Badge variant="outline" className={isDark ? 'border-slate-600' : ''}>
+                        <Badge variant="outline" className={`${isDark ? 'border-slate-600 text-slate-300' : 'text-slate-600'}`}>
                           +{webhook.events.length - 3}
                         </Badge>
                       )}
