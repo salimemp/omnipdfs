@@ -69,6 +69,18 @@ const defaultTemplates = [
   { id: 6, name: 'Achievement Certificate', category: 'certificate', description: 'Award and recognition certificate', usage_count: 780, is_public: true },
   { id: 7, name: 'Application Form', category: 'form', description: 'Multi-purpose application form', usage_count: 560, is_public: true },
   { id: 8, name: 'NDA Agreement', category: 'contract', description: 'Non-disclosure agreement template', usage_count: 1100, is_public: true },
+  { id: 9, name: 'Employee Onboarding Form', category: 'form', description: 'New hire registration and information form', usage_count: 920, is_public: true },
+  { id: 10, name: 'Expense Report Form', category: 'form', description: 'Business expense claim template', usage_count: 1450, is_public: true },
+  { id: 11, name: 'Customer Feedback Form', category: 'form', description: 'Survey and feedback collection form', usage_count: 830, is_public: true },
+  { id: 12, name: 'Leave Request Form', category: 'form', description: 'Employee vacation/leave application', usage_count: 1200, is_public: true },
+  { id: 13, name: 'Purchase Order Form', category: 'form', description: 'Vendor purchase order template', usage_count: 980, is_public: true },
+  { id: 14, name: 'Medical History Form', category: 'form', description: 'Patient health information form', usage_count: 670, is_public: true },
+  { id: 15, name: 'Event Registration Form', category: 'form', description: 'Conference/event signup form', usage_count: 1100, is_public: true },
+  { id: 16, name: 'Job Application Form', category: 'form', description: 'Employment application template', usage_count: 1890, is_public: true },
+  { id: 17, name: 'Freelance Contract', category: 'contract', description: 'Independent contractor agreement', usage_count: 1340, is_public: true },
+  { id: 18, name: 'Sales Proposal', category: 'report', description: 'Client sales pitch document', usage_count: 760, is_public: true },
+  { id: 19, name: 'Meeting Minutes', category: 'report', description: 'Meeting notes and action items', usage_count: 540, is_public: true },
+  { id: 20, name: 'Project Proposal', category: 'report', description: 'Project planning document', usage_count: 890, is_public: true },
 ];
 
 export default function Templates({ theme = 'dark' }) {
@@ -277,7 +289,7 @@ export default function Templates({ theme = 'dark' }) {
                     {template.description}
                   </p>
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className={isDark ? 'border-slate-700' : ''}>
+                    <Badge variant="outline" className={isDark ? 'border-slate-700 text-slate-300' : 'text-slate-700'}>
                       {categories.find(c => c.id === template.category)?.label || 'Custom'}
                     </Badge>
                     {template.usage_count > 0 && (

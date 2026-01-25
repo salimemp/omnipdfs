@@ -220,9 +220,9 @@ Be specific and actionable.`;
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-10"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6">
+        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${isDark ? 'bg-violet-500/10' : 'bg-violet-100'} border border-violet-500/20 mb-6`}>
           <Brain className="w-4 h-4 text-violet-400" />
-          <span className="text-sm text-violet-300">Powered by Gemini AI</span>
+          <span className={`text-sm ${isDark ? 'text-violet-300' : 'text-violet-600'}`}>Powered by Gemini AI</span>
         </div>
         <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
           AI Document Assistant
@@ -531,7 +531,7 @@ Be specific and actionable.`;
                         <h4 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Main Topics</h4>
                         <div className="flex flex-wrap gap-2">
                           {result.data.main_topics.map((topic, i) => (
-                            <Badge key={i} variant="secondary" className="bg-violet-500/20 text-violet-300">
+                            <Badge key={i} variant="secondary" className={`${isDark ? 'bg-violet-500/20 text-violet-300' : 'bg-violet-100 text-violet-700'}`}>
                               {topic}
                             </Badge>
                           ))}
@@ -558,7 +558,7 @@ Be specific and actionable.`;
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-2">
                       {result.data.tags?.map((tag, i) => (
-                        <Badge key={i} className="bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 cursor-pointer">
+                        <Badge key={i} className={`${isDark ? 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'} cursor-pointer`}>
                           <Tags className="w-3 h-3 mr-1" />
                           {tag}
                         </Badge>
