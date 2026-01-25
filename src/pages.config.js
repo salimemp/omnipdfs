@@ -13,6 +13,10 @@ import Templates from './pages/Templates';
 import Webhooks from './pages/Webhooks';
 import AIDocGenerator from './pages/AIDocGenerator';
 import Collaboration from './pages/Collaboration';
+import FormFiller from './pages/FormFiller';
+import Analytics from './pages/Analytics';
+import APIDocs from './pages/APIDocs';
+import TranslationMemory from './pages/TranslationMemory';
 import __Layout from './Layout.jsx';
 
 
@@ -32,6 +36,10 @@ export const PAGES = {
     "Webhooks": Webhooks,
     "AIDocGenerator": AIDocGenerator,
     "Collaboration": Collaboration,
+    "FormFiller": FormFiller,
+    "Analytics": Analytics,
+    "APIDocs": APIDocs,
+    "TranslationMemory": TranslationMemory,
 }
 
 export const pagesConfig = {
