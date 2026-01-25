@@ -20,7 +20,13 @@ import {
   X,
   Search,
   Filter,
-  Plus
+  Plus,
+  AtSign,
+  Bell,
+  GitBranch,
+  Link2,
+  Video,
+  Calendar
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +70,15 @@ const statusConfig = {
   approved: { label: 'Approved', color: 'bg-emerald-500/20 text-emerald-400' },
   published: { label: 'Published', color: 'bg-blue-500/20 text-blue-400' },
 };
+
+const quickActions = [
+  { icon: AtSign, label: 'Mention', description: 'Tag team members' },
+  { icon: Bell, label: 'Notify', description: 'Send notifications' },
+  { icon: GitBranch, label: 'Version', description: 'Create version' },
+  { icon: Link2, label: 'Share Link', description: 'Copy share link' },
+  { icon: Video, label: 'Meet', description: 'Start video call' },
+  { icon: Calendar, label: 'Schedule', description: 'Set deadline' },
+];
 
 export default function Collaboration({ theme = 'dark' }) {
   const [user, setUser] = useState(null);
@@ -215,6 +230,27 @@ export default function Collaboration({ theme = 'dark' }) {
           </motion.div>
         ))}
       </div>
+
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`rounded-2xl p-4 mb-8 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
+      >
+        <h3 className={`text-sm font-medium mb-3 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Quick Actions</h3>
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+          {quickActions.map((action, i) => (
+            <button
+              key={i}
+              onClick={() => toast.info(`${action.label}: ${action.description}`)}
+              className={`p-3 rounded-xl text-center transition-all hover:scale-105 ${isDark ? 'bg-slate-800/50 hover:bg-slate-800' : 'bg-slate-50 hover:bg-slate-100'}`}
+            >
+              <action.icon className={`w-5 h-5 mx-auto mb-1 ${isDark ? 'text-violet-400' : 'text-violet-500'}`} />
+              <p className={`text-xs font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{action.label}</p>
+            </button>
+          ))}
+        </div>
+      </motion.div>
 
       {/* Collaboration Cards */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
