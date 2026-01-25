@@ -56,21 +56,21 @@ export default function FileCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="shrink-0 text-slate-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  className={`shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
                 >
                   <MoreHorizontal className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-slate-900 border-slate-700">
-                <DropdownMenuItem onClick={() => onDownload?.(file)} className="text-slate-300 focus:text-white focus:bg-slate-800">
+              <DropdownMenuContent align="end" className={`w-48 ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
+                <DropdownMenuItem onClick={() => onDownload?.(file)} className={isDark ? 'text-slate-300 focus:text-white focus:bg-slate-800' : 'text-slate-700 focus:text-slate-900 focus:bg-slate-100'}>
                   <Download className="w-4 h-4 mr-2" />
                   Download
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onShare?.(file)} className="text-slate-300 focus:text-white focus:bg-slate-800">
+                <DropdownMenuItem onClick={() => onShare?.(file)} className={isDark ? 'text-slate-300 focus:text-white focus:bg-slate-800' : 'text-slate-700 focus:text-slate-900 focus:bg-slate-100'}>
                   <Share2 className="w-4 h-4 mr-2" />
                   Share
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onToggleFavorite?.(file)} className="text-slate-300 focus:text-white focus:bg-slate-800">
+                <DropdownMenuItem onClick={() => onToggleFavorite?.(file)} className={isDark ? 'text-slate-300 focus:text-white focus:bg-slate-800' : 'text-slate-700 focus:text-slate-900 focus:bg-slate-100'}>
                   {file.is_favorite ? (
                     <>
                       <StarOff className="w-4 h-4 mr-2" />
@@ -83,7 +83,7 @@ export default function FileCard({
                     </>
                   )}
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-slate-700" />
+                <DropdownMenuSeparator className={isDark ? 'bg-slate-700' : 'bg-slate-200'} />
                 <DropdownMenuItem onClick={() => onDelete?.(file)} className="text-red-400 focus:text-red-300 focus:bg-red-500/10">
                   <Trash2 className="w-4 h-4 mr-2" />
                   Delete
