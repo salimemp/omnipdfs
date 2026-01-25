@@ -171,6 +171,7 @@ export default function Dashboard({ theme = 'dark' }) {
           icon={FolderOpen}
           gradient="from-violet-500/20 to-violet-600/20"
           delay={0.1}
+          isDark={isDark}
         />
         <StatsCard
           title="Conversions"
@@ -179,6 +180,7 @@ export default function Dashboard({ theme = 'dark' }) {
           icon={Zap}
           gradient="from-cyan-500/20 to-cyan-600/20"
           delay={0.2}
+          isDark={isDark}
         />
         <StatsCard
           title="Storage Used"
@@ -187,6 +189,7 @@ export default function Dashboard({ theme = 'dark' }) {
           icon={TrendingUp}
           gradient="from-emerald-500/20 to-emerald-600/20"
           delay={0.3}
+          isDark={isDark}
         />
         <StatsCard
           title="Security"
@@ -195,6 +198,7 @@ export default function Dashboard({ theme = 'dark' }) {
           icon={Shield}
           gradient="from-amber-500/20 to-amber-600/20"
           delay={0.4}
+          isDark={isDark}
         />
       </div>
 
@@ -257,6 +261,7 @@ export default function Dashboard({ theme = 'dark' }) {
                 file={file}
                 delay={index * 0.05}
                 onDownload={(f) => window.open(f.file_url, '_blank')}
+                isDark={isDark}
               />
             ))}
           </div>
