@@ -24,7 +24,9 @@ import {
   ScanText,
   LayoutTemplate,
   Webhook,
-  PenTool
+  PenTool,
+  Wand2,
+  Users
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -63,8 +65,10 @@ export default function Layout({ children, currentPageName }) {
     { name: 'PDF Editor', page: 'PDFEditor', icon: PenTool },
     { name: 'OCR', page: 'OCR', icon: ScanText },
     { name: 'Templates', page: 'Templates', icon: LayoutTemplate },
+    { name: 'AI Generator', page: 'AIDocGenerator', icon: Wand2 },
     { name: 'Compare PDFs', page: 'Compare', icon: GitCompare },
     { name: 'AI Assistant', page: 'AIAssistant', icon: Sparkles },
+    { name: 'Collaboration', page: 'Collaboration', icon: Users },
     { name: 'Cloud Storage', page: 'CloudStorage', icon: Cloud },
     { name: 'My Files', page: 'Files', icon: FolderOpen },
     { name: 'History', page: 'History', icon: History },
