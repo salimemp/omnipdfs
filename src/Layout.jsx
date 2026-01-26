@@ -35,6 +35,45 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AccessibilityPanel from '@/components/shared/AccessibilityPanel';
 
 export default function Layout({ children, currentPageName }) {
+  // SEO Metadata
+  useEffect(() => {
+    const metadata = {
+      title: 'OmniPDF - Enterprise PDF Management & Conversion Platform',
+      description: 'Convert, edit, and manage PDFs with AI-powered tools. GDPR, HIPAA, SOC 2 compliant. 50+ file formats, real-time collaboration, OCR, and more.',
+      keywords: 'PDF converter, PDF editor, document management, AI PDF tools, GDPR compliant, HIPAA compliant, PDF to Word, merge PDF, compress PDF',
+      ogTitle: 'OmniPDF - Professional PDF Tools with AI',
+      ogDescription: 'Enterprise-grade PDF management with AI assistance, collaboration, and compliance',
+      ogImage: 'https://omnipdf.com/og-image.png',
+    };
+
+    document.title = metadata.title;
+    
+    const metaTags = [
+      { name: 'description', content: metadata.description },
+      { name: 'keywords', content: metadata.keywords },
+      { property: 'og:title', content: metadata.ogTitle },
+      { property: 'og:description', content: metadata.ogDescription },
+      { property: 'og:image', content: metadata.ogImage },
+      { property: 'og:type', content: 'website' },
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: metadata.ogTitle },
+      { name: 'twitter:description', content: metadata.ogDescription },
+      { name: 'robots', content: 'index, follow' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1.0' },
+    ];
+
+    metaTags.forEach(({ name, property, content }) => {
+      const selector = name ? `meta[name="${name}"]` : `meta[property="${property}"]`;
+      let tag = document.querySelector(selector);
+      if (!tag) {
+        tag = document.createElement('meta');
+        if (name) tag.setAttribute('name', name);
+        if (property) tag.setAttribute('property', property);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute('content', content);
+    });
+  }, []);
   const [user, setUser] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(() => {
@@ -72,6 +111,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Compare PDFs', page: 'Compare', icon: GitCompare },
     { name: 'AI Assistant', page: 'AIAssistant', icon: Sparkles },
     { name: 'Collaboration', page: 'Collaboration', icon: Users },
+    { name: 'Legal Docs', page: 'LegalDocs', icon: Shield },
     { name: 'Translation', page: 'TranslationMemory', icon: Cloud },
     { name: 'My Files', page: 'Files', icon: FolderOpen },
     { name: 'Analytics', page: 'Analytics', icon: History },

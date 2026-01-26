@@ -74,28 +74,37 @@ export default function AIToolsPanel({
     
     try {
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are a document improvement assistant. Respond in ${lang}.
+        prompt: `You are an advanced PDF editing AI assistant. Respond in ${lang}.
         
-Analyze a PDF document with ${elements.length} annotations and suggest 3-5 professional improvements.
-Focus on:
-- Layout and visual hierarchy
-- Content organization
-- Professional appearance
-- Accessibility considerations
+Analyze a PDF document with ${elements.length} elements and provide:
+1. 5 specific improvement suggestions
+2. Accessibility enhancements (WCAG 2.1 AA compliance)
+3. Professional design recommendations
+4. Content optimization tips
+5. Layout efficiency improvements
 
-Provide actionable, specific suggestions.`,
+Consider:
+- Visual hierarchy and spacing
+- Color contrast and readability  
+- Typography and font usage
+- Element positioning and alignment
+- Content clarity and structure
+- Mobile responsiveness
+- Print optimization`,
         response_json_schema: {
           type: "object",
           properties: {
             suggestions: { type: "array", items: { type: "string" } },
-            priority: { type: "string" }
+            accessibility_tips: { type: "array", items: { type: "string" } },
+            design_score: { type: "number" },
+            priority_areas: { type: "array", items: { type: "string" } }
           }
         }
       });
       
-      setSuggestions(response.suggestions);
-      onSuggestionsReady?.(response.suggestions);
-      toast.success('AI suggestions ready');
+      setSuggestions([...response.suggestions, ...response.accessibility_tips].slice(0, 7));
+      onSuggestionsReady?.(response);
+      toast.success(`AI analysis complete (Score: ${response.design_score}/10)`);
     } catch (e) {
       toast.error('AI processing failed');
     }
