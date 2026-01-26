@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import StatsCard from '@/components/shared/StatsCard';
 import FileCard from '@/components/shared/FileCard';
+import ComplianceWidget from '@/components/compliance/ComplianceWidget';
 
 export default function Dashboard({ theme = 'dark' }) {
   const [user, setUser] = useState(null);
@@ -265,6 +266,9 @@ export default function Dashboard({ theme = 'dark' }) {
           </motion.div>
         )}
       </div>
+
+      {/* Compliance Widget */}
+      <ComplianceWidget isDark={isDark} />
 
       {/* Features Banner */}
       <motion.div
