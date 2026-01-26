@@ -76,14 +76,14 @@ const statusConfig = {
 };
 
 const quickActions = [
-  { icon: AtSign, label: 'Mention', description: 'Tag team members' },
-  { icon: Bell, label: 'Notify', description: 'Send notifications' },
-  { icon: GitBranch, label: 'Version', description: 'Create version' },
-  { icon: Link2, label: 'Share Link', description: 'Copy share link' },
-  { icon: Video, label: 'Meet', description: 'Start video call' },
-  { icon: Calendar, label: 'Schedule', description: 'Set deadline' },
-  { icon: Sparkles, label: 'AI Analyze', description: 'Analyze document' },
-  { icon: BarChart3, label: 'Insights', description: 'View insights' },
+  { icon: AtSign, label: 'Mention', description: 'Tag team members', action: 'mention' },
+  { icon: Bell, label: 'Notify', description: 'Send notifications', action: 'notify' },
+  { icon: GitBranch, label: 'Version', description: 'Create version', action: 'version' },
+  { icon: Link2, label: 'Share Link', description: 'Copy share link', action: 'share' },
+  { icon: Video, label: 'Meet', description: 'Start video call', action: 'video' },
+  { icon: Calendar, label: 'Schedule', description: 'Set deadline', action: 'schedule' },
+  { icon: Sparkles, label: 'AI Analyze', description: 'Analyze document', action: 'analyze' },
+  { icon: CheckCircle2, label: 'Auto-Assign', description: 'AI task assignment', action: 'assign' },
 ];
 
 export default function Collaboration({ theme = 'dark' }) {
@@ -226,6 +226,53 @@ export default function Collaboration({ theme = 'dark' }) {
     toast.success(`Status updated to ${statusConfig[newStatus].label}`);
   };
 
+  const autoAssignTasks = async (collab) => {
+    setAiAnalyzing(true);
+    
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Based on a collaboration with ${collab.collaborators?.length || 0} team members and ${collab.comments?.length || 0} comments, suggest 3-5 specific action items and who should handle them.`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            tasks: { 
+              type: "array", 
+              items: { 
+                type: "object",
+                properties: {
+                  task: { type: "string" },
+                  assignee_role: { type: "string" },
+                  priority: { type: "string" }
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      const taskComment = {
+        id: Date.now().toString(),
+        author: 'AI Assistant',
+        content: `📋 Suggested Tasks:\n${response.tasks.map((t, i) => `${i + 1}. ${t.task} (${t.assignee_role}) - Priority: ${t.priority}`).join('\n')}`,
+        created_at: new Date().toISOString(),
+        resolved: false
+      };
+
+      const existingCollab = collaborations.find(c => c.id === collab.id);
+      await updateCollabMutation.mutateAsync({
+        id: collab.id,
+        data: {
+          comments: [...(existingCollab?.comments || []), taskComment]
+        }
+      });
+
+      toast.success('AI assigned tasks');
+    } catch (e) {
+      toast.error('Task assignment failed');
+    }
+    setAiAnalyzing(false);
+  };
+
   const getDocumentName = (docId) => {
     return documents.find(d => d.id === docId)?.name || 'Unknown Document';
   };
@@ -280,16 +327,18 @@ export default function Collaboration({ theme = 'dark' }) {
             <button
               key={i}
               onClick={() => {
-                if (action.label === 'AI Analyze' && collaborations.length > 0) {
+                if (action.action === 'analyze' && collaborations.length > 0) {
                   analyzeDocumentWithAI(collaborations[0]);
+                } else if (action.action === 'assign' && collaborations.length > 0) {
+                  autoAssignTasks(collaborations[0]);
                 } else {
                   toast.info(`${action.label}: ${action.description}`);
                 }
               }}
-              disabled={action.label === 'AI Analyze' && aiAnalyzing}
+              disabled={(action.action === 'analyze' || action.action === 'assign') && aiAnalyzing}
               className={`p-3 rounded-xl text-center transition-all hover:scale-105 ${isDark ? 'bg-slate-800/50 hover:bg-slate-800' : 'bg-slate-50 hover:bg-slate-100'} ${action.label === 'AI Analyze' ? 'bg-gradient-to-br from-violet-500/10 to-cyan-500/10' : ''}`}
             >
-              {action.label === 'AI Analyze' && aiAnalyzing ? (
+              {(action.action === 'analyze' || action.action === 'assign') && aiAnalyzing ? (
                 <Loader2 className="w-5 h-5 mx-auto mb-1 text-violet-400 animate-spin" />
               ) : (
                 <action.icon className={`w-5 h-5 mx-auto mb-1 ${isDark ? 'text-violet-400' : 'text-violet-500'}`} />

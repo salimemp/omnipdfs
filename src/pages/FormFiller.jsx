@@ -130,6 +130,61 @@ export default function FormFiller({ theme = 'dark' }) {
     setAiProcessing(false);
   };
 
+  const extractDataFromPDF = async () => {
+    if (!uploadedPdf || !selectedForm) {
+      toast.error('Upload a PDF and select a form first');
+      return;
+    }
+
+    setAiProcessing(true);
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Extract data from this PDF that matches these form fields: ${selectedForm.fields.map(f => f.label).join(', ')}. Return structured data.`,
+        response_json_schema: {
+          type: "object",
+          properties: selectedForm.fields.reduce((acc, field) => {
+            acc[field.id] = { type: field.type === 'checkbox' ? 'boolean' : field.type === 'number' ? 'number' : 'string' };
+            return acc;
+          }, {})
+        },
+        file_urls: uploadedPdf.file_url ? [uploadedPdf.file_url] : undefined
+      });
+      
+      setFormData(response);
+      toast.success('Extracted data from PDF');
+    } catch (e) {
+      toast.error('Data extraction failed');
+    }
+    setAiProcessing(false);
+  };
+
+  const validateFormData = () => {
+    if (!selectedForm) return true;
+    
+    const errors = [];
+    selectedForm.fields.forEach(field => {
+      const value = formData[field.id];
+      
+      if (field.required && (!value || value === '')) {
+        errors.push(`${field.label} is required`);
+      }
+      
+      if (value && field.type === 'email' && !value.includes('@')) {
+        errors.push(`${field.label} must be a valid email`);
+      }
+      
+      if (value && field.type === 'phone' && value.length < 10) {
+        errors.push(`${field.label} must be a valid phone number`);
+      }
+    });
+    
+    if (errors.length > 0) {
+      toast.error(errors[0]);
+      return false;
+    }
+    return true;
+  };
+
   const handleFieldChange = (fieldId, value) => {
     setFormData(prev => ({ ...prev, [fieldId]: value }));
   };
@@ -137,13 +192,7 @@ export default function FormFiller({ theme = 'dark' }) {
   const handleSubmit = async () => {
     if (!selectedForm) return;
 
-    const requiredFields = selectedForm.fields.filter(f => f.required);
-    const missingFields = requiredFields.filter(f => !formData[f.id]);
-
-    if (missingFields.length > 0) {
-      toast.error(`Please fill in: ${missingFields.map(f => f.label).join(', ')}`);
-      return;
-    }
+    if (!validateFormData()) return;
 
     toast.success('Form submitted successfully!');
     await base44.entities.ActivityLog.create({
@@ -311,6 +360,18 @@ export default function FormFiller({ theme = 'dark' }) {
                     {aiProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Wand2 className="w-4 h-4 mr-2 text-violet-400" />}
                     AI Fill
                   </Button>
+                  {uploadedPdf && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={extractDataFromPDF}
+                      disabled={aiProcessing}
+                      className={`${isDark ? 'border-slate-700' : ''}`}
+                    >
+                      {aiProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                      Extract
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"

@@ -168,6 +168,58 @@ Keep it professional and under 100 words.`,
     setProcessing(false);
   };
 
+  const rewriteContent = async (tone = 'professional') => {
+    if (elements.length === 0) {
+      toast.error('No content to rewrite');
+      return;
+    }
+    
+    setProcessing(true);
+    const lang = getPromptLanguage();
+    const textElements = elements.filter(e => e.type === 'text').map(e => e.content).join(' ');
+    
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Rewrite this text in a ${tone} tone, in ${lang}. Improve clarity, grammar, and flow while maintaining the core message: "${textElements.slice(0, 500)}"`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            rewritten_text: { type: "string" }
+          }
+        }
+      });
+      
+      onAddElement?.('text', { content: response.rewritten_text, width: 400, height: 100 });
+      toast.success('Content rewritten');
+    } catch (e) {
+      toast.error('Rewrite failed');
+    }
+    setProcessing(false);
+  };
+
+  const autoFormat = async () => {
+    setProcessing(true);
+    
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Suggest optimal formatting for a document with ${elements.length} elements. Provide specific positioning and styling recommendations.`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            formatting_tips: { type: "array", items: { type: "string" } },
+            grid_layout: { type: "string" }
+          }
+        }
+      });
+      
+      setSuggestions(response.formatting_tips || ['Use consistent spacing', 'Align elements to grid', 'Group related content']);
+      toast.success('Formatting suggestions ready');
+    } catch (e) {
+      toast.error('Auto-format failed');
+    }
+    setProcessing(false);
+  };
+
   return (
     <div className="space-y-4" role="region" aria-label="AI Tools">
       <Label className={`text-sm flex items-center gap-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
@@ -208,7 +260,7 @@ Keep it professional and under 100 words.`,
           aria-label="Get AI suggestions for document improvements"
         >
           {processing ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Wand2 className="w-3 h-3 mr-1" />}
-          Suggest
+          Analyze
         </Button>
         <Button
           variant="outline"
@@ -220,6 +272,26 @@ Keep it professional and under 100 words.`,
         >
           {processing ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <FileText className="w-3 h-3 mr-1" />}
           Summary
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`text-xs ${isDark ? 'border-slate-700' : ''}`}
+          disabled={processing}
+          onClick={() => rewriteContent('professional')}
+        >
+          {processing ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <MessageSquare className="w-3 h-3 mr-1" />}
+          Rewrite
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`text-xs ${isDark ? 'border-slate-700' : ''}`}
+          disabled={processing}
+          onClick={autoFormat}
+        >
+          {processing ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1" />}
+          Format
         </Button>
       </div>
 
