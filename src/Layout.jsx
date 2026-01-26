@@ -26,11 +26,13 @@ import {
   Webhook,
   PenTool,
   Wand2,
-  Users
+  Users,
+  Accessibility
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from 'framer-motion';
+import AccessibilityPanel from '@/components/shared/AccessibilityPanel';
 
 export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
@@ -136,11 +138,13 @@ export default function Layout({ children, currentPageName }) {
             <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>OmniPDF</span>
           </div>
           <div className="flex items-center gap-2">
+            <AccessibilityPanel isDark={isDark} />
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
               className={isDark ? 'text-slate-400' : 'text-slate-600'}
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </Button>
@@ -149,6 +153,8 @@ export default function Layout({ children, currentPageName }) {
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className={isDark ? 'text-slate-400' : 'text-slate-600'}
+              aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={sidebarOpen}
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
@@ -193,14 +199,18 @@ export default function Layout({ children, currentPageName }) {
                   </div>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleTheme}
-                className={`hidden lg:flex ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
-              >
-                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </Button>
+              <div className="hidden lg:flex items-center gap-1">
+                <AccessibilityPanel isDark={isDark} />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTheme}
+                  className={isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}
+                  aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                >
+                  {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </Button>
+              </div>
             </div>
           </div>
 
