@@ -132,7 +132,7 @@ export default function Dashboard({ theme = 'dark' }) {
               </Button>
             </Link>
             <Link to={createPageUrl('PDFTools')}>
-              <Button variant="outline" className={`px-6 py-6 text-base rounded-xl ${isDark ? 'border-slate-700 text-white hover:bg-slate-800' : 'border-slate-300 text-slate-900 hover:bg-slate-100'}`}>
+              <Button variant="outline" className={`px-6 py-6 text-base rounded-xl ${isDark ? 'border-slate-700 text-white hover:bg-slate-800' : 'border-slate-300 text-slate-700 bg-white hover:bg-slate-100'}`}>
                 <Layers className="w-5 h-5 mr-2" />
                 PDF Tools
               </Button>
@@ -140,27 +140,7 @@ export default function Dashboard({ theme = 'dark' }) {
           </div>
         </div>
 
-        {/* Floating Elements */}
-        <div className="hidden lg:block absolute right-12 top-1/2 -translate-y-1/2">
-          <motion.div
-            animate={{ y: [0, -10, 0], rotate: [0, 2, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="w-64 h-80 rounded-2xl glass p-6 glow"
-          >
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 mb-4 flex items-center justify-center">
-              <FileText className="w-6 h-6 text-white" />
-            </div>
-            <div className="h-3 bg-slate-700 rounded-full w-3/4 mb-3" />
-            <div className="h-3 bg-slate-700 rounded-full w-1/2 mb-6" />
-            <div className="space-y-2">
-              <div className="h-2 bg-slate-700/50 rounded w-full" />
-              <div className="h-2 bg-slate-700/50 rounded w-full" />
-              <div className="h-2 bg-slate-700/50 rounded w-4/5" />
-              <div className="h-2 bg-slate-700/50 rounded w-full" />
-              <div className="h-2 bg-slate-700/50 rounded w-3/5" />
-            </div>
-          </motion.div>
-        </div>
+
       </motion.div>
 
       {/* Stats Grid */}
