@@ -19,7 +19,10 @@ import {
   ToggleLeft,
   List,
   Upload,
-  Eye
+  Eye,
+  Sparkles,
+  Loader2,
+  Wand2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,8 +101,34 @@ export default function FormFiller({ theme = 'dark' }) {
   const [formData, setFormData] = useState({});
   const [showPreview, setShowPreview] = useState(false);
   const [uploadedPdf, setUploadedPdf] = useState(null);
+  const [aiProcessing, setAiProcessing] = useState(false);
 
   const isDark = theme === 'dark';
+
+  const autoFillWithAI = async () => {
+    if (!selectedForm) return;
+    setAiProcessing(true);
+    
+    try {
+      const browserLang = navigator.language.split('-')[0];
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Generate realistic sample data for a form called "${selectedForm.name}" with these fields: ${selectedForm.fields.map(f => `${f.label} (${f.type})`).join(', ')}. Respond in the user's language (${browserLang}). Return plausible sample data.`,
+        response_json_schema: {
+          type: "object",
+          properties: selectedForm.fields.reduce((acc, field) => {
+            acc[field.id] = { type: field.type === 'checkbox' ? 'boolean' : field.type === 'number' ? 'number' : 'string' };
+            return acc;
+          }, {})
+        }
+      });
+      
+      setFormData(response);
+      toast.success('AI filled the form with sample data');
+    } catch (e) {
+      toast.error('AI auto-fill failed');
+    }
+    setAiProcessing(false);
+  };
 
   const handleFieldChange = (fieldId, value) => {
     setFormData(prev => ({ ...prev, [fieldId]: value }));
@@ -272,6 +301,16 @@ export default function FormFiller({ theme = 'dark' }) {
                   {selectedForm.name}
                 </h2>
                 <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={autoFillWithAI}
+                    disabled={aiProcessing}
+                    className={`${isDark ? 'border-slate-700' : ''} bg-gradient-to-r from-violet-500/10 to-cyan-500/10 border-violet-500/30`}
+                  >
+                    {aiProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Wand2 className="w-4 h-4 mr-2 text-violet-400" />}
+                    AI Fill
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"

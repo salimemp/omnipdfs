@@ -26,7 +26,10 @@ import {
   GitBranch,
   Link2,
   Video,
-  Calendar
+  Calendar,
+  Sparkles,
+  Loader2,
+  BarChart3
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,6 +82,8 @@ const quickActions = [
   { icon: Link2, label: 'Share Link', description: 'Copy share link' },
   { icon: Video, label: 'Meet', description: 'Start video call' },
   { icon: Calendar, label: 'Schedule', description: 'Set deadline' },
+  { icon: Sparkles, label: 'AI Analyze', description: 'Analyze document' },
+  { icon: BarChart3, label: 'Insights', description: 'View insights' },
 ];
 
 export default function Collaboration({ theme = 'dark' }) {
@@ -90,13 +95,44 @@ export default function Collaboration({ theme = 'dark' }) {
   const [inviteRole, setInviteRole] = useState('editor');
   const [newComment, setNewComment] = useState('');
   const [activeTab, setActiveTab] = useState('collaborators');
+  const [aiAnalyzing, setAiAnalyzing] = useState(false);
+  const [aiInsights, setAiInsights] = useState(null);
 
   const isDark = theme === 'dark';
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    let mounted = true;
+    base44.auth.me().then(data => {
+      if (mounted) setUser(data);
+    }).catch(() => {});
+    return () => { mounted = false; };
   }, []);
+
+  const analyzeDocumentWithAI = async (collab) => {
+    setAiAnalyzing(true);
+    const docName = getDocumentName(collab.document_id);
+    const browserLang = navigator.language.split('-')[0];
+    
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Analyze this collaboration on document "${docName}". Team has ${collab.collaborators?.length || 0} members, ${collab.comments?.filter(c => !c.resolved)?.length || 0} open comments, status is ${collab.status}. Respond in ${browserLang}. Provide: 1) Summary 2) Potential bottlenecks 3) Recommendations`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            summary: { type: "string" },
+            bottlenecks: { type: "array", items: { type: "string" } },
+            recommendations: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+      setAiInsights(response);
+      toast.success('AI analysis complete');
+    } catch (e) {
+      toast.error('Analysis failed');
+    }
+    setAiAnalyzing(false);
+  };
 
   const { data: documents = [] } = useQuery({
     queryKey: ['documents'],
@@ -239,18 +275,49 @@ export default function Collaboration({ theme = 'dark' }) {
         className={`rounded-2xl p-4 mb-8 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
       >
         <h3 className={`text-sm font-medium mb-3 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Quick Actions</h3>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+        <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
           {quickActions.map((action, i) => (
             <button
               key={i}
-              onClick={() => toast.info(`${action.label}: ${action.description}`)}
-              className={`p-3 rounded-xl text-center transition-all hover:scale-105 ${isDark ? 'bg-slate-800/50 hover:bg-slate-800' : 'bg-slate-50 hover:bg-slate-100'}`}
+              onClick={() => {
+                if (action.label === 'AI Analyze' && collaborations.length > 0) {
+                  analyzeDocumentWithAI(collaborations[0]);
+                } else {
+                  toast.info(`${action.label}: ${action.description}`);
+                }
+              }}
+              disabled={action.label === 'AI Analyze' && aiAnalyzing}
+              className={`p-3 rounded-xl text-center transition-all hover:scale-105 ${isDark ? 'bg-slate-800/50 hover:bg-slate-800' : 'bg-slate-50 hover:bg-slate-100'} ${action.label === 'AI Analyze' ? 'bg-gradient-to-br from-violet-500/10 to-cyan-500/10' : ''}`}
             >
-              <action.icon className={`w-5 h-5 mx-auto mb-1 ${isDark ? 'text-violet-400' : 'text-violet-500'}`} />
+              {action.label === 'AI Analyze' && aiAnalyzing ? (
+                <Loader2 className="w-5 h-5 mx-auto mb-1 text-violet-400 animate-spin" />
+              ) : (
+                <action.icon className={`w-5 h-5 mx-auto mb-1 ${isDark ? 'text-violet-400' : 'text-violet-500'}`} />
+              )}
               <p className={`text-xs font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{action.label}</p>
             </button>
           ))}
         </div>
+
+        {aiInsights && (
+          <div className={`mt-4 p-4 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-violet-400" />
+              <h4 className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>AI Insights</h4>
+              <Button size="sm" variant="ghost" onClick={() => setAiInsights(null)} className="ml-auto h-6 px-2">
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+            <p className={`text-sm mb-3 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{aiInsights.summary}</p>
+            {aiInsights.recommendations?.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {aiInsights.recommendations.slice(0, 3).map((rec, i) => (
+                  <Badge key={i} className="bg-violet-500/20 text-violet-400 text-xs">{rec}</Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </motion.div>
 
       {/* Collaboration Cards */}
