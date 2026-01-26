@@ -41,6 +41,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import DropZone from '@/components/shared/DropZone';
 import ReadAloud from '@/components/shared/ReadAloud';
+import { useEffect } from 'react';
 
 const detectLanguage = (text) => {
   const langPatterns = {
@@ -96,6 +97,15 @@ export default function AIAssistant({ theme = 'dark' }) {
   const [detectedLang, setDetectedLang] = useState('en');
 
   const isDark = theme === 'dark';
+
+  // Cleanup on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      setResult(null);
+      setSuggestedTags([]);
+      setUploadedFile(null);
+    };
+  }, []);
 
   const handleFileUploaded = async (fileData) => {
     const document = await base44.entities.Document.create(fileData);
