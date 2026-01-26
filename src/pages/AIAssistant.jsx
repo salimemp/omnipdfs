@@ -16,7 +16,8 @@ import {
   X,
   Brain,
   Wand2,
-  BookOpen
+  BookOpen,
+  Volume2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,6 +40,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import DropZone from '@/components/shared/DropZone';
+import ReadAloud from '@/components/shared/ReadAloud';
+
+const detectLanguage = (text) => {
+  const langPatterns = {
+    ar: /[\u0600-\u06FF]/, zh: /[\u4E00-\u9FFF]/, ja: /[\u3040-\u30FF]/,
+    ko: /[\uAC00-\uD7AF]/, ru: /[\u0400-\u04FF]/, hi: /[\u0900-\u097F]/,
+  };
+  for (const [lang, pattern] of Object.entries(langPatterns)) {
+    if (pattern.test(text)) return lang;
+  }
+  const lower = text.toLowerCase();
+  if (/\b(el|la|los|es|está)\b/.test(lower)) return 'es';
+  if (/\b(le|la|les|est|sont)\b/.test(lower)) return 'fr';
+  if (/\b(der|die|das|ist|sind)\b/.test(lower)) return 'de';
+  return navigator.language.split('-')[0] || 'en';
+};
+
+const languageNames = {
+  en: 'English', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian',
+  pt: 'Portuguese', zh: 'Chinese', ja: 'Japanese', ko: 'Korean', ar: 'Arabic'
+};
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -71,6 +93,7 @@ export default function AIAssistant({ theme = 'dark' }) {
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState(null);
   const [suggestedTags, setSuggestedTags] = useState([]);
+  const [detectedLang, setDetectedLang] = useState('en');
 
   const isDark = theme === 'dark';
 
@@ -84,13 +107,18 @@ export default function AIAssistant({ theme = 'dark' }) {
     setProcessing(true);
     setResult(null);
 
+    // Detect language from input
+    const inputLang = detectLanguage(textInput || '');
+    setDetectedLang(inputLang);
+    const langName = languageNames[inputLang] || 'English';
+
     try {
       let prompt = '';
       let schema = null;
 
       switch (action) {
         case 'summarize':
-          prompt = `Analyze and summarize the following document content. Provide:
+          prompt = `Respond in ${langName}. Analyze and summarize the following document content. Provide:
 1. A concise executive summary (2-3 sentences)
 2. Key points (bullet points)
 3. Main topics covered
@@ -131,7 +159,7 @@ Provide a high-quality, natural translation.`;
           break;
 
         case 'tags':
-          prompt = `Analyze the following document/text and suggest relevant tags for organization and searchability. Consider:
+          prompt = `Respond in ${langName}. Analyze the following document/text and suggest relevant tags for organization and searchability. Consider:
 - Main topics and themes
 - Document type
 - Industry/domain
@@ -152,7 +180,7 @@ Provide 5-10 relevant tags.`;
           break;
 
         case 'suggestions':
-          prompt = `Based on the following document content, provide intelligent suggestions:
+          prompt = `Respond in ${langName}. Based on the following document content, provide intelligent suggestions:
 1. Recommended next actions
 2. Related documents to review
 3. Missing information that should be added
@@ -510,7 +538,10 @@ Be specific and actionable.`;
                 {result.action === 'summarize' && result.data && (
                   <div className="space-y-6">
                     <div>
-                      <h4 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Executive Summary</h4>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Executive Summary</h4>
+                        <ReadAloud text={result.data.executive_summary} isDark={isDark} />
+                      </div>
                       <p className={isDark ? 'text-slate-300' : 'text-slate-700'}>{result.data.executive_summary}</p>
                     </div>
                     {result.data.key_points?.length > 0 && (
@@ -543,6 +574,9 @@ Be specific and actionable.`;
 
                 {result.action === 'translate' && result.data && (
                   <div className="space-y-4">
+                    <div className="flex justify-end mb-2">
+                      <ReadAloud text={result.data.translated_text} isDark={isDark} />
+                    </div>
                     <div className={`p-4 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
                       <p className={isDark ? 'text-slate-300' : 'text-slate-700'}>{result.data.translated_text}</p>
                     </div>
