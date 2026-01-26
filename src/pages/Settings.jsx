@@ -47,6 +47,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import ComplianceWidget from '@/components/compliance/ComplianceWidget';
 
 export default function Settings({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -196,6 +197,8 @@ export default function Settings({ theme = 'dark' }) {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
+            <ComplianceWidget isDark={isDark} />
+            
             <Card className="bg-slate-900/50 border-slate-800">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
