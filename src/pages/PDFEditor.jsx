@@ -59,6 +59,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import DropZone from '@/components/shared/DropZone';
+import AIToolsPanel from '@/components/editor/AIToolsPanel';
+import ReadAloud from '@/components/shared/ReadAloud';
 import { toast } from 'sonner';
 
 const tools = [
@@ -548,75 +550,24 @@ export default function PDFEditor({ theme = 'dark' }) {
 
               {/* AI Tools */}
               {activeTool === 'ai' && (
-                <div className="space-y-3">
-                  <Label className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>AI Features</Label>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={`w-full justify-start ${isDark ? 'border-slate-700' : ''}`}
-                    disabled={aiProcessing}
-                    onClick={async () => {
-                      setAiProcessing(true);
-                      try {
-                        const response = await base44.integrations.Core.InvokeLLM({
-                          prompt: `Suggest 3 professional improvements for a PDF document that currently has ${elements.length} annotations. Be concise.`,
-                          response_json_schema: {
-                            type: "object",
-                            properties: {
-                              suggestions: { type: "array", items: { type: "string" } }
-                            }
-                          }
-                        });
-                        setAiSuggestion(response.suggestions);
-                        toast.success('AI suggestions ready');
-                      } catch (e) {
-                        toast.error('AI processing failed');
-                      }
-                      setAiProcessing(false);
-                    }}
-                  >
-                    {aiProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Wand2 className="w-4 h-4 mr-2" />}
-                    Get Suggestions
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={`w-full justify-start ${isDark ? 'border-slate-700' : ''}`}
-                    disabled={aiProcessing}
-                    onClick={async () => {
-                      setAiProcessing(true);
-                      try {
-                        const response = await base44.integrations.Core.InvokeLLM({
-                          prompt: 'Generate a brief professional summary text (2-3 sentences) that could be added to a business document.',
-                          response_json_schema: {
-                            type: "object",
-                            properties: {
-                              text: { type: "string" }
-                            }
-                          }
-                        });
-                        addElement('text', { content: response.text, width: 300, height: 60 });
-                        toast.success('AI text added to document');
-                      } catch (e) {
-                        toast.error('AI generation failed');
-                      }
-                      setAiProcessing(false);
-                    }}
-                  >
-                    {aiProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <MessageSquare className="w-4 h-4 mr-2" />}
-                    Generate Text
-                  </Button>
+                <AIToolsPanel
+                  isDark={isDark}
+                  elements={elements}
+                  onAddElement={addElement}
+                  onSuggestionsReady={setAiSuggestion}
+                />
+              )}
 
-                  {aiSuggestion && (
-                    <div className={`mt-3 p-3 rounded-lg ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}>
-                      <p className={`text-xs font-medium mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>AI Suggestions:</p>
-                      <ul className="space-y-1">
-                        {aiSuggestion.map((s, i) => (
-                          <li key={i} className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>• {s}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+              {/* Read Aloud for selected text */}
+              {selectedElement && elements.find(e => e.id === selectedElement)?.type === 'text' && (
+                <div className="mt-4 pt-4 border-t border-slate-700">
+                  <Label className={`text-sm mb-2 block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    Read Selected Text
+                  </Label>
+                  <ReadAloud 
+                    text={elements.find(e => e.id === selectedElement)?.content || ''} 
+                    isDark={isDark} 
+                  />
                 </div>
               )}
             </div>

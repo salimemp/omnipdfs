@@ -57,6 +57,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from 'sonner';
 import moment from 'moment';
+import CollaboratorCard from '@/components/collab/CollaboratorCard';
 
 const roleConfig = {
   admin: { label: 'Admin', icon: Crown, color: 'text-amber-400', bg: 'bg-amber-500/20' },
@@ -253,14 +254,15 @@ export default function Collaboration({ theme = 'dark' }) {
       </motion.div>
 
       {/* Collaboration Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label="Active collaborations">
         {collaborations.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className={`col-span-full text-center py-16 rounded-2xl ${isDark ? 'glass-light' : 'bg-white border border-slate-200'}`}
+            role="status"
           >
-            <Users className={`w-16 h-16 mx-auto mb-4 ${isDark ? 'text-slate-600' : 'text-slate-300'}`} />
+            <Users className={`w-16 h-16 mx-auto mb-4 ${isDark ? 'text-slate-600' : 'text-slate-300'}`} aria-hidden="true" />
             <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
               No active collaborations
             </h3>
@@ -270,111 +272,22 @@ export default function Collaboration({ theme = 'dark' }) {
           </motion.div>
         ) : (
           collaborations.map((collab, index) => (
-            <motion.div
+            <CollaboratorCard
               key={collab.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`rounded-2xl overflow-hidden ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
-            >
-              <div className="p-5">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-violet-500/20' : 'bg-violet-100'}`}>
-                      <FileText className="w-5 h-5 text-violet-400" />
-                    </div>
-                    <div>
-                      <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        {getDocumentName(collab.document_id)}
-                      </h3>
-                      <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                        {moment(collab.created_date).fromNow()}
-                      </p>
-                    </div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className={isDark ? 'text-slate-400' : ''}>
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className={isDark ? 'bg-slate-900 border-slate-700' : ''}>
-                      {Object.entries(statusConfig).map(([key, config]) => (
-                        <DropdownMenuItem
-                          key={key}
-                          onClick={() => updateStatus(collab.id, key)}
-                          className={isDark ? 'text-white' : ''}
-                        >
-                          Set as {config.label}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-
-                <Badge className={statusConfig[collab.status || 'draft'].color}>
-                  {statusConfig[collab.status || 'draft'].label}
-                </Badge>
-
-                {/* Collaborators */}
-                <div className="mt-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                      Team ({collab.collaborators?.length || 0})
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        setSelectedCollab(collab);
-                        setShowInviteDialog(true);
-                      }}
-                      className={`h-6 px-2 ${isDark ? 'text-violet-400 hover:text-violet-300' : 'text-violet-600'}`}
-                    >
-                      <UserPlus className="w-3 h-3 mr-1" />
-                      Invite
-                    </Button>
-                  </div>
-                  <div className="flex -space-x-2">
-                    {collab.collaborators?.slice(0, 5).map((c, i) => (
-                      <Avatar key={i} className="w-8 h-8 border-2 border-slate-900">
-                        <AvatarFallback className={`text-xs ${roleConfig[c.role]?.bg} ${roleConfig[c.role]?.color}`}>
-                          {c.email.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    ))}
-                    {(collab.collaborators?.length || 0) > 5 && (
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs border-2 ${isDark ? 'bg-slate-800 border-slate-900 text-slate-400' : 'bg-slate-100 border-white text-slate-500'}`}>
-                        +{collab.collaborators.length - 5}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Comments Preview */}
-                <div className="mt-4 pt-4 border-t border-slate-700/50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <MessageSquare className={`w-4 h-4 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
-                      <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                        {collab.comments?.filter(c => !c.resolved)?.length || 0} open comments
-                      </span>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        setSelectedCollab(collab);
-                        setShowCommentDialog(true);
-                      }}
-                      className={isDark ? 'text-slate-400' : ''}
-                    >
-                      View All
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              collab={collab}
+              documentName={getDocumentName(collab.document_id)}
+              onStatusChange={updateStatus}
+              onInviteClick={(c) => {
+                setSelectedCollab(c);
+                setShowInviteDialog(true);
+              }}
+              onCommentsClick={(c) => {
+                setSelectedCollab(c);
+                setShowCommentDialog(true);
+              }}
+              isDark={isDark}
+              index={index}
+            />
           ))
         )}
       </div>

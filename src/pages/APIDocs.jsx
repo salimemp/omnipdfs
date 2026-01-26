@@ -26,6 +26,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { toast } from 'sonner';
+import EndpointCard from '@/components/api/EndpointCard';
 
 const apiEndpoints = [
   {
@@ -33,6 +34,7 @@ const apiEndpoints = [
     path: '/api/v1/convert',
     title: 'Convert Document',
     description: 'Convert a document from one format to another',
+    rateLimit: '100 requests/minute',
     params: [
       { name: 'file', type: 'File', required: true, description: 'The file to convert' },
       { name: 'target_format', type: 'string', required: true, description: 'Target format (pdf, docx, xlsx, etc.)' },
@@ -54,6 +56,7 @@ const apiEndpoints = [
     path: '/api/v1/merge',
     title: 'Merge PDFs',
     description: 'Merge multiple PDF files into one',
+    rateLimit: '50 requests/minute',
     params: [
       { name: 'files', type: 'File[]', required: true, description: 'Array of PDF files to merge' },
       { name: 'order', type: 'number[]', required: false, description: 'Custom order for merging' }
@@ -74,6 +77,7 @@ const apiEndpoints = [
     path: '/api/v1/ocr',
     title: 'OCR Recognition',
     description: 'Extract text from images and scanned PDFs',
+    rateLimit: '30 requests/minute',
     params: [
       { name: 'file', type: 'File', required: true, description: 'Image or PDF file' },
       { name: 'language', type: 'string', required: false, description: 'OCR language (default: en)' },
@@ -95,6 +99,7 @@ const apiEndpoints = [
     path: '/api/v1/documents',
     title: 'List Documents',
     description: 'Retrieve a list of all documents',
+    rateLimit: '200 requests/minute',
     params: [
       { name: 'limit', type: 'number', required: false, description: 'Number of results (default: 50)' },
       { name: 'offset', type: 'number', required: false, description: 'Pagination offset' },
@@ -107,6 +112,43 @@ const apiEndpoints = [
   "offset": 0
 }`,
     example: `curl https://api.omnipdf.com/v1/documents?limit=10 \\
+  -H "Authorization: Bearer YOUR_API_KEY"`
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/split',
+    title: 'Split PDF',
+    description: 'Split a PDF into multiple files',
+    rateLimit: '50 requests/minute',
+    params: [
+      { name: 'file', type: 'File', required: true, description: 'PDF file to split' },
+      { name: 'pages', type: 'string', required: true, description: 'Page ranges (e.g., "1-3,5,7-10")' }
+    ],
+    response: `{
+  "id": "split_abc123",
+  "status": "completed",
+  "output_urls": ["https://..."],
+  "page_count": 3
+}`,
+    example: `curl -X POST https://api.omnipdf.com/v1/split \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -F "file=@document.pdf" \\
+  -F "pages=1-3,5"`
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/documents/:id',
+    title: 'Delete Document',
+    description: 'Permanently delete a document',
+    rateLimit: '100 requests/minute',
+    params: [
+      { name: 'id', type: 'string', required: true, description: 'Document ID' }
+    ],
+    response: `{
+  "success": true,
+  "message": "Document deleted"
+}`,
+    example: `curl -X DELETE https://api.omnipdf.com/v1/documents/doc_123 \\
   -H "Authorization: Bearer YOUR_API_KEY"`
   }
 ];
@@ -287,97 +329,15 @@ export default function APIDocs({ theme = 'dark' }) {
           API Endpoints
         </h2>
 
-        <div className="space-y-4">
+        <div className="space-y-4" role="list" aria-label="API endpoints">
           {apiEndpoints.map((endpoint, index) => (
-            <Collapsible
+            <EndpointCard
               key={index}
-              open={expandedEndpoint === index}
-              onOpenChange={(open) => setExpandedEndpoint(open ? index : -1)}
-            >
-              <CollapsibleTrigger className={`w-full p-4 rounded-xl flex items-center justify-between transition-colors ${
-                isDark ? 'bg-slate-800/50 hover:bg-slate-800' : 'bg-slate-50 hover:bg-slate-100'
-              }`}>
-                <div className="flex items-center gap-3">
-                  <Badge className={methodColors[endpoint.method]}>
-                    {endpoint.method}
-                  </Badge>
-                  <code className={`font-mono text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                    {endpoint.path}
-                  </code>
-                  <span className={`text-sm ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                    {endpoint.title}
-                  </span>
-                </div>
-                {expandedEndpoint === index ? (
-                  <ChevronDown className={`w-4 h-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`} />
-                ) : (
-                  <ChevronRight className={`w-4 h-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`} />
-                )}
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className={`mt-2 p-4 rounded-xl ${isDark ? 'bg-slate-800/30' : 'bg-slate-50'}`}>
-                  <p className={`text-sm mb-4 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    {endpoint.description}
-                  </p>
-
-                  <h4 className={`text-sm font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    Parameters
-                  </h4>
-                  <div className="overflow-x-auto mb-4">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className={isDark ? 'text-slate-400' : 'text-slate-500'}>
-                          <th className="text-left py-2 pr-4">Name</th>
-                          <th className="text-left py-2 pr-4">Type</th>
-                          <th className="text-left py-2 pr-4">Required</th>
-                          <th className="text-left py-2">Description</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {endpoint.params.map((param, i) => (
-                          <tr key={i} className={isDark ? 'text-slate-300' : 'text-slate-700'}>
-                            <td className="py-2 pr-4 font-mono text-violet-400">{param.name}</td>
-                            <td className="py-2 pr-4 font-mono text-cyan-400">{param.type}</td>
-                            <td className="py-2 pr-4">
-                              {param.required ? (
-                                <Badge className="bg-red-500/20 text-red-400">Required</Badge>
-                              ) : (
-                                <Badge variant="outline" className={isDark ? 'border-slate-700' : ''}>Optional</Badge>
-                              )}
-                            </td>
-                            <td className="py-2">{param.description}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <h4 className={`text-sm font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    Response
-                  </h4>
-                  <pre className={`p-3 rounded-lg text-xs font-mono mb-4 ${isDark ? 'bg-slate-900 text-slate-300' : 'bg-slate-900 text-slate-300'}`}>
-                    {endpoint.response}
-                  </pre>
-
-                  <h4 className={`text-sm font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    Example
-                  </h4>
-                  <div className="relative">
-                    <pre className={`p-3 rounded-lg text-xs font-mono ${isDark ? 'bg-slate-900 text-slate-300' : 'bg-slate-900 text-slate-300'}`}>
-                      {endpoint.example}
-                    </pre>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="absolute top-2 right-2 text-slate-400"
-                      onClick={() => copyToClipboard(endpoint.example, `example-${index}`)}
-                    >
-                      {copied === `example-${index}` ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                    </Button>
-                  </div>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
+              endpoint={endpoint}
+              isExpanded={expandedEndpoint === index}
+              onToggle={(open) => setExpandedEndpoint(open ? index : -1)}
+              isDark={isDark}
+            />
           ))}
         </div>
       </motion.div>
