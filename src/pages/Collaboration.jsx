@@ -78,10 +78,10 @@ const statusConfig = {
 const quickActions = [
   { icon: AtSign, label: 'Mention', description: 'Tag team members', action: 'mention' },
   { icon: Bell, label: 'Notify', description: 'Send notifications', action: 'notify' },
-  { icon: GitBranch, label: 'Version', description: 'Create version', action: 'version' },
+  { icon: GitBranch, label: 'Smart Merge', description: 'AI version merge', action: 'merge' },
   { icon: Link2, label: 'Share Link', description: 'Copy share link', action: 'share' },
   { icon: Video, label: 'Meet', description: 'Start video call', action: 'video' },
-  { icon: Calendar, label: 'Schedule', description: 'Set deadline', action: 'schedule' },
+  { icon: Calendar, label: 'Meeting Notes', description: 'Generate notes', action: 'notes' },
   { icon: Sparkles, label: 'AI Analyze', description: 'Analyze document', action: 'analyze' },
   { icon: CheckCircle2, label: 'Auto-Assign', description: 'AI task assignment', action: 'assign' },
 ];
@@ -331,14 +331,18 @@ export default function Collaboration({ theme = 'dark' }) {
                   analyzeDocumentWithAI(collaborations[0]);
                 } else if (action.action === 'assign' && collaborations.length > 0) {
                   autoAssignTasks(collaborations[0]);
+                } else if (action.action === 'merge' && collaborations.length > 0) {
+                  smartMergeVersions(collaborations[0].id);
+                } else if (action.action === 'notes' && collaborations.length > 0) {
+                  generateMeetingNotes(collaborations[0].id);
                 } else {
                   toast.info(`${action.label}: ${action.description}`);
                 }
               }}
-              disabled={(action.action === 'analyze' || action.action === 'assign') && aiAnalyzing}
+              disabled={(action.action === 'analyze' || action.action === 'assign' || action.action === 'merge' || action.action === 'notes') && aiAnalyzing}
               className={`p-3 rounded-xl text-center transition-all hover:scale-105 ${isDark ? 'bg-slate-800/50 hover:bg-slate-800' : 'bg-slate-50 hover:bg-slate-100'} ${action.label === 'AI Analyze' ? 'bg-gradient-to-br from-violet-500/10 to-cyan-500/10' : ''}`}
             >
-              {(action.action === 'analyze' || action.action === 'assign') && aiAnalyzing ? (
+              {(action.action === 'analyze' || action.action === 'assign' || action.action === 'merge' || action.action === 'notes') && aiAnalyzing ? (
                 <Loader2 className="w-5 h-5 mx-auto mb-1 text-violet-400 animate-spin" />
               ) : (
                 <action.icon className={`w-5 h-5 mx-auto mb-1 ${isDark ? 'text-violet-400' : 'text-violet-500'}`} />

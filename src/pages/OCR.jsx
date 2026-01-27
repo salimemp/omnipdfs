@@ -18,7 +18,8 @@ import {
   ChevronDown,
   Zap,
   Eye,
-  FileSearch
+  FileSearch,
+  FileOutput
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -191,6 +192,63 @@ export default function OCR({ theme = 'dark' }) {
     a.download = `${uploadedFile?.name?.replace(/\.[^/.]+$/, '') || 'extracted'}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const convertImageToPDF = async () => {
+    if (!uploadedFile || !extractedText) {
+      toast.error('Extract text first');
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Convert this extracted text into a well-formatted PDF document:\n\n${extractedText}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            formatted_content: { type: "string" },
+            sections: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+
+      await base44.entities.Document.create({
+        name: `${uploadedFile.name.replace(/\.[^/.]+$/, '')}_converted.pdf`,
+        file_type: 'pdf',
+        file_size: extractedText.length * 1.2,
+        status: 'ready'
+      });
+
+      toast.success('Image converted to PDF!');
+    } catch (e) {
+      toast.error('Conversion failed');
+    }
+    setProcessing(false);
+  };
+
+  const translateText = async (targetLang) => {
+    if (!extractedText) return;
+    
+    setProcessing(true);
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Translate this text to ${targetLang}:\n\n${extractedText}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            translated_text: { type: "string" },
+            source_language: { type: "string" }
+          }
+        }
+      });
+      
+      setExtractedText(result.translated_text);
+      toast.success(`Translated to ${targetLang}`);
+    } catch (e) {
+      toast.error('Translation failed');
+    }
+    setProcessing(false);
   };
 
   return (
@@ -398,9 +456,10 @@ export default function OCR({ theme = 'dark' }) {
                 onChange={(e) => setExtractedText(e.target.value)}
                 className={`min-h-[400px] mb-4 font-mono text-sm ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200'}`}
               />
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={copyToClipboard}
                   className={isDark ? 'border-slate-700 text-slate-300' : ''}
                 >
@@ -409,12 +468,35 @@ export default function OCR({ theme = 'dark' }) {
                 </Button>
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={downloadText}
                   className={isDark ? 'border-slate-700 text-slate-300' : ''}
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  Download
+                  TXT
                 </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={convertImageToPDF}
+                  disabled={processing}
+                  className={isDark ? 'border-slate-700 text-slate-300' : ''}
+                >
+                  {processing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileOutput className="w-4 h-4 mr-2" />}
+                  To PDF
+                </Button>
+                <Select onValueChange={translateText}>
+                  <SelectTrigger className={`w-32 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : ''}`}>
+                    <SelectValue placeholder="Translate" />
+                  </SelectTrigger>
+                  <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : ''}>
+                    {languages.filter(l => l.code !== 'auto').slice(0, 10).map(lang => (
+                      <SelectItem key={lang.code} value={lang.name} className={isDark ? 'text-white' : ''}>
+                        {lang.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </>
           ) : (

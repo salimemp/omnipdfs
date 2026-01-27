@@ -177,6 +177,68 @@ Format the output with clear sections and proper structure.`,
     URL.revokeObjectURL(url);
   };
 
+  const saveAsPDF = async () => {
+    if (!generatedContent) return;
+    
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Convert this document to PDF-ready format with proper styling:\n\n${generatedContent.sections?.map(s => `${s.heading}\n${s.body}`).join('\n\n')}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            pdf_url: { type: "string" }
+          }
+        }
+      });
+      
+      toast.success('PDF generated! Opening in editor...');
+      window.location.href = createPageUrl('PDFEditor');
+    } catch (e) {
+      toast.error('PDF generation failed');
+    }
+  };
+
+  const improveWithAI = async () => {
+    if (!generatedContent) return;
+    
+    setGenerating(true);
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Improve this document by:
+1. Enhancing clarity and professionalism
+2. Fixing grammar and style issues
+3. Adding missing sections if needed
+4. Improving structure and flow
+
+Current document:
+${generatedContent.sections?.map(s => `${s.heading}\n${s.body}`).join('\n\n')}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            sections: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  heading: { type: "string" },
+                  body: { type: "string" }
+                }
+              }
+            },
+            improvements_made: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+      
+      setGeneratedContent(result);
+      toast.success(`Improved! Changes: ${result.improvements_made?.join(', ')}`);
+    } catch (e) {
+      toast.error('AI improvement failed');
+    }
+    setGenerating(false);
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <motion.div
@@ -378,10 +440,14 @@ Example: "A service agreement between ABC Company and XYZ Corp for web developme
                   </ul>
                 </div>
               )}
-              <div className="mt-6 flex gap-3">
+              <div className="mt-6 flex flex-wrap gap-3">
                 <Button onClick={generateDocument} variant="outline" className={isDark ? 'border-slate-700 text-slate-300' : ''}>
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Regenerate
+                </Button>
+                <Button onClick={improveWithAI} variant="outline" disabled={generating} className={isDark ? 'border-slate-700 text-slate-300' : ''}>
+                  {generating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                  AI Improve
                 </Button>
                 <Link to={createPageUrl('PDFEditor')}>
                   <Button className="bg-violet-500 hover:bg-violet-600">

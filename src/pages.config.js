@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Files from './pages/Files';
 import FormFiller from './pages/FormFiller';
 import History from './pages/History';
+import LegalDocs from './pages/LegalDocs';
 import OCR from './pages/OCR';
 import PDFEditor from './pages/PDFEditor';
 import PDFTools from './pages/PDFTools';
@@ -17,7 +18,6 @@ import Settings from './pages/Settings';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
-import LegalDocs from './pages/LegalDocs';
 import __Layout from './Layout.jsx';
 
 
@@ -34,6 +34,7 @@ export const PAGES = {
     "Files": Files,
     "FormFiller": FormFiller,
     "History": History,
+    "LegalDocs": LegalDocs,
     "OCR": OCR,
     "PDFEditor": PDFEditor,
     "PDFTools": PDFTools,
@@ -41,7 +42,6 @@ export const PAGES = {
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
-    "LegalDocs": LegalDocs,
 }
 
 export const pagesConfig = {

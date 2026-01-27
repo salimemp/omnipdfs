@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from 'framer-motion';
 import AccessibilityPanel from '@/components/shared/AccessibilityPanel';
+import CookieConsent from '@/components/shared/CookieConsent';
 
 export default function Layout({ children, currentPageName }) {
   // SEO Metadata
@@ -353,6 +354,9 @@ export default function Layout({ children, currentPageName }) {
           {React.cloneElement(children, { theme })}
         </div>
       </main>
+
+      {/* Cookie Consent */}
+      <CookieConsent />
     </div>
   );
 }
