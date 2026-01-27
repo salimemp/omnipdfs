@@ -64,6 +64,8 @@ import AIToolsPanel from '@/components/editor/AIToolsPanel';
 import AdvancedToolbar from '@/components/editor/AdvancedToolbar';
 import RealtimeEditor from '@/components/editor/RealtimeEditor';
 import ReadAloud from '@/components/shared/ReadAloud';
+import PDFChatAssistant from '@/components/ai/PDFChatAssistant';
+import { useLanguage } from '@/components/shared/LanguageContext';
 import { toast } from 'sonner';
 
 const tools = [
@@ -76,6 +78,7 @@ const tools = [
   { id: 'stamp', icon: Stamp, label: 'Stamp', shortcut: 'P' },
   { id: 'signature', icon: Signature, label: 'Signature', shortcut: 'G' },
   { id: 'eraser', icon: Eraser, label: 'Eraser', shortcut: 'E' },
+  { id: 'chat', icon: MessageSquare, label: 'AI Chat', shortcut: 'Q' },
   { id: 'ai', icon: Sparkles, label: 'AI Tools', shortcut: 'A' },
   { id: 'collab', icon: Users, label: 'Collaborate', shortcut: 'C' },
 ];
@@ -101,6 +104,7 @@ const colors = [
 ];
 
 export default function PDFEditor({ theme = 'dark' }) {
+  const { t } = useLanguage();
   const [uploadedFile, setUploadedFile] = useState(null);
   const [activeTool, setActiveTool] = useState('select');
   const [zoom, setZoom] = useState(100);
@@ -548,6 +552,18 @@ export default function PDFEditor({ theme = 'dark' }) {
                         {stamp.label}
                       </Button>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* AI Chat */}
+              {activeTool === 'chat' && uploadedFile && (
+                <div>
+                  <Label className={`text-sm mb-2 block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    AI Chat Assistant
+                  </Label>
+                  <div className="max-h-[400px] overflow-y-auto">
+                    <PDFChatAssistant document={uploadedFile} isDark={isDark} />
                   </div>
                 </div>
               )}
