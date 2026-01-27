@@ -17,7 +17,8 @@ import {
   Brain,
   Wand2,
   BookOpen,
-  Volume2
+  Volume2,
+  FileSearch
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,6 +44,7 @@ import DropZone from '@/components/shared/DropZone';
 import ReadAloud from '@/components/shared/ReadAloud';
 import PDFSummarizer from '@/components/ai/PDFSummarizer';
 import DocumentAssistant from '@/components/ai/DocumentAssistant';
+import DocumentReview from '@/components/ai/DocumentReview';
 import { useEffect } from 'react';
 
 const detectLanguage = (text) => {
@@ -275,7 +277,7 @@ Be specific and actionable.`;
       </motion.div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className={`grid grid-cols-5 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border p-1`}>
+        <TabsList className={`grid grid-cols-6 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border p-1`}>
           <TabsTrigger value="summarize" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
             <BookOpen className="w-4 h-4 mr-2" />
             Summarize
@@ -295,6 +297,10 @@ Be specific and actionable.`;
           <TabsTrigger value="assistant" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
             <Brain className="w-4 h-4 mr-2" />
             AI Chat
+          </TabsTrigger>
+          <TabsTrigger value="review" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
+            <FileSearch className="w-4 h-4 mr-2" />
+            Review
           </TabsTrigger>
         </TabsList>
 
@@ -527,6 +533,23 @@ Be specific and actionable.`;
                 </div>
               </CardContent>
             )}
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="review" className="mt-6">
+          <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+            <CardContent className="pt-6">
+              {uploadedFile ? (
+                <DocumentReview document={uploadedFile} isDark={isDark} />
+              ) : (
+                <div className="text-center py-12">
+                  <FileSearch className={`w-16 h-16 mx-auto mb-4 ${isDark ? 'text-slate-700' : 'text-slate-300'}`} />
+                  <p className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                    Upload a document to perform an AI quality review
+                  </p>
+                </div>
+              )}
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
