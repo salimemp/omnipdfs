@@ -7,6 +7,12 @@ import { createPageUrl } from '@/utils';
 
 export default function CookieConsent() {
   const [show, setShow] = useState(false);
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const theme = localStorage.getItem('omnipdf-theme') || 'dark';
+    setIsDark(theme === 'dark');
+  }, []);
 
   useEffect(() => {
     const consent = localStorage.getItem('omnipdf-cookie-consent');
@@ -34,10 +40,16 @@ export default function CookieConsent() {
           exit={{ y: 100, opacity: 0 }}
           className="fixed bottom-4 left-4 right-4 md:left-auto md:right-8 md:max-w-md z-[100]"
         >
-          <div className="bg-slate-900/95 backdrop-blur-lg border border-slate-700 rounded-2xl p-6 shadow-2xl">
+          <div className={`backdrop-blur-lg rounded-2xl p-6 shadow-2xl ${
+            isDark 
+              ? 'bg-slate-900/95 border border-slate-700' 
+              : 'bg-white/95 border border-slate-200'
+          }`}>
             <button
               onClick={declineCookies}
-              className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors"
+              className={`absolute top-3 right-3 transition-colors ${
+                isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+              }`}
               aria-label="Close"
             >
               <X className="w-4 h-4" />
@@ -48,8 +60,10 @@ export default function CookieConsent() {
                 <Cookie className="w-5 h-5 text-violet-400" />
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-1">Cookie Consent</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <h3 className={`font-semibold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Cookie Consent
+                </h3>
+                <p className={`text-sm leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   We use cookies to enhance your experience, analyze site usage, and improve our services. 
                   Your privacy is important to us.
                 </p>
@@ -77,7 +91,7 @@ export default function CookieConsent() {
               <Button
                 onClick={declineCookies}
                 variant="outline"
-                className="border-slate-700 text-slate-300 hover:bg-slate-800"
+                className={isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-300 text-slate-700 hover:bg-slate-100'}
               >
                 Decline
               </Button>
