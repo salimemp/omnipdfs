@@ -1,179 +1,240 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Sparkles, 
-  Loader2, 
-  FileText, 
-  CheckCircle2, 
-  Copy, 
-  Volume2,
-  ChevronDown,
-  ChevronUp
-} from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  FileText, Sparkles, Loader2, Copy, Download, RefreshCw,
+  BookOpen, List, Lightbulb, Target, Clock, BarChart3
+} from 'lucide-react';
+import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import ReadAloud from '@/components/shared/ReadAloud';
 
-export default function PDFSummarizer({ 
-  file, 
-  isDark = true,
-  onSummaryReady 
-}) {
-  const [processing, setProcessing] = useState(false);
+const summaryLengths = {
+  brief: { label: 'Brief', words: '50-100', icon: Sparkles },
+  standard: { label: 'Standard', words: '200-300', icon: FileText },
+  detailed: { label: 'Detailed', words: '500-800', icon: BookOpen }
+};
+
+export default function PDFSummarizer({ document, isDark = true }) {
+  const [summarizing, setSummarizing] = useState(false);
   const [summary, setSummary] = useState(null);
-  const [expanded, setExpanded] = useState(true);
+  const [selectedLength, setSelectedLength] = useState('standard');
+  const [customInstructions, setCustomInstructions] = useState('');
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      setSummary(null);
-      setProcessing(false);
-    };
-  }, []);
+  const generateSummary = async () => {
+    if (!document) {
+      toast.error('No document selected');
+      return;
+    }
 
-  const summarizePDF = useCallback(async () => {
-    if (!file) return;
-    setProcessing(true);
-    
-    const browserLang = navigator.language.split('-')[0];
-    const langNames = {
-      en: 'English', es: 'Spanish', fr: 'French', de: 'German',
-      it: 'Italian', pt: 'Portuguese', zh: 'Chinese', ja: 'Japanese'
-    };
-    const langName = langNames[browserLang] || 'English';
-    
+    setSummarizing(true);
     try {
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `Respond in ${langName}. Analyze and summarize this PDF document "${file.name}". Provide:
-1. Executive summary (2-3 sentences)
-2. Key points (bullet points)
-3. Document type
-4. Main topics
-5. Estimated reading time`,
+        prompt: `Analyze and summarize this document. Generate a ${selectedLength} summary.
+
+${customInstructions ? `Additional instructions: ${customInstructions}\n\n` : ''}
+
+Provide:
+1. Executive summary
+2. Key points (3-7 main points)
+3. Main topics/themes
+4. Actionable insights
+5. Important details/statistics
+
+Document reference: ${document.name}`,
+        file_urls: document.file_url ? [document.file_url] : undefined,
         response_json_schema: {
           type: "object",
           properties: {
             executive_summary: { type: "string" },
             key_points: { type: "array", items: { type: "string" } },
-            document_type: { type: "string" },
             main_topics: { type: "array", items: { type: "string" } },
-            reading_time: { type: "string" }
+            insights: { type: "array", items: { type: "string" } },
+            statistics: { type: "array", items: { type: "string" } },
+            word_count: { type: "number" },
+            reading_time_minutes: { type: "number" },
+            complexity_score: { type: "number" }
           }
-        },
-        file_urls: file.file_url ? [file.file_url] : undefined
+        }
       });
-      
-      setSummary(response);
-      onSummaryReady?.(response);
-      toast.success('PDF summarized successfully');
-    } catch (e) {
-      toast.error('Failed to summarize PDF');
-    }
-    setProcessing(false);
-  }, [file, onSummaryReady]);
 
-  const copyToClipboard = () => {
-    if (!summary) return;
-    const text = `${summary.executive_summary}\n\nKey Points:\n${summary.key_points?.join('\n• ')}\n\nTopics: ${summary.main_topics?.join(', ')}`;
+      setSummary(response);
+      
+      await base44.entities.ActivityLog.create({
+        action: 'convert',
+        document_id: document.id,
+        document_name: document.name,
+        details: { type: 'ai_summarization', length: selectedLength }
+      });
+
+      toast.success('Summary generated successfully!');
+    } catch (e) {
+      toast.error('Failed to generate summary');
+    }
+    setSummarizing(false);
+  };
+
+  const copySummary = () => {
+    const text = `${summary.executive_summary}\n\nKey Points:\n${summary.key_points.map((p, i) => `${i + 1}. ${p}`).join('\n')}`;
     navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard');
   };
 
-  if (!file) return null;
+  const downloadSummary = () => {
+    const text = `Document Summary: ${document.name}\n\n${summary.executive_summary}\n\nKey Points:\n${summary.key_points.map((p, i) => `${i + 1}. ${p}`).join('\n')}\n\nMain Topics:\n${summary.main_topics.join(', ')}`;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${document.name}_summary.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
-    <div 
-      className={`rounded-xl overflow-hidden ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}
-      role="region"
-      aria-label="PDF Summarizer"
-    >
-      <div 
-        className={`p-4 flex items-center justify-between cursor-pointer ${isDark ? 'hover:bg-slate-800' : 'hover:bg-slate-200'}`}
-        onClick={() => setExpanded(!expanded)}
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <p className={`font-medium text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              AI PDF Summarizer
-            </p>
-            <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-              {summary ? 'Summary ready' : 'Generate summary'}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {!summary && (
-            <Button
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                summarizePDF();
-              }}
-              disabled={processing}
-              className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 text-xs"
-            >
-              {processing ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Summarize'}
-            </Button>
-          )}
-          {expanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+    <div className="space-y-4">
+      {/* Length Selection */}
+      <div>
+        <label className={`text-sm font-medium mb-2 block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          Summary Length
+        </label>
+        <div className="grid grid-cols-3 gap-2">
+          {Object.entries(summaryLengths).map(([key, config]) => {
+            const Icon = config.icon;
+            return (
+              <button
+                key={key}
+                onClick={() => setSelectedLength(key)}
+                className={`p-3 rounded-lg border transition-all ${
+                  selectedLength === key
+                    ? 'bg-violet-500/20 border-violet-500/50'
+                    : isDark ? 'bg-slate-800 border-slate-700 hover:border-slate-600' : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <Icon className={`w-5 h-5 mx-auto mb-1 ${selectedLength === key ? 'text-violet-400' : isDark ? 'text-slate-400' : 'text-slate-500'}`} />
+                <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{config.label}</p>
+                <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{config.words} words</p>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {expanded && summary && (
-        <div className={`p-4 border-t ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                {summary.reading_time || '~5 min read'}
-              </span>
-              <Badge className="text-xs bg-violet-500/20 text-violet-400">
-                {summary.document_type || 'Document'}
-              </Badge>
-            </div>
-            <div className="flex gap-1">
-              <Button size="icon" variant="ghost" onClick={copyToClipboard} className="h-7 w-7">
-                <Copy className="w-3 h-3" />
-              </Button>
-            </div>
+      {/* Custom Instructions */}
+      <div>
+        <label className={`text-sm font-medium mb-2 block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          Custom Instructions (Optional)
+        </label>
+        <Textarea
+          value={customInstructions}
+          onChange={(e) => setCustomInstructions(e.target.value)}
+          placeholder="E.g., Focus on financial data, summarize technical sections..."
+          className={`h-20 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : ''}`}
+        />
+      </div>
+
+      {/* Generate Button */}
+      <Button
+        onClick={generateSummary}
+        disabled={summarizing}
+        className="w-full bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600"
+      >
+        {summarizing ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Analyzing Document...
+          </>
+        ) : (
+          <>
+            <Sparkles className="w-4 h-4 mr-2" />
+            Generate Summary
+          </>
+        )}
+      </Button>
+
+      {/* Summary Results */}
+      {summary && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`rounded-xl p-4 space-y-4 ${isDark ? 'bg-slate-800/50 border border-slate-700' : 'bg-slate-50 border border-slate-200'}`}
+        >
+          {/* Stats Bar */}
+          <div className="flex gap-2 flex-wrap">
+            <Badge className="bg-violet-500/20 text-violet-400">
+              <Clock className="w-3 h-3 mr-1" />
+              {summary.reading_time_minutes} min read
+            </Badge>
+            <Badge className="bg-cyan-500/20 text-cyan-400">
+              <BarChart3 className="w-3 h-3 mr-1" />
+              {summary.word_count} words
+            </Badge>
+            <Badge className={`${summary.complexity_score > 7 ? 'bg-red-500/20 text-red-400' : summary.complexity_score > 4 ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+              Complexity: {summary.complexity_score}/10
+            </Badge>
           </div>
 
-          <p className={`text-sm mb-4 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-            {summary.executive_summary}
-          </p>
+          {/* Executive Summary */}
+          <div>
+            <h4 className={`font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              <FileText className="w-4 h-4 text-violet-400" />
+              Executive Summary
+            </h4>
+            <p className={`text-sm leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+              {summary.executive_summary}
+            </p>
+          </div>
 
-          <ReadAloud text={summary.executive_summary} isDark={isDark} />
+          {/* Key Points */}
+          <div>
+            <h4 className={`font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              <List className="w-4 h-4 text-cyan-400" />
+              Key Points
+            </h4>
+            <ul className="space-y-2">
+              {summary.key_points.map((point, i) => (
+                <li key={i} className={`text-sm flex gap-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  <span className="text-violet-400 font-semibold">{i + 1}.</span>
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-          {summary.key_points?.length > 0 && (
-            <div className="mt-4">
-              <p className={`text-xs font-medium mb-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Key Points
-              </p>
+          {/* Insights */}
+          {summary.insights?.length > 0 && (
+            <div>
+              <h4 className={`font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <Lightbulb className="w-4 h-4 text-amber-400" />
+                Actionable Insights
+              </h4>
               <ul className="space-y-1">
-                {summary.key_points.slice(0, 5).map((point, i) => (
-                  <li key={i} className={`text-xs flex items-start gap-2 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                    <span className="text-violet-400 mt-0.5">•</span>
-                    {point}
+                {summary.insights.map((insight, i) => (
+                  <li key={i} className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    • {insight}
                   </li>
                 ))}
               </ul>
             </div>
           )}
 
-          {summary.main_topics?.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-1">
-              {summary.main_topics.map((topic, i) => (
-                <Badge key={i} variant="outline" className={`text-xs ${isDark ? 'border-slate-700' : ''}`}>
-                  {topic}
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
+          {/* Actions */}
+          <div className="flex gap-2 pt-2 border-t border-slate-700">
+            <Button variant="outline" size="sm" onClick={copySummary} className={isDark ? 'border-slate-700' : ''}>
+              <Copy className="w-4 h-4 mr-1" />
+              Copy
+            </Button>
+            <Button variant="outline" size="sm" onClick={downloadSummary} className={isDark ? 'border-slate-700' : ''}>
+              <Download className="w-4 h-4 mr-1" />
+              Download
+            </Button>
+            <Button variant="outline" size="sm" onClick={generateSummary} className={isDark ? 'border-slate-700' : ''}>
+              <RefreshCw className="w-4 h-4 mr-1" />
+              Regenerate
+            </Button>
+          </div>
+        </motion.div>
       )}
     </div>
   );

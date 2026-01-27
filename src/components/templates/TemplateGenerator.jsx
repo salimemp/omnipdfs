@@ -147,6 +147,72 @@ Make it professional, industry-standard, and easily customizable.`,
     URL.revokeObjectURL(url);
   };
 
+  const improveTemplate = async () => {
+    if (!generatedTemplate) return;
+    
+    setGenerating(true);
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Improve this template by:
+1. Adding more relevant fields
+2. Enhancing field validation
+3. Improving layout structure
+4. Adding better default values
+5. Optimizing for usability
+
+Current template: ${JSON.stringify(generatedTemplate)}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            template_name: { type: "string" },
+            fields: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  label: { type: "string" },
+                  type: { type: "string" },
+                  required: { type: "boolean" },
+                  default_value: { type: "string" },
+                  placeholder: { type: "string" },
+                  validation: { type: "string" }
+                }
+              }
+            },
+            sections: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  content: { type: "string" },
+                  order: { type: "number" }
+                }
+              }
+            },
+            styling: {
+              type: "object",
+              properties: {
+                primary_font: { type: "string" },
+                heading_font: { type: "string" },
+                primary_color: { type: "string" },
+                accent_color: { type: "string" }
+              }
+            },
+            improvements_made: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+
+      setGeneratedTemplate(response);
+      toast.success(`Improved! ${response.improvements_made?.length || 0} enhancements made`);
+    } catch (e) {
+      toast.error('Failed to improve template');
+    }
+    setGenerating(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className={`max-w-4xl max-h-[90vh] overflow-y-auto ${isDark ? 'bg-slate-900 border-slate-700' : ''}`}>
@@ -275,6 +341,10 @@ Make it professional, industry-standard, and easily customizable.`,
                 </div>
 
                 <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={improveTemplate} disabled={generating} className={isDark ? 'border-slate-700' : ''}>
+                    {generating ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />}
+                    Improve
+                  </Button>
                   <Button size="sm" variant="outline" onClick={downloadTemplate} className={isDark ? 'border-slate-700' : ''}>
                     <Download className="w-4 h-4 mr-1" />
                     Download

@@ -412,6 +412,31 @@ export default function Collaboration({ theme = 'dark' }) {
         )}
       </div>
 
+      {/* Permissions Dialog */}
+      <Dialog open={!!showPermissions} onOpenChange={() => setShowPermissions(null)}>
+        <DialogContent className={`max-w-3xl max-h-[90vh] overflow-y-auto ${isDark ? 'bg-slate-900 border-slate-700' : ''}`}>
+          <DialogHeader>
+            <DialogTitle className={`flex items-center gap-2 ${isDark ? 'text-white' : ''}`}>
+              <Shield className="w-5 h-5 text-violet-400" />
+              Manage Permissions
+            </DialogTitle>
+          </DialogHeader>
+          {showPermissions && (
+            <PermissionsManager
+              collaborators={showPermissions.collaborators || []}
+              onUpdate={(updated) => {
+                updateCollabMutation.mutateAsync({
+                  id: showPermissions.id,
+                  data: { collaborators: updated }
+                });
+              }}
+              currentUserRole="admin"
+              isDark={isDark}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Invite Dialog */}
       <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
         <DialogContent className={isDark ? 'bg-slate-900 border-slate-700' : ''}>

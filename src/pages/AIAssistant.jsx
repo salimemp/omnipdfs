@@ -508,7 +508,14 @@ Be specific and actionable.`;
 
       {/* Results Section */}
       <AnimatePresence>
-        {result && (
+        {activeTab === 'pdf-summary' && uploadedFiles.length > 0 && (
+          <PDFSummarizer
+            document={uploadedFiles[0]}
+            isDark={isDark}
+          />
+        )}
+
+        {result && activeTab !== 'pdf-summary' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
