@@ -89,6 +89,8 @@ const languages = [
   { code: 'sv', name: 'Swedish' },
   { code: 'da', name: 'Danish' },
   { code: 'fi', name: 'Finnish' },
+  { code: 'ta', name: 'Tamil' },
+  { code: 'bn', name: 'Bengali' },
 ];
 
 export default function AIAssistant({ theme = 'dark' }) {
