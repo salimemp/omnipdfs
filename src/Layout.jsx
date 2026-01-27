@@ -35,8 +35,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AccessibilityPanel from '@/components/shared/AccessibilityPanel';
 import CookieConsent from '@/components/shared/CookieConsent';
 import AppLogo from '@/components/shared/AppLogo';
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
+import { LanguageProvider } from '@/components/shared/LanguageContext';
 
-export default function Layout({ children, currentPageName }) {
+function LayoutContent({ children, currentPageName }) {
   // SEO Metadata
   useEffect(() => {
     const metadata = {
@@ -119,6 +121,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'My Files', page: 'Files', icon: FolderOpen },
     { name: 'Analytics', page: 'Analytics', icon: History },
     { name: 'API Docs', page: 'APIDocs', icon: Webhook },
+    { name: 'Security', page: 'Security', icon: Shield },
     { name: 'Settings', page: 'Settings', icon: Settings },
   ];
 
@@ -177,6 +180,7 @@ export default function Layout({ children, currentPageName }) {
           <AppLogo size="small" showText={true} isDark={isDark} />
           <div className="flex items-center gap-2">
             <AccessibilityPanel isDark={isDark} />
+            <LanguageSwitcher isDark={isDark} />
             <Button
               variant="ghost"
               size="icon"
@@ -234,6 +238,7 @@ export default function Layout({ children, currentPageName }) {
               </div>
               <div className="hidden lg:flex items-center gap-1">
                 <AccessibilityPanel isDark={isDark} />
+                <LanguageSwitcher isDark={isDark} />
                 <Button
                   variant="ghost"
                   size="icon"
@@ -350,5 +355,13 @@ export default function Layout({ children, currentPageName }) {
       {/* Cookie Consent */}
       <CookieConsent />
     </div>
+  );
+}
+
+export default function Layout({ children, currentPageName }) {
+  return (
+    <LanguageProvider>
+      <LayoutContent children={children} currentPageName={currentPageName} />
+    </LanguageProvider>
   );
 }

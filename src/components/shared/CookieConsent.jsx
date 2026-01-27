@@ -4,10 +4,12 @@ import { Cookie, X, ExternalLink, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { useLanguage } from './LanguageContext';
 
 export default function CookieConsent() {
   const [show, setShow] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const theme = localStorage.getItem('omnipdf-theme') || 'dark';
@@ -61,11 +63,10 @@ export default function CookieConsent() {
               </div>
               <div>
                 <h3 className={`font-semibold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Cookie Consent
+                  {t('cookieConsent')}
                 </h3>
                 <p className={`text-sm leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                  We use cookies to enhance your experience, analyze site usage, and improve our services. 
-                  Your privacy is important to us.
+                  {t('cookieMessage')}
                 </p>
               </div>
             </div>
@@ -76,7 +77,7 @@ export default function CookieConsent() {
                 className="text-xs text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1"
               >
                 <Shield className="w-3 h-3" />
-                Privacy Policy
+                {t('privacyPolicy')}
                 <ExternalLink className="w-3 h-3" />
               </Link>
             </div>
@@ -86,14 +87,14 @@ export default function CookieConsent() {
                 onClick={acceptCookies}
                 className="flex-1 bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 text-white"
               >
-                Accept All
+                {t('acceptAll')}
               </Button>
               <Button
                 onClick={declineCookies}
                 variant="outline"
                 className={isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-300 text-slate-700 hover:bg-slate-100'}
               >
-                Decline
+                {t('decline')}
               </Button>
             </div>
           </div>
