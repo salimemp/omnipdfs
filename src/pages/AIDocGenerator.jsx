@@ -407,7 +407,11 @@ Example: "A service agreement between ABC Company and XYZ Corp for web developme
                 </Button>
                 <Button variant="outline" size="sm" onClick={downloadAsText} className={isDark ? 'border-slate-700 text-slate-300' : ''}>
                   <Download className="w-4 h-4 mr-1" />
-                  Download
+                  TXT
+                </Button>
+                <Button variant="outline" size="sm" onClick={saveAsPDF} className={isDark ? 'border-slate-700 text-slate-300' : ''}>
+                  <FileOutput className="w-4 h-4 mr-1" />
+                  PDF
                 </Button>
               </div>
             )}
