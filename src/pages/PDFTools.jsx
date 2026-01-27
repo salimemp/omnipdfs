@@ -41,6 +41,13 @@ import PDFStandards from '@/components/pdf/PDFStandards';
 import MeasurementTools from '@/components/pdf/MeasurementTools';
 import CertificateManager from '@/components/pdf/CertificateManager';
 import PrintProduction from '@/components/pdf/PrintProduction';
+import FileCombiner from '@/components/pdf/FileCombiner';
+import PageOrganizer from '@/components/pdf/PageOrganizer';
+import SendForComments from '@/components/pdf/SendForComments';
+import ESignatureRequest from '@/components/pdf/ESignatureRequest';
+import FillAndSign from '@/components/pdf/FillAndSign';
+import ShareDocument from '@/components/pdf/ShareDocument';
+import SearchIndex from '@/components/pdf/SearchIndex';
 
 const tools = [
   {
@@ -279,17 +286,52 @@ export default function PDFTools({ theme = 'dark' }) {
         <h2 className={`text-2xl font-bold mb-6 ${isDark ? 'text-white' : 'text-slate-900'}`}>
           Advanced Features
         </h2>
-        <Tabs defaultValue="workflow" className="space-y-6">
+        <Tabs defaultValue="combine" className="space-y-6">
           <TabsList className="bg-slate-900/50 border border-slate-800 p-1 flex-wrap h-auto gap-1">
-            <TabsTrigger value="workflow">Workflow Automation</TabsTrigger>
-            <TabsTrigger value="version">Version Control</TabsTrigger>
-            <TabsTrigger value="signing">Digital Signing</TabsTrigger>
+            <TabsTrigger value="combine">Combine Files</TabsTrigger>
+            <TabsTrigger value="organize">Organize Pages</TabsTrigger>
+            <TabsTrigger value="comment-request">Send for Comments</TabsTrigger>
+            <TabsTrigger value="esign-request">E-Signature Request</TabsTrigger>
+            <TabsTrigger value="fill-sign">Fill & Sign</TabsTrigger>
+            <TabsTrigger value="share">Share</TabsTrigger>
+            <TabsTrigger value="search">Search Index</TabsTrigger>
+            <TabsTrigger value="workflow">Workflow</TabsTrigger>
+            <TabsTrigger value="version">Versions</TabsTrigger>
+            <TabsTrigger value="signing">Sign</TabsTrigger>
             <TabsTrigger value="comments">Comments</TabsTrigger>
-            <TabsTrigger value="standards">PDF Standards</TabsTrigger>
-            <TabsTrigger value="measure">Measurements</TabsTrigger>
+            <TabsTrigger value="standards">Standards</TabsTrigger>
+            <TabsTrigger value="measure">Measure</TabsTrigger>
             <TabsTrigger value="certificate">Certificates</TabsTrigger>
-            <TabsTrigger value="print">Print Production</TabsTrigger>
+            <TabsTrigger value="print">Print</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="combine">
+            <FileCombiner isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="organize">
+            <PageOrganizer document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="comment-request">
+            <SendForComments document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="esign-request">
+            <ESignatureRequest document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="fill-sign">
+            <FillAndSign document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="share">
+            <ShareDocument document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="search">
+            <SearchIndex document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
 
           <TabsContent value="workflow">
             <WorkflowAutomation isDark={isDark} />
