@@ -33,6 +33,15 @@ import {
 import DropZone from '@/components/shared/DropZone';
 import { base44 } from '@/api/base44Client';
 
+import WorkflowAutomation from '@/components/pdf/WorkflowAutomation';
+import VersionControl from '@/components/pdf/VersionControl';
+import PDFSigning from '@/components/pdf/PDFSigning';
+import PDFComments from '@/components/pdf/PDFComments';
+import PDFStandards from '@/components/pdf/PDFStandards';
+import MeasurementTools from '@/components/pdf/MeasurementTools';
+import CertificateManager from '@/components/pdf/CertificateManager';
+import PrintProduction from '@/components/pdf/PrintProduction';
+
 const tools = [
   {
     id: 'merge',
@@ -139,6 +148,7 @@ const categories = [
   { id: 'security', name: 'Security' },
   { id: 'edit', name: 'Edit' },
   { id: 'convert', name: 'Convert' },
+  { id: 'advanced', name: 'Advanced' },
 ];
 
 export default function PDFTools({ theme = 'dark' }) {
@@ -259,6 +269,61 @@ export default function PDFTools({ theme = 'dark' }) {
           );
         })}
       </div>
+
+      {/* Advanced Tools Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-12"
+      >
+        <h2 className={`text-2xl font-bold mb-6 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          Advanced Features
+        </h2>
+        <Tabs defaultValue="workflow" className="space-y-6">
+          <TabsList className="bg-slate-900/50 border border-slate-800 p-1 flex-wrap h-auto gap-1">
+            <TabsTrigger value="workflow">Workflow Automation</TabsTrigger>
+            <TabsTrigger value="version">Version Control</TabsTrigger>
+            <TabsTrigger value="signing">Digital Signing</TabsTrigger>
+            <TabsTrigger value="comments">Comments</TabsTrigger>
+            <TabsTrigger value="standards">PDF Standards</TabsTrigger>
+            <TabsTrigger value="measure">Measurements</TabsTrigger>
+            <TabsTrigger value="certificate">Certificates</TabsTrigger>
+            <TabsTrigger value="print">Print Production</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="workflow">
+            <WorkflowAutomation isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="version">
+            <VersionControl document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="signing">
+            <PDFSigning document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="comments">
+            <PDFComments document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="standards">
+            <PDFStandards document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="measure">
+            <MeasurementTools isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="certificate">
+            <CertificateManager isDark={isDark} />
+          </TabsContent>
+
+          <TabsContent value="print">
+            <PrintProduction document={uploadedFiles[0]} isDark={isDark} />
+          </TabsContent>
+        </Tabs>
+      </motion.div>
 
       {/* Tool Dialog */}
       <Dialog open={!!selectedTool} onOpenChange={(open) => !open && resetTool()}>
