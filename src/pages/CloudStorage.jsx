@@ -1,94 +1,24 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Cloud, Upload, Download, Folder } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import CloudConnector from '@/components/storage/CloudConnector';
-import CloudFileBrowser from '@/components/storage/CloudFileBrowser';
-
-export default function CloudStorage({ theme = 'dark' }) {
-  const isDark = theme === 'dark';
-  const [activeProvider, setActiveProvider] = useState('google-drive');
-
-  return (
-    <div className="max-w-6xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-10"
-      >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-500/10 border border-sky-500/20 mb-6">
-          <Cloud className="w-4 h-4 text-sky-400" />
-          <span className="text-sm text-sky-300">Cloud Storage Integration</span>
-        </div>
-        <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-          Connect Your Cloud Storage
-        </h1>
-        <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
-          Import and export PDFs directly from your favorite cloud storage providers
-        </p>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <CloudConnector isDark={isDark} />
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <Tabs value={activeProvider} onValueChange={setActiveProvider}>
-          <TabsList className={isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'}>
-            <TabsTrigger value="google-drive">Google Drive</TabsTrigger>
-            <TabsTrigger value="dropbox">Dropbox</TabsTrigger>
-            <TabsTrigger value="onedrive">OneDrive</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="google-drive" className="mt-4">
-            <CloudFileBrowser provider="Google Drive" isDark={isDark} />
-          </TabsContent>
-
-          <TabsContent value="dropbox" className="mt-4">
-            <CloudFileBrowser provider="Dropbox" isDark={isDark} />
-          </TabsContent>
-
-          <TabsContent value="onedrive" className="mt-4">
-            <CloudFileBrowser provider="OneDrive" isDark={isDark} />
-          </TabsContent>
-        </Tabs>
-      </motion.div>
-    </div>
-  );
-}, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Cloud,
   HardDrive,
-  FolderOpen,
   Upload,
   Download,
   RefreshCw,
   Link2,
   Unlink,
   CheckCircle2,
-  AlertCircle,
   Loader2,
   FileText,
-  ExternalLink,
-  Settings,
-  ArrowRight
+  ExternalLink
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -100,10 +30,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import DropZone from '@/components/shared/DropZone';
-import FileCard from '@/components/shared/FileCard';
 
 const cloudServices = [
   {
@@ -186,7 +114,6 @@ export default function CloudStorage({ theme = 'dark' }) {
   const handleImport = async (fileData) => {
     setImporting(true);
     
-    // Simulate import
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     const document = await base44.entities.Document.create({
@@ -209,7 +136,6 @@ export default function CloudStorage({ theme = 'dark' }) {
   const exportToCloud = async (file, serviceId) => {
     setSyncing(prev => ({ ...prev, [file.id]: serviceId }));
     
-    // Simulate export
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     await base44.entities.ActivityLog.create({
@@ -232,7 +158,6 @@ export default function CloudStorage({ theme = 'dark' }) {
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -250,7 +175,6 @@ export default function CloudStorage({ theme = 'dark' }) {
         </p>
       </motion.div>
 
-      {/* Cloud Services */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         {cloudServices.map((service, index) => {
           const connected = isConnected(service.id);
@@ -317,7 +241,6 @@ export default function CloudStorage({ theme = 'dark' }) {
         })}
       </div>
 
-      {/* Quick Actions */}
       {connectedServices.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -358,7 +281,6 @@ export default function CloudStorage({ theme = 'dark' }) {
         </motion.div>
       )}
 
-      {/* Recent Files with Export */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -427,7 +349,6 @@ export default function CloudStorage({ theme = 'dark' }) {
         )}
       </div>
 
-      {/* Connect Dialog */}
       <Dialog open={showConnectDialog} onOpenChange={setShowConnectDialog}>
         <DialogContent className={`${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
           <DialogHeader>
@@ -473,7 +394,6 @@ export default function CloudStorage({ theme = 'dark' }) {
         </DialogContent>
       </Dialog>
 
-      {/* Import Dialog */}
       <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
         <DialogContent className={`${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} max-w-xl`}>
           <DialogHeader>
