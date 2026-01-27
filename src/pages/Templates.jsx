@@ -48,6 +48,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from 'sonner';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
+import TemplateGenerator from '@/components/templates/TemplateGenerator';
 
 const categories = [
   { id: 'all', label: 'All Templates', icon: LayoutTemplate },
@@ -89,6 +90,7 @@ export default function Templates({ theme = 'dark' }) {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [newTemplate, setNewTemplate] = useState({
     name: '',
     description: '',
@@ -156,13 +158,23 @@ export default function Templates({ theme = 'dark' }) {
             Professional templates for every document type
           </p>
         </div>
-        <Button
-          onClick={() => setShowCreateDialog(true)}
-          className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Create Template
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setShowAIGenerator(true)}
+            className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            AI Generate
+          </Button>
+          <Button
+            onClick={() => setShowCreateDialog(true)}
+            variant="outline"
+            className={isDark ? 'border-slate-700' : ''}
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Manual
+          </Button>
+        </div>
       </motion.div>
 
       {/* Search & Filters */}
@@ -380,6 +392,17 @@ export default function Templates({ theme = 'dark' }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* AI Generator */}
+      <TemplateGenerator
+        open={showAIGenerator}
+        onClose={() => setShowAIGenerator(false)}
+        onTemplateCreated={() => {
+          queryClient.invalidateQueries(['templates']);
+          setShowAIGenerator(false);
+        }}
+        isDark={isDark}
+      />
 
       {/* Preview Dialog */}
       <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>

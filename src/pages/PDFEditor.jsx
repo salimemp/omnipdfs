@@ -60,6 +60,7 @@ import {
 } from "@/components/ui/popover";
 import DropZone from '@/components/shared/DropZone';
 import AIToolsPanel from '@/components/editor/AIToolsPanel';
+import AdvancedToolbar from '@/components/editor/AdvancedToolbar';
 import ReadAloud from '@/components/shared/ReadAloud';
 import { toast } from 'sonner';
 
