@@ -46,6 +46,7 @@ import PDFSummarizer from '@/components/ai/PDFSummarizer';
 import DocumentAssistant from '@/components/ai/DocumentAssistant';
 import DocumentReview from '@/components/ai/DocumentReview';
 import AIWorkflowEngine from '@/components/workflows/AIWorkflowEngine';
+import PDFChatAssistant from '@/components/ai/PDFChatAssistant';
 import { useEffect } from 'react';
 
 const detectLanguage = (text) => {
@@ -527,10 +528,10 @@ Be specific and actionable.`;
         </TabsContent>
 
         <TabsContent value="assistant" className="mt-6">
-          <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
-            {uploadedFile ? (
-              <DocumentAssistant document={uploadedFile} isDark={isDark} />
-            ) : (
+          {uploadedFile ? (
+            <PDFChatAssistant document={uploadedFile} isDark={isDark} />
+          ) : (
+            <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
               <CardContent className="pt-6">
                 <div className="text-center py-12">
                   <Brain className={`w-16 h-16 mx-auto mb-4 ${isDark ? 'text-slate-700' : 'text-slate-300'}`} />
@@ -539,8 +540,8 @@ Be specific and actionable.`;
                   </p>
                 </div>
               </CardContent>
-            )}
-          </Card>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="review" className="mt-6">

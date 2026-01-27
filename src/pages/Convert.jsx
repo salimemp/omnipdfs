@@ -121,11 +121,12 @@ export default function Convert({ theme = 'dark' }) {
   const [targetFormat, setTargetFormat] = useState('pdf');
   const [showOptions, setShowOptions] = useState(false);
   const [options, setOptions] = useState({
-    quality: 'high',
+    quality: 'maximum',
     ocr_enabled: false,
     compress: false,
     dpi: 300,
     colorMode: 'color',
+    preserve_metadata: true,
   });
   const [convertingFiles, setConvertingFiles] = useState({});
   const [activeCategory, setActiveCategory] = useState('all');
@@ -311,6 +312,20 @@ export default function Convert({ theme = 'dark' }) {
         />
       </motion.div>
 
+      {/* Batch Progress */}
+      {uploadedFiles.length > 1 && Object.keys(convertingFiles).length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <BatchConversionProgress 
+            files={uploadedFiles.map(f => ({ ...f, status: convertingFiles[f.id] || 'pending' }))}
+            isDark={isDark}
+          />
+        </motion.div>
+      )}
+
       {/* Uploaded Files */}
       <AnimatePresence>
         {uploadedFiles.length > 0 && (
@@ -462,10 +477,10 @@ export default function Convert({ theme = 'dark' }) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
-                      <SelectItem value="low" className={isDark ? 'text-white' : 'text-slate-900'}>Low (faster)</SelectItem>
-                      <SelectItem value="medium" className={isDark ? 'text-white' : 'text-slate-900'}>Medium</SelectItem>
-                      <SelectItem value="high" className={isDark ? 'text-white' : 'text-slate-900'}>High</SelectItem>
-                      <SelectItem value="maximum" className={isDark ? 'text-white' : 'text-slate-900'}>Maximum</SelectItem>
+                     <SelectItem value="low" className={isDark ? 'text-white' : 'text-slate-900'}>Low (faster)</SelectItem>
+                     <SelectItem value="medium" className={isDark ? 'text-white' : 'text-slate-900'}>Medium</SelectItem>
+                     <SelectItem value="high" className={isDark ? 'text-white' : 'text-slate-900'}>High</SelectItem>
+                     <SelectItem value="maximum" className={isDark ? 'text-white' : 'text-slate-900'}>Maximum ⭐</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

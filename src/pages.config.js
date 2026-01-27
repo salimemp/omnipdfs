@@ -15,11 +15,11 @@ import OCR from './pages/OCR';
 import PDFEditor from './pages/PDFEditor';
 import PDFTools from './pages/PDFTools';
 import ProjectFiles from './pages/ProjectFiles';
+import Security from './pages/Security';
 import Settings from './pages/Settings';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
-import Security from './pages/Security';
 import __Layout from './Layout.jsx';
 
 
@@ -41,11 +41,11 @@ export const PAGES = {
     "PDFEditor": PDFEditor,
     "PDFTools": PDFTools,
     "ProjectFiles": ProjectFiles,
+    "Security": Security,
     "Settings": Settings,
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
-    "Security": Security,
 }
 
 export const pagesConfig = {
