@@ -28,8 +28,12 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import DropZone from '@/components/shared/DropZone';
+import SideBySideViewer from '@/components/compare/SideBySideViewer';
+import AIComparisonTools from '@/components/compare/AIComparisonTools';
+import { useLanguage } from '@/components/shared/LanguageContext';
 
 export default function Compare({ theme = 'dark' }) {
+  const { t } = useLanguage();
   const [leftFile, setLeftFile] = useState(null);
   const [rightFile, setRightFile] = useState(null);
   const [comparing, setComparing] = useState(false);
@@ -226,6 +230,17 @@ Be thorough and specific about the differences.`,
         </motion.div>
       </div>
 
+      {/* Side-by-Side Viewer */}
+      {leftFile && rightFile && !comparisonResult && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <SideBySideViewer doc1={leftFile} doc2={rightFile} isDark={isDark} />
+        </motion.div>
+      )}
+
       {/* Compare Button */}
       {leftFile && rightFile && (
         <motion.div
@@ -246,7 +261,7 @@ Be thorough and specific about the differences.`,
             ) : (
               <>
                 <GitCompare className="w-5 h-5 mr-2" />
-                Compare Documents
+                AI Compare Documents
               </>
             )}
           </Button>
@@ -258,6 +273,17 @@ Be thorough and specific about the differences.`,
             <X className="w-4 h-4 mr-2" />
             Clear
           </Button>
+        </motion.div>
+      )}
+
+      {/* AI Comparison Tools */}
+      {leftFile && rightFile && comparisonResult && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <AIComparisonTools doc1={leftFile} doc2={rightFile} isDark={isDark} />
         </motion.div>
       )}
 
