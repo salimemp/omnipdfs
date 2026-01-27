@@ -310,7 +310,7 @@ export default function Collaboration({ theme = 'dark' }) {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <CollaborationAnalytics collaborations={collaborations} isDark={isDark} />
+          <InsightsDashboard collaborations={collaborations} isDark={isDark} />
         </motion.div>
       )}
 

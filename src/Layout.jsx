@@ -112,6 +112,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Compare PDFs', page: 'Compare', icon: GitCompare },
     { name: 'AI Assistant', page: 'AIAssistant', icon: Sparkles },
     { name: 'Collaboration', page: 'Collaboration', icon: Users },
+    { name: 'Project Files', page: 'ProjectFiles', icon: FolderOpen },
     { name: 'Legal Docs', page: 'LegalDocs', icon: Shield },
     { name: 'Translation', page: 'TranslationMemory', icon: Cloud },
     { name: 'My Files', page: 'Files', icon: FolderOpen },

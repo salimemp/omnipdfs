@@ -38,7 +38,8 @@ import {
   Sparkles,
   Wand2,
   Loader2,
-  MessageSquare
+  MessageSquare,
+  Users
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,6 +77,7 @@ const tools = [
   { id: 'signature', icon: Signature, label: 'Signature', shortcut: 'G' },
   { id: 'eraser', icon: Eraser, label: 'Eraser', shortcut: 'E' },
   { id: 'ai', icon: Sparkles, label: 'AI Tools', shortcut: 'A' },
+  { id: 'collab', icon: Users, label: 'Collaborate', shortcut: 'C' },
 ];
 
 const shapes = [
@@ -560,11 +562,11 @@ export default function PDFEditor({ theme = 'dark' }) {
                 />
               )}
 
-              {/* Real-time Editing */}
-              {uploadedFile && (
-                <div className="mt-4 pt-4 border-t border-slate-700">
+              {/* Collaboration */}
+              {activeTool === 'collab' && uploadedFile && (
+                <div>
                   <Label className={`text-sm mb-2 block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Collaborative Editing
+                    Real-time Collaboration
                   </Label>
                   <RealtimeEditor documentId={uploadedFile.id} isDark={isDark} />
                 </div>

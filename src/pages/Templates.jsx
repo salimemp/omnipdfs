@@ -52,6 +52,7 @@ import TemplateGenerator from '@/components/templates/TemplateGenerator';
 import TemplateManager from '@/components/templates/TemplateManager';
 import TemplateAnalytics from '@/components/templates/TemplateAnalytics';
 import VersionControl from '@/components/templates/VersionControl';
+import AdvancedTemplateManager from '@/components/templates/AdvancedTemplateManager';
 
 const categories = [
   { id: 'all', label: 'All Templates', icon: LayoutTemplate },
