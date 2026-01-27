@@ -49,6 +49,7 @@ import { toast } from 'sonner';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
 import TemplateGenerator from '@/components/templates/TemplateGenerator';
+import TemplateManager from '@/components/templates/TemplateManager';
 
 const categories = [
   { id: 'all', label: 'All Templates', icon: LayoutTemplate },
@@ -91,6 +92,7 @@ export default function Templates({ theme = 'dark' }) {
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [showManager, setShowManager] = useState(false);
   const [newTemplate, setNewTemplate] = useState({
     name: '',
     description: '',
@@ -159,6 +161,13 @@ export default function Templates({ theme = 'dark' }) {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button
+            onClick={() => setShowManager(true)}
+            variant="outline"
+            className={isDark ? 'border-slate-700' : ''}
+          >
+            Manage
+          </Button>
           <Button
             onClick={() => setShowAIGenerator(true)}
             className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600"
@@ -392,6 +401,29 @@ export default function Templates({ theme = 'dark' }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Template Manager */}
+      {showManager && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-6"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Template Manager</h2>
+            <Button variant="outline" onClick={() => setShowManager(false)} className={isDark ? 'border-slate-700' : ''}>
+              Close
+            </Button>
+          </div>
+          <TemplateManager
+            onSelectTemplate={(template) => {
+              setSelectedTemplate(template);
+              setShowManager(false);
+            }}
+            isDark={isDark}
+          />
+        </motion.div>
+      )}
 
       {/* AI Generator */}
       <TemplateGenerator

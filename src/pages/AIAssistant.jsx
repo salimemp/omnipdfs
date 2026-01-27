@@ -41,6 +41,8 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import DropZone from '@/components/shared/DropZone';
 import ReadAloud from '@/components/shared/ReadAloud';
+import PDFSummarizer from '@/components/ai/PDFSummarizer';
+import DocumentAssistant from '@/components/ai/DocumentAssistant';
 import { useEffect } from 'react';
 
 const detectLanguage = (text) => {
@@ -95,6 +97,7 @@ export default function AIAssistant({ theme = 'dark' }) {
   const [result, setResult] = useState(null);
   const [suggestedTags, setSuggestedTags] = useState([]);
   const [detectedLang, setDetectedLang] = useState('en');
+  const [uploadedFiles, setUploadedFiles] = useState([]);
 
   const isDark = theme === 'dark';
 
@@ -110,6 +113,7 @@ export default function AIAssistant({ theme = 'dark' }) {
   const handleFileUploaded = async (fileData) => {
     const document = await base44.entities.Document.create(fileData);
     setUploadedFile(document);
+    setUploadedFiles([document]);
     setResult(null);
   };
 
@@ -271,7 +275,7 @@ Be specific and actionable.`;
       </motion.div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className={`grid grid-cols-4 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border p-1`}>
+        <TabsList className={`grid grid-cols-5 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border p-1`}>
           <TabsTrigger value="summarize" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
             <BookOpen className="w-4 h-4 mr-2" />
             Summarize
@@ -287,6 +291,10 @@ Be specific and actionable.`;
           <TabsTrigger value="suggestions" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
             <Lightbulb className="w-4 h-4 mr-2" />
             Suggestions
+          </TabsTrigger>
+          <TabsTrigger value="assistant" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
+            <Brain className="w-4 h-4 mr-2" />
+            AI Chat
           </TabsTrigger>
         </TabsList>
 
@@ -502,6 +510,23 @@ Be specific and actionable.`;
                 )}
               </Button>
             </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="assistant" className="mt-6">
+          <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+            {uploadedFile ? (
+              <DocumentAssistant document={uploadedFile} isDark={isDark} />
+            ) : (
+              <CardContent className="pt-6">
+                <div className="text-center py-12">
+                  <Brain className={`w-16 h-16 mx-auto mb-4 ${isDark ? 'text-slate-700' : 'text-slate-300'}`} />
+                  <p className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                    Upload a document to start chatting with the AI assistant
+                  </p>
+                </div>
+              </CardContent>
+            )}
           </Card>
         </TabsContent>
       </Tabs>

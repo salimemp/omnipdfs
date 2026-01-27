@@ -412,6 +412,24 @@ export default function Collaboration({ theme = 'dark' }) {
         )}
       </div>
 
+      {/* Workflow Automation Dialog */}
+      <Dialog open={!!showWorkflows} onOpenChange={() => setShowWorkflows(null)}>
+        <DialogContent className={`max-w-3xl max-h-[90vh] overflow-y-auto ${isDark ? 'bg-slate-900 border-slate-700' : ''}`}>
+          <DialogHeader>
+            <DialogTitle className={`flex items-center gap-2 ${isDark ? 'text-white' : ''}`}>
+              <Zap className="w-5 h-5 text-violet-400" />
+              Workflow Automation
+            </DialogTitle>
+          </DialogHeader>
+          {showWorkflows && (
+            <WorkflowAutomation
+              collaborationId={showWorkflows.id}
+              isDark={isDark}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Permissions Dialog */}
       <Dialog open={!!showPermissions} onOpenChange={() => setShowPermissions(null)}>
         <DialogContent className={`max-w-3xl max-h-[90vh] overflow-y-auto ${isDark ? 'bg-slate-900 border-slate-700' : ''}`}>
