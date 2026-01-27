@@ -1,170 +1,173 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { Zap, Play, Plus, Trash2, Edit, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import {
-  Workflow, Play, Pause, CheckCircle2, Loader2, Sparkles,
-  FileText, ArrowRight, Zap, Brain
-} from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useLanguage } from '../shared/LanguageContext';
+import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 
-const workflowTemplates = [
-  {
-    id: 'review_approve',
-    name: 'Review & Approve',
-    description: 'AI reviews document quality, assigns reviewers, sends for approval',
-    steps: ['AI Quality Check', 'Auto-assign Reviewer', 'Send Notification', 'Track Approval']
-  },
-  {
-    id: 'extract_process',
-    name: 'Extract & Process',
-    description: 'Extract data from documents, validate, and store in database',
-    steps: ['OCR/Extract', 'AI Validation', 'Data Mapping', 'Store Data']
-  },
-  {
-    id: 'translate_publish',
-    name: 'Translate & Publish',
-    description: 'Translate document to multiple languages and publish',
-    steps: ['AI Translation', 'Quality Check', 'Format Conversion', 'Publish']
-  },
-  {
-    id: 'summarize_share',
-    name: 'Summarize & Share',
-    description: 'Generate summary and share with stakeholders',
-    steps: ['AI Summarization', 'Create Highlights', 'Share via Email', 'Track Views']
-  }
-];
+export default function AIWorkflowEngine({ isDark }) {
+  const { t } = useLanguage();
+  const [workflows, setWorkflows] = useState([
+    { id: 1, name: 'Auto-OCR & Translate', trigger: 'upload', steps: ['OCR', 'Translate'], status: 'active' },
+    { id: 2, name: 'Compress & Archive', trigger: 'daily', steps: ['Compress', 'Archive'], status: 'active' },
+  ]);
+  const [newWorkflow, setNewWorkflow] = useState({ name: '', trigger: 'upload', steps: [] });
 
-export default function AIWorkflowEngine({ document, isDark = true }) {
-  const [running, setRunning] = useState(false);
-  const [activeWorkflow, setActiveWorkflow] = useState(null);
-  const [progress, setProgress] = useState(0);
-  const [currentStep, setCurrentStep] = useState(0);
+  const availableActions = [
+    'OCR', 'Translate', 'Compress', 'Watermark', 'Encrypt', 'Convert', 'Split', 'Merge', 'Archive'
+  ];
 
-  const runWorkflow = async (workflow) => {
-    setActiveWorkflow(workflow);
-    setRunning(true);
-    setProgress(0);
-    setCurrentStep(0);
-
-    try {
-      for (let i = 0; i < workflow.steps.length; i++) {
-        setCurrentStep(i);
-        setProgress(((i + 1) / workflow.steps.length) * 100);
-        
-        // Simulate AI processing
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        toast.success(`${workflow.steps[i]} completed`);
-      }
-
-      await base44.entities.ActivityLog.create({
-        action: 'convert',
-        document_id: document?.id,
-        document_name: document?.name,
-        details: { workflow: workflow.name, steps_completed: workflow.steps.length }
-      });
-
-      toast.success('Workflow completed successfully!');
-    } catch (e) {
-      toast.error('Workflow failed');
+  const handleCreateWorkflow = async () => {
+    if (!newWorkflow.name || newWorkflow.steps.length === 0) {
+      toast.error('Please complete all fields');
+      return;
     }
 
-    setRunning(false);
-    setActiveWorkflow(null);
+    const workflow = { id: Date.now(), ...newWorkflow, status: 'active' };
+    setWorkflows([...workflows, workflow]);
+    setNewWorkflow({ name: '', trigger: 'upload', steps: [] });
+    toast.success('Workflow created successfully');
+
+    await base44.entities.ActivityLog.create({
+      action: 'workflow_created',
+      details: { workflow_name: workflow.name }
+    });
+  };
+
+  const handleDeleteWorkflow = (id) => {
+    setWorkflows(workflows.filter(w => w.id !== id));
+    toast.success('Workflow deleted');
+  };
+
+  const handleToggleWorkflow = (id) => {
+    setWorkflows(workflows.map(w => 
+      w.id === id ? { ...w, status: w.status === 'active' ? 'paused' : 'active' } : w
+    ));
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 mb-4">
-        <Workflow className="w-5 h-5 text-violet-400" />
-        <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-          AI Workflow Automation
-        </h3>
+    <div className="space-y-6">
+      <div className={`flex items-center gap-3 p-4 rounded-xl ${isDark ? 'bg-purple-500/10 border border-purple-500/20' : 'bg-purple-50 border border-purple-200'}`}>
+        <Zap className="w-6 h-6 text-purple-500" />
+        <div>
+          <p className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            AI-Powered {t('workflows')}
+          </p>
+          <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+            Automate document processing with intelligent workflows
+          </p>
+        </div>
       </div>
 
-      {/* Workflow Templates */}
-      <div className="grid md:grid-cols-2 gap-3">
-        {workflowTemplates.map((workflow, i) => (
-          <motion.div
-            key={workflow.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className={`rounded-xl p-4 border ${
-              activeWorkflow?.id === workflow.id
-                ? isDark ? 'bg-violet-500/10 border-violet-500/50' : 'bg-violet-50 border-violet-300'
-                : isDark ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'
-            }`}
-          >
-            <div className="flex items-start gap-3 mb-3">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                isDark ? 'bg-slate-700' : 'bg-white'
-              }`}>
-                <Brain className="w-5 h-5 text-violet-400" />
-              </div>
-              <div className="flex-1">
-                <h4 className={`font-medium mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  {workflow.name}
-                </h4>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                  {workflow.description}
-                </p>
-              </div>
-            </div>
+      <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}>
+        <CardHeader>
+          <CardTitle className={isDark ? 'text-white' : 'text-slate-900'}>Create New Workflow</CardTitle>
+          <CardDescription className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+            Set up automated document processing
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Workflow Name</Label>
+            <Input
+              value={newWorkflow.name}
+              onChange={(e) => setNewWorkflow({ ...newWorkflow, name: e.target.value })}
+              placeholder="My Automation"
+              className={`mt-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}`}
+            />
+          </div>
 
-            {/* Steps Preview */}
-            <div className="flex items-center gap-1 mb-3 overflow-x-auto">
-              {workflow.steps.map((step, i) => (
-                <React.Fragment key={i}>
-                  <Badge 
-                    variant="outline" 
-                    className={`text-xs whitespace-nowrap ${
-                      activeWorkflow?.id === workflow.id && i <= currentStep
-                        ? 'bg-violet-500/20 text-violet-400 border-violet-500/50'
-                        : isDark ? 'border-slate-600 text-slate-500' : 'text-slate-600'
-                    }`}
-                  >
-                    {step}
-                  </Badge>
-                  {i < workflow.steps.length - 1 && (
-                    <ArrowRight className={`w-3 h-3 shrink-0 ${isDark ? 'text-slate-600' : 'text-slate-400'}`} />
-                  )}
-                </React.Fragment>
+          <div>
+            <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Trigger</Label>
+            <Select value={newWorkflow.trigger} onValueChange={(v) => setNewWorkflow({ ...newWorkflow, trigger: v })}>
+              <SelectTrigger className={`mt-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}`}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
+                <SelectItem value="upload">On Document Upload</SelectItem>
+                <SelectItem value="daily">Daily Schedule</SelectItem>
+                <SelectItem value="weekly">Weekly Schedule</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Actions</Label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {availableActions.map(action => (
+                <Button
+                  key={action}
+                  size="sm"
+                  variant={newWorkflow.steps.includes(action) ? 'default' : 'outline'}
+                  onClick={() => {
+                    if (newWorkflow.steps.includes(action)) {
+                      setNewWorkflow({ ...newWorkflow, steps: newWorkflow.steps.filter(s => s !== action) });
+                    } else {
+                      setNewWorkflow({ ...newWorkflow, steps: [...newWorkflow.steps, action] });
+                    }
+                  }}
+                  className={newWorkflow.steps.includes(action) ? 'bg-violet-500' : ''}
+                >
+                  {action}
+                </Button>
               ))}
             </div>
+          </div>
 
-            <Button
-              size="sm"
-              onClick={() => runWorkflow(workflow)}
-              disabled={running || !document}
-              className="w-full bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600"
-            >
-              {running && activeWorkflow?.id === workflow.id ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                  Running...
-                </>
-              ) : (
-                <>
-                  <Play className="w-4 h-4 mr-1" />
-                  Run Workflow
-                </>
-              )}
-            </Button>
+          <Button onClick={handleCreateWorkflow} className="w-full bg-gradient-to-r from-purple-500 to-pink-500">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Workflow
+          </Button>
+        </CardContent>
+      </Card>
 
-            {/* Progress */}
-            {running && activeWorkflow?.id === workflow.id && (
-              <div className="mt-3">
-                <Progress value={progress} className="h-1" />
-                <p className={`text-xs mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                  {workflow.steps[currentStep]}...
-                </p>
+      <div className="space-y-4">
+        <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>Active Workflows</h3>
+        {workflows.map(workflow => (
+          <Card key={workflow.id} className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{workflow.name}</h4>
+                    <Badge variant={workflow.status === 'active' ? 'default' : 'secondary'} className={workflow.status === 'active' ? 'bg-green-500' : ''}>
+                      {workflow.status === 'active' ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <Clock className="w-3 h-3 mr-1" />}
+                      {workflow.status}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {workflow.steps.map((step, i) => (
+                      <Badge key={i} variant="outline" className={isDark ? 'border-violet-500/30 text-violet-300' : 'border-violet-300 text-violet-600'}>
+                        {step}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleToggleWorkflow(workflow.id)}
+                  >
+                    <Play className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDeleteWorkflow(workflow.id)}
+                    className="text-red-400 hover:text-red-300"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
-            )}
-          </motion.div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>

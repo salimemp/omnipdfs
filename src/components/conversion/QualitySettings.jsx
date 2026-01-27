@@ -1,80 +1,46 @@
 import React from 'react';
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { Sparkles, Gauge, FileImage, Zap } from 'lucide-react';
+import { Settings, Zap, Award, Crown } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '../shared/LanguageContext';
 
-const qualityProfiles = {
-  maximum: {
-    label: 'Maximum Quality',
-    icon: Sparkles,
-    color: 'text-violet-400',
-    description: 'Highest quality, larger file size',
-    settings: { dpi: 600, compression: 0, optimization: false }
-  },
-  high: {
-    label: 'High Quality',
-    icon: Gauge,
-    color: 'text-blue-400',
-    description: 'Excellent quality, balanced size',
-    settings: { dpi: 300, compression: 20, optimization: true }
-  },
-  medium: {
-    label: 'Medium Quality',
-    icon: FileImage,
-    color: 'text-cyan-400',
-    description: 'Good quality, smaller size',
-    settings: { dpi: 150, compression: 50, optimization: true }
-  },
-  low: {
-    label: 'Low Quality',
-    icon: Zap,
-    color: 'text-amber-400',
-    description: 'Fast processing, smallest size',
-    settings: { dpi: 96, compression: 70, optimization: true }
-  }
-};
+export default function QualitySettings({ options, onChange, isDark }) {
+  const { t } = useLanguage();
 
-export default function QualitySettings({ 
-  quality = 'high',
-  onQualityChange,
-  advancedSettings = {},
-  onAdvancedChange,
-  isDark = true 
-}) {
-  const currentProfile = qualityProfiles[quality];
-  const Icon = currentProfile?.icon || Gauge;
+  const qualityLevels = [
+    { value: 'low', label: 'Low', icon: Zap, color: 'text-slate-400', desc: 'Fast, smaller files' },
+    { value: 'medium', label: 'Medium', icon: Settings, color: 'text-blue-400', desc: 'Balanced quality' },
+    { value: 'high', label: 'High', icon: Award, color: 'text-amber-400', desc: 'Better quality' },
+    { value: 'maximum', label: 'Maximum', icon: Crown, color: 'text-violet-400', desc: 'Best quality, larger files' },
+  ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
-        <Label className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-          Quality Preset
+        <Label className={`mb-3 block ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+          Output Quality
         </Label>
-        <Select value={quality} onValueChange={onQualityChange}>
-          <SelectTrigger className={`mt-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : ''}`}>
+        <Select value={options.quality || 'maximum'} onValueChange={(v) => onChange({ quality: v })}>
+          <SelectTrigger className={isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : ''}>
-            {Object.entries(qualityProfiles).map(([key, profile]) => {
-              const ProfileIcon = profile.icon;
+          <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
+            {qualityLevels.map(level => {
+              const Icon = level.icon;
               return (
-                <SelectItem key={key} value={key} className={isDark ? 'text-white' : ''}>
-                  <div className="flex items-center gap-2">
-                    <ProfileIcon className={`w-4 h-4 ${profile.color}`} />
+                <SelectItem key={level.value} value={level.value}>
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 ${level.color}`} />
                     <div>
-                      <p className="font-medium">{profile.label}</p>
-                      <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                        {profile.description}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className={isDark ? 'text-white' : 'text-slate-900'}>{level.label}</span>
+                        {level.value === 'maximum' && (
+                          <Badge className="bg-violet-500/20 text-violet-300 text-xs">Recommended</Badge>
+                        )}
+                      </div>
+                      <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{level.desc}</p>
                     </div>
                   </div>
                 </SelectItem>
@@ -84,62 +50,52 @@ export default function QualitySettings({
         </Select>
       </div>
 
-      {currentProfile && (
-        <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
-          <div className="flex items-center gap-2 mb-2">
-            <Icon className={`w-4 h-4 ${currentProfile.color}`} />
-            <span className={`text-xs font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-              Current Settings
-            </span>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <Label className={isDark ? 'text-slate-300' : 'text-slate-700'}>OCR (Text Recognition)</Label>
+            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Extract text from images</p>
           </div>
-          <div className="space-y-1 text-xs">
-            <div className="flex justify-between">
-              <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>DPI:</span>
-              <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>{currentProfile.settings.dpi}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Compression:</span>
-              <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>{currentProfile.settings.compression}%</span>
-            </div>
-            <div className="flex justify-between">
-              <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Optimization:</span>
-              <Badge className={currentProfile.settings.optimization ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-500/20 text-slate-400'}>
-                {currentProfile.settings.optimization ? 'Enabled' : 'Disabled'}
-              </Badge>
-            </div>
+          <Switch
+            checked={options.ocr_enabled || false}
+            onCheckedChange={(checked) => onChange({ ocr_enabled: checked })}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <Label className={isDark ? 'text-slate-300' : 'text-slate-700'}>Compress Output</Label>
+            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Reduce file size</p>
           </div>
-        </div>
-      )}
-
-      <div className="space-y-3 pt-2">
-        <div className="flex items-center justify-between">
-          <Label className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-            OCR Processing
-          </Label>
-          <Switch 
-            checked={advancedSettings.ocrEnabled || false}
-            onCheckedChange={(v) => onAdvancedChange?.({ ...advancedSettings, ocrEnabled: v })}
+          <Switch
+            checked={options.compress || false}
+            onCheckedChange={(checked) => onChange({ compress: checked })}
           />
         </div>
 
         <div className="flex items-center justify-between">
-          <Label className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-            Preserve Metadata
-          </Label>
-          <Switch 
-            checked={advancedSettings.preserveMetadata !== false}
-            onCheckedChange={(v) => onAdvancedChange?.({ ...advancedSettings, preserveMetadata: v })}
+          <div>
+            <Label className={isDark ? 'text-slate-300' : 'text-slate-700'}>Preserve Metadata</Label>
+            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Keep original properties</p>
+          </div>
+          <Switch
+            checked={options.preserve_metadata !== false}
+            onCheckedChange={(checked) => onChange({ preserve_metadata: checked })}
           />
         </div>
+      </div>
 
-        <div className="flex items-center justify-between">
-          <Label className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-            Fast Mode
-          </Label>
-          <Switch 
-            checked={advancedSettings.fastMode || false}
-            onCheckedChange={(v) => onAdvancedChange?.({ ...advancedSettings, fastMode: v })}
-          />
+      <div className={`p-4 rounded-xl ${isDark ? 'bg-violet-500/10 border border-violet-500/20' : 'bg-violet-50 border border-violet-200'}`}>
+        <div className="flex items-start gap-3">
+          <Crown className="w-5 h-5 text-violet-400 mt-0.5" />
+          <div>
+            <p className={`text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              Maximum Quality Enabled
+            </p>
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              Your conversions will use the highest quality settings for professional-grade output
+            </p>
+          </div>
         </div>
       </div>
     </div>
