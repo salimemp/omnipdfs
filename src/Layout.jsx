@@ -34,6 +34,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from 'framer-motion';
 import AccessibilityPanel from '@/components/shared/AccessibilityPanel';
 import CookieConsent from '@/components/shared/CookieConsent';
+import AppLogo from '@/components/shared/AppLogo';
 
 export default function Layout({ children, currentPageName }) {
   // SEO Metadata
@@ -173,12 +174,7 @@ export default function Layout({ children, currentPageName }) {
       {/* Mobile Header */}
       <header className={`lg:hidden fixed top-0 left-0 right-0 z-50 glass border-b ${isDark ? 'border-slate-800/50' : 'border-slate-200'}`}>
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-white" />
-            </div>
-            <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>OmniPDF</span>
-          </div>
+          <AppLogo size="small" showText={true} isDark={isDark} />
           <div className="flex items-center gap-2">
             <AccessibilityPanel isDark={isDark} />
             <Button
@@ -229,16 +225,11 @@ export default function Layout({ children, currentPageName }) {
           {/* Logo */}
           <div className={`p-6 border-b ${isDark ? 'border-slate-800/50' : 'border-slate-200'}`}>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center glow">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <span className={`font-bold text-xl ${isDark ? 'text-white' : 'text-slate-900'}`}>OmniPDF</span>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Enterprise</span>
-                    <Shield className="w-3 h-3 text-emerald-400" />
-                  </div>
+              <div>
+                <AppLogo size="default" showText={true} isDark={isDark} />
+                <div className="flex items-center gap-1.5 mt-2 ml-14">
+                  <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Enterprise</span>
+                  <Shield className="w-3 h-3 text-emerald-400" />
                 </div>
               </div>
               <div className="hidden lg:flex items-center gap-1">
