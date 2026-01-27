@@ -466,59 +466,11 @@ export default function Convert({ theme = 'dark' }) {
               </button>
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-4">
-              <div className="grid md:grid-cols-4 gap-6">
-                <div>
-                  <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Quality</Label>
-                  <Select 
-                    value={options.quality} 
-                    onValueChange={(v) => setOptions({ ...options, quality: v })}
-                  >
-                    <SelectTrigger className={`mt-2 ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
-                     <SelectItem value="low" className={isDark ? 'text-white' : 'text-slate-900'}>Low (faster)</SelectItem>
-                     <SelectItem value="medium" className={isDark ? 'text-white' : 'text-slate-900'}>Medium</SelectItem>
-                     <SelectItem value="high" className={isDark ? 'text-white' : 'text-slate-900'}>High</SelectItem>
-                     <SelectItem value="maximum" className={isDark ? 'text-white' : 'text-slate-900'}>Maximum ⭐</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>DPI (for images)</Label>
-                  <Select 
-                    value={String(options.dpi)} 
-                    onValueChange={(v) => setOptions({ ...options, dpi: parseInt(v) })}
-                  >
-                    <SelectTrigger className={`mt-2 ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
-                      <SelectItem value="72" className={isDark ? 'text-white' : 'text-slate-900'}>72 DPI (web)</SelectItem>
-                      <SelectItem value="150" className={isDark ? 'text-white' : 'text-slate-900'}>150 DPI</SelectItem>
-                      <SelectItem value="300" className={isDark ? 'text-white' : 'text-slate-900'}>300 DPI (print)</SelectItem>
-                      <SelectItem value="600" className={isDark ? 'text-white' : 'text-slate-900'}>600 DPI (high)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center justify-between md:flex-col md:items-start gap-2">
-                  <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Enable OCR</Label>
-                  <Switch
-                    checked={options.ocr_enabled}
-                    onCheckedChange={(v) => setOptions({ ...options, ocr_enabled: v })}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between md:flex-col md:items-start gap-2">
-                  <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Compress Output</Label>
-                  <Switch
-                    checked={options.compress}
-                    onCheckedChange={(v) => setOptions({ ...options, compress: v })}
-                  />
-                </div>
-              </div>
+              <QualitySettings
+                options={options}
+                onChange={(newOpts) => setOptions({ ...options, ...newOpts })}
+                isDark={isDark}
+              />
             </CollapsibleContent>
           </Collapsible>
         </motion.div>

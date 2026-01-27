@@ -85,19 +85,21 @@ export default function QualitySettings({ options, onChange, isDark }) {
         </div>
       </div>
 
-      <div className={`p-4 rounded-xl ${isDark ? 'bg-violet-500/10 border border-violet-500/20' : 'bg-violet-50 border border-violet-200'}`}>
-        <div className="flex items-start gap-3">
-          <Crown className="w-5 h-5 text-violet-400 mt-0.5" />
-          <div>
-            <p className={`text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Maximum Quality Enabled
-            </p>
-            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Your conversions will use the highest quality settings for professional-grade output
-            </p>
+      {options.quality === 'maximum' && (
+        <div className={`p-4 rounded-xl ${isDark ? 'bg-violet-500/10 border border-violet-500/20' : 'bg-violet-50 border border-violet-200'}`}>
+          <div className="flex items-start gap-3">
+            <Crown className="w-5 h-5 text-violet-400 mt-0.5" />
+            <div>
+              <p className={`text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Maximum Quality Enabled ⭐
+              </p>
+              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                Your conversions will use the highest quality settings for professional-grade output
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
