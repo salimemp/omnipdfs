@@ -19,6 +19,7 @@ import Settings from './pages/Settings';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
+import Security from './pages/Security';
 import __Layout from './Layout.jsx';
 
 
@@ -44,6 +45,7 @@ export const PAGES = {
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
+    "Security": Security,
 }
 
 export const pagesConfig = {
