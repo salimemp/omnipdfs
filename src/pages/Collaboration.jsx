@@ -95,6 +95,7 @@ export default function Collaboration({ theme = 'dark' }) {
   const [inviteRole, setInviteRole] = useState('editor');
   const [newComment, setNewComment] = useState('');
   const [activeTab, setActiveTab] = useState('collaborators');
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const [aiAnalyzing, setAiAnalyzing] = useState(false);
   const [aiInsights, setAiInsights] = useState(null);
 
@@ -292,7 +293,26 @@ export default function Collaboration({ theme = 'dark' }) {
             Work together on documents with your team
           </p>
         </div>
+        <Button
+          onClick={() => setShowAnalytics(!showAnalytics)}
+          variant="outline"
+          className={isDark ? 'border-slate-700' : ''}
+        >
+          <BarChart3 className="w-4 h-4 mr-2" />
+          {showAnalytics ? 'Hide' : 'Show'} Analytics
+        </Button>
       </motion.div>
+
+      {/* Analytics Panel */}
+      {showAnalytics && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <CollaborationAnalytics collaborations={collaborations} isDark={isDark} />
+        </motion.div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

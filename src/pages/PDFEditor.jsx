@@ -61,6 +61,7 @@ import {
 import DropZone from '@/components/shared/DropZone';
 import AIToolsPanel from '@/components/editor/AIToolsPanel';
 import AdvancedToolbar from '@/components/editor/AdvancedToolbar';
+import RealtimeEditor from '@/components/editor/RealtimeEditor';
 import ReadAloud from '@/components/shared/ReadAloud';
 import { toast } from 'sonner';
 
@@ -557,6 +558,16 @@ export default function PDFEditor({ theme = 'dark' }) {
                   onAddElement={addElement}
                   onSuggestionsReady={setAiSuggestion}
                 />
+              )}
+
+              {/* Real-time Editing */}
+              {uploadedFile && (
+                <div className="mt-4 pt-4 border-t border-slate-700">
+                  <Label className={`text-sm mb-2 block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    Collaborative Editing
+                  </Label>
+                  <RealtimeEditor documentId={uploadedFile.id} isDark={isDark} />
+                </div>
               )}
 
               {/* Read Aloud for selected text */}

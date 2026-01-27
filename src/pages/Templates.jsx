@@ -50,6 +50,8 @@ import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
 import TemplateGenerator from '@/components/templates/TemplateGenerator';
 import TemplateManager from '@/components/templates/TemplateManager';
+import TemplateAnalytics from '@/components/templates/TemplateAnalytics';
+import VersionControl from '@/components/templates/VersionControl';
 
 const categories = [
   { id: 'all', label: 'All Templates', icon: LayoutTemplate },
@@ -93,6 +95,8 @@ export default function Templates({ theme = 'dark' }) {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [showManager, setShowManager] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showVersions, setShowVersions] = useState(null);
   const [newTemplate, setNewTemplate] = useState({
     name: '',
     description: '',
@@ -161,6 +165,13 @@ export default function Templates({ theme = 'dark' }) {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button
+            onClick={() => setShowAnalytics(true)}
+            variant="outline"
+            className={isDark ? 'border-slate-700' : ''}
+          >
+            Analytics
+          </Button>
           <Button
             onClick={() => setShowManager(true)}
             variant="outline"
@@ -401,6 +412,23 @@ export default function Templates({ theme = 'dark' }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Template Analytics */}
+      {showAnalytics && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-6"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Template Analytics</h2>
+            <Button variant="outline" onClick={() => setShowAnalytics(false)} className={isDark ? 'border-slate-700' : ''}>
+              Close
+            </Button>
+          </div>
+          <TemplateAnalytics templates={allTemplates} isDark={isDark} />
+        </motion.div>
+      )}
 
       {/* Template Manager */}
       {showManager && (
