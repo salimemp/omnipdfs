@@ -1,165 +1,122 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { motion } from 'framer-motion';
+import { Users, Save, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Users, Wifi, WifiOff, Eye, Edit, Save, Circle
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import moment from 'moment';
 
-const userColors = [
-  'bg-violet-500', 'bg-cyan-500', 'bg-emerald-500', 
-  'bg-amber-500', 'bg-pink-500', 'bg-blue-500'
-];
-
-export default function RealtimeEditor({ documentId, isDark = true }) {
+export default function RealtimeEditor({ documentId, isDark }) {
   const [content, setContent] = useState('');
-  const [activeUsers, setActiveUsers] = useState([]);
-  const [isConnected, setIsConnected] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
+  const [activeUsers, setActiveUsers] = useState([]);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const initUser = async () => {
-      const user = await base44.auth.me();
-      setCurrentUser(user);
-      
-      // Simulate joining session
-      setActiveUsers([{
-        email: user.email,
-        color: userColors[0],
-        cursor: null,
-        typing: false
-      }]);
-      setIsConnected(true);
-    };
-    initUser();
-  }, []);
+    fetchUser();
+    loadDocument();
 
-  useEffect(() => {
-    if (!documentId) return;
-
-    // Subscribe to real-time document changes
+    // Subscribe to real-time updates
     const unsubscribe = base44.entities.Document.subscribe((event) => {
-      if (event.id === documentId && event.type === 'update') {
+      if (event.type === 'update' && event.id === documentId) {
         setContent(event.data.content || '');
-        setLastSaved(new Date());
-        toast.success('Document updated', { duration: 1000 });
+        setLastSaved(new Date().toISOString());
       }
     });
 
     return unsubscribe;
   }, [documentId]);
 
-  const handleContentChange = (e) => {
-    const newContent = e.target.value;
-    setContent(newContent);
-    
-    // Mark user as typing
-    setActiveUsers(prev => 
-      prev.map(u => u.email === currentUser?.email ? { ...u, typing: true } : u)
-    );
-
-    // Auto-save after 2 seconds of no typing
-    clearTimeout(window.editorSaveTimeout);
-    window.editorSaveTimeout = setTimeout(() => {
-      saveContent(newContent);
-    }, 2000);
+  const fetchUser = async () => {
+    try {
+      const userData = await base44.auth.me();
+      setUser(userData);
+      setActiveUsers([userData]);
+    } catch (e) {}
   };
 
-  const saveContent = async (contentToSave = content) => {
+  const loadDocument = async () => {
     try {
-      await base44.entities.Document.update(documentId, {
-        content: contentToSave
-      });
-      setLastSaved(new Date());
-      setActiveUsers(prev => 
-        prev.map(u => u.email === currentUser?.email ? { ...u, typing: false } : u)
-      );
-    } catch (e) {
-      toast.error('Failed to save');
+      const docs = await base44.entities.Document.filter({ id: documentId });
+      if (docs.length > 0) {
+        setContent(docs[0].content || '');
+      }
+    } catch (error) {
+      console.error('Failed to load document');
     }
   };
 
+  const saveContent = async () => {
+    setSaving(true);
+    try {
+      await base44.entities.Document.update(documentId, { content });
+      setLastSaved(new Date().toISOString());
+      toast.success('Saved successfully');
+    } catch (error) {
+      toast.error('Failed to save');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Auto-save every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (content) saveContent();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [content]);
+
   return (
     <div className="space-y-4">
-      {/* Status Bar */}
-      <div className={`flex items-center justify-between p-3 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+      <div className={`flex items-center justify-between p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            {isConnected ? (
-              <Wifi className="w-4 h-4 text-emerald-400" />
-            ) : (
-              <WifiOff className="w-4 h-4 text-red-400" />
-            )}
-            <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              {isConnected ? 'Connected' : 'Offline'}
-            </span>
+          <div className="flex -space-x-2">
+            {activeUsers.map((u, i) => (
+              <Avatar key={i} className="w-6 h-6 border-2 border-slate-900">
+                <AvatarFallback className="bg-gradient-to-br from-violet-500 to-cyan-500 text-white text-xs">
+                  {u.email?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            ))}
           </div>
+          <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+            {activeUsers.length} {activeUsers.length === 1 ? 'editor' : 'editors'} active
+          </span>
+          <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1" />
+            Live
+          </Badge>
+        </div>
+
+        <div className="flex items-center gap-2">
           {lastSaved && (
             <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-              Last saved {moment(lastSaved).fromNow()}
+              Saved {new Date(lastSaved).toLocaleTimeString()}
             </span>
           )}
-        </div>
-
-        {/* Active Users */}
-        <div className="flex items-center gap-2">
-          <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            <Users className="w-4 h-4 inline mr-1" />
-            {activeUsers.length}
-          </span>
-          <div className="flex -space-x-2">
-            <AnimatePresence>
-              {activeUsers.map((user, i) => (
-                <motion.div
-                  key={user.email}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  className="relative"
-                >
-                  <Avatar className={`w-8 h-8 border-2 ${isDark ? 'border-slate-900' : 'border-white'}`}>
-                    <AvatarFallback className={`${user.color} text-white text-xs`}>
-                      {user.email.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  {user.typing && (
-                    <Circle className="absolute -bottom-1 -right-1 w-3 h-3 text-emerald-400 fill-current animate-pulse" />
-                  )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+          <Button size="sm" onClick={saveContent} disabled={saving}>
+            {saving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-1" />
+                Save
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
-      {/* Editor */}
-      <div className={`rounded-xl overflow-hidden border ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
-        <Textarea
-          value={content}
-          onChange={handleContentChange}
-          placeholder="Start typing... Changes save automatically"
-          className={`min-h-[400px] border-0 focus:ring-0 ${isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}`}
-        />
-      </div>
-
-      {/* Actions */}
-      <div className="flex justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => saveContent()}
-          className={isDark ? 'border-slate-700' : ''}
-        >
-          <Save className="w-4 h-4 mr-1" />
-          Save Now
-        </Button>
-      </div>
+      <Textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Start editing..."
+        className={`min-h-[500px] font-mono ${isDark ? 'bg-slate-900/50 border-slate-800 text-white' : 'bg-white border-slate-200'}`}
+      />
     </div>
   );
 }

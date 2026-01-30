@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import SyncStatus from '@/components/cloud/SyncStatus';
 import CloudFileBrowser from '@/components/storage/CloudFileBrowser';
+import CloudSyncConflictResolver from '@/components/storage/CloudSyncConflictResolver';
 import {
   Cloud,
   HardDrive,
