@@ -47,6 +47,7 @@ import DocumentAssistant from '@/components/ai/DocumentAssistant';
 import DocumentReview from '@/components/ai/DocumentReview';
 import AIWorkflowEngine from '@/components/workflows/AIWorkflowEngine';
 import PDFChatAssistant from '@/components/ai/PDFChatAssistant';
+import PDFWorkflowBuilder from '@/components/workflows/PDFWorkflowBuilder';
 import { useEffect } from 'react';
 
 const detectLanguage = (text) => {
@@ -579,11 +580,18 @@ Be specific and actionable.`;
         </TabsContent>
 
         <TabsContent value="workflows" className="mt-6">
-          <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
-            <CardContent className="pt-6">
-              <AIWorkflowEngine document={uploadedFile} isDark={isDark} />
-            </CardContent>
-          </Card>
+          {uploadedFile ? (
+            <PDFWorkflowBuilder document={uploadedFile} isDark={isDark} />
+          ) : (
+            <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+              <CardContent className="py-12 text-center">
+                <Wand2 className={`w-16 h-16 mx-auto mb-4 ${isDark ? 'text-slate-700' : 'text-slate-300'}`} />
+                <p className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                  Upload a document to build AI workflows
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
 

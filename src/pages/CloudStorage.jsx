@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
+import SyncStatus from '@/components/cloud/SyncStatus';
 import {
   Cloud,
   HardDrive,
@@ -79,6 +80,19 @@ export default function CloudStorage({ theme = 'dark' }) {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importing, setImporting] = useState(false);
   const [syncing, setSyncing] = useState({});
+  const [syncStatus, setSyncStatus] = useState({});
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      connectedServices.forEach(serviceId => {
+        setSyncStatus(prev => ({
+          ...prev,
+          [serviceId]: { lastSync: prev[serviceId]?.lastSync || new Date().toISOString() }
+        }));
+      });
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [connectedServices]);
 
   const isDark = theme === 'dark';
   const queryClient = useQueryClient();
@@ -343,37 +357,29 @@ export default function CloudStorage({ theme = 'dark' }) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-10"
+          className="mb-10 space-y-4"
         >
           <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
             <CardHeader>
               <CardTitle className={`flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 <RefreshCw className="w-5 h-5 text-violet-400" />
-                Quick Actions
+                Sync Status
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-3">
-                {connectedServices.map(serviceId => {
-                  const service = cloudServices.find(s => s.id === serviceId);
-                  return (
-                    <Button
-                      key={serviceId}
-                      variant="outline"
-                      onClick={() => syncAll(serviceId)}
-                      disabled={syncing.all === serviceId}
-                      className={`${isDark ? 'border-slate-700 text-slate-300' : 'border-slate-200 text-slate-600'}`}
-                    >
-                      {syncing.all === serviceId ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      ) : (
-                        <RefreshCw className="w-4 h-4 mr-2" />
-                      )}
-                      Sync with {service?.name}
-                    </Button>
-                  );
-                })}
-              </div>
+            <CardContent className="space-y-3">
+              {connectedServices.map(serviceId => {
+                const service = cloudServices.find(s => s.id === serviceId);
+                return (
+                  <SyncStatus
+                    key={serviceId}
+                    service={service?.name}
+                    lastSync={syncStatus[serviceId]?.lastSync}
+                    syncing={syncing.all === serviceId}
+                    onSync={() => syncAll(serviceId)}
+                    isDark={isDark}
+                  />
+                );
+              })}
             </CardContent>
           </Card>
         </motion.div>
