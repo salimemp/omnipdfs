@@ -76,38 +76,30 @@ export default function AdvancedSharePermissions({ document, isDark }) {
     }
 
     try {
-      const newUser = {
-        email: newUserEmail,
-        role: newUserRole,
-        addedAt: new Date().toISOString()
-      };
-
-      await base44.entities.Document.update(document.id, {
-        is_shared: true,
-        shared_with: [...(document.shared_with || []), newUserEmail]
-      });
-
-      await base44.integrations.Core.SendEmail({
-        to: newUserEmail,
-        subject: `Document shared: ${document.name}`,
-        body: `You have been granted ${newUserRole} access to: ${document.name}\n\nAccess the document here: ${window.location.origin}/share/${document.id}`
-      });
-
-      await base44.entities.ActivityLog.create({
-        action: 'share',
-        document_id: document.id,
-        document_name: document.name,
-        details: {
-          type: 'user_added',
-          user_email: newUserEmail,
-          role: newUserRole
+      const response = await base44.functions.invoke('shareDocument', {
+        documentId: document.id,
+        action: 'add_user',
+        data: {
+          email: newUserEmail,
+          role: newUserRole,
+          shareLink: `${window.location.origin}/share/${document.id}`
         }
       });
 
-      setShareUsers([...shareUsers, newUser]);
-      setNewUserEmail('');
-      toast.success('User added successfully');
-      loadAuditLog();
+      if (response.data.success) {
+        const newUser = {
+          email: newUserEmail,
+          role: newUserRole,
+          addedAt: new Date().toISOString()
+        };
+        
+        setShareUsers([...shareUsers, newUser]);
+        setNewUserEmail('');
+        toast.success('User added successfully');
+        loadAuditLog();
+      } else {
+        throw new Error('Failed to add user');
+      }
     } catch (error) {
       toast.error('Failed to add user');
     }

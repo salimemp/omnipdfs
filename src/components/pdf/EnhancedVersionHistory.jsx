@@ -63,42 +63,20 @@ export default function EnhancedVersionHistory({ document, isDark }) {
     }
 
     try {
-      const user = await base44.auth.me();
-      const latestVersion = versions[0];
-      const versionNumber = parseFloat(latestVersion.version.replace('v', '')) + 0.1;
-      
-      const newVersion = {
-        version: `v${versionNumber.toFixed(1)}`,
-        author: user.email,
-        changes: newVersionNotes,
-        created_at: new Date().toISOString()
-      };
-
-      const collab = await base44.entities.Collaboration.filter({ document_id: document.id });
-      
-      if (collab[0]) {
-        const currentHistory = collab[0].version_history || [];
-        await base44.entities.Collaboration.update(collab[0].id, {
-          version_history: [...currentHistory, newVersion]
-        });
-      } else {
-        await base44.entities.Collaboration.create({
-          document_id: document.id,
-          version_history: [newVersion]
-        });
-      }
-
-      await base44.entities.ActivityLog.create({
-        action: 'convert',
-        document_id: document?.id,
-        document_name: document?.name,
-        details: { type: 'version_created', version: newVersion.version, notes: newVersionNotes }
+      const response = await base44.functions.invoke('manageVersions', {
+        documentId: document.id,
+        action: 'create',
+        data: { notes: newVersionNotes }
       });
 
-      setNewVersionNotes('');
-      setCreating(false);
-      toast.success('New version created');
-      loadVersions();
+      if (response.data.success) {
+        setNewVersionNotes('');
+        setCreating(false);
+        toast.success('New version created');
+        loadVersions();
+      } else {
+        throw new Error('Failed to create version');
+      }
     } catch (error) {
       toast.error('Failed to create version');
       console.error(error);

@@ -43,63 +43,17 @@ export default function AdvancedSummarizer({ document, isDark }) {
   const generateSummary = async () => {
     setLoading(true);
     try {
-      const focusText = settings.focus.length > 0 
-        ? `Focus specifically on: ${settings.focus.map(f => focusAreas.find(a => a.id === f)?.name).join(', ')}`
-        : '';
-
-      const prompt = `Create a ${settings.style} summary of this document. 
-Target length: approximately ${settings.length} words.
-${focusText}
-${settings.customInstructions ? `Additional instructions: ${settings.customInstructions}` : ''}
-${settings.includeCitations ? 'Include page/section references where applicable.' : ''}
-
-Provide the summary in a structured format with:
-- Main summary text
-- Key takeaways (3-5 points)
-- Confidence score (0-100)
-- Reading time estimate
-${settings.focus.includes('action_items') ? '- Actionable items list' : ''}
-${settings.focus.includes('dates') ? '- Important dates timeline' : ''}`;
-
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt,
-        add_context_from_internet: false,
-        file_urls: [document.file_url],
-        response_json_schema: {
-          type: "object",
-          properties: {
-            summary: { type: "string" },
-            key_takeaways: { type: "array", items: { type: "string" } },
-            confidence_score: { type: "number" },
-            reading_time: { type: "string" },
-            word_count: { type: "number" },
-            action_items: { type: "array", items: { type: "string" } },
-            important_dates: { type: "array", items: { 
-              type: "object",
-              properties: {
-                date: { type: "string" },
-                description: { type: "string" }
-              }
-            }}
-          }
-        }
+      const response = await base44.functions.invoke('advancedSummarize', {
+        documentId: document.id,
+        settings: settings
       });
 
-      setSummary(response);
-
-      await base44.entities.ActivityLog.create({
-        action: 'convert',
-        document_id: document.id,
-        document_name: document.name,
-        details: { 
-          type: 'advanced_summary',
-          style: settings.style,
-          length: settings.length,
-          focus: settings.focus
-        }
-      });
-
-      toast.success('Summary generated successfully');
+      if (response.data.success) {
+        setSummary(response.data.summary);
+        toast.success('Summary generated successfully');
+      } else {
+        throw new Error('Summarization failed');
+      }
     } catch (error) {
       toast.error('Failed to generate summary');
       console.error(error);
