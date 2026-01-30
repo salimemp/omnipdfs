@@ -16,10 +16,20 @@ export default function RealTimeCollaboration({ documentId, isDark }) {
   const [newCollaborator, setNewCollaborator] = useState('');
   const [newComment, setNewComment] = useState('');
   const [adding, setAdding] = useState(false);
+  const [activeUsers, setActiveUsers] = useState([]);
 
   useEffect(() => {
     fetchUser();
     fetchCollaboration();
+    
+    // Subscribe to real-time updates
+    const unsubscribe = base44.entities.Collaboration.subscribe((event) => {
+      if (event.type === 'update' && event.data.document_id === documentId) {
+        setCollaboration(event.data);
+      }
+    });
+    
+    return unsubscribe;
   }, [documentId]);
 
   const fetchUser = async () => {
@@ -129,10 +139,27 @@ export default function RealTimeCollaboration({ documentId, isDark }) {
     <div className="space-y-6">
       <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}>
         <CardHeader>
-          <CardTitle className={`flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            <Users className="w-5 h-5 text-violet-400" />
-            Collaborators ({collaboration?.collaborators?.length || 0})
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className={`flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              <Users className="w-5 h-5 text-violet-400" />
+              Collaborators ({collaboration?.collaborators?.length || 0})
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <div className="flex -space-x-2">
+                {collaboration?.collaborators?.slice(0, 3).map((collab, i) => (
+                  <Avatar key={i} className="w-6 h-6 border-2 border-slate-900">
+                    <AvatarFallback className="bg-gradient-to-br from-violet-500 to-cyan-500 text-white text-xs">
+                      {collab.email?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
+              <span className="text-xs text-emerald-400 flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                Live
+              </span>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">

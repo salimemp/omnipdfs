@@ -18,11 +18,37 @@ const workflowSteps = [
   { id: 'auto-tag', name: 'Auto-Tag', icon: '🏷️', description: 'Generate tags' }
 ];
 
+const workflowTemplates = [
+  {
+    id: 'research',
+    name: 'Research Analysis',
+    icon: '🔬',
+    description: 'Complete research document analysis',
+    steps: ['summarize', 'extract_data', 'create_outline', 'generate_questions']
+  },
+  {
+    id: 'legal',
+    name: 'Legal Review',
+    icon: '⚖️',
+    description: 'Legal document processing',
+    steps: ['extract_data', 'sentiment_analysis', 'auto-tag']
+  },
+  {
+    id: 'content',
+    name: 'Content Analysis',
+    icon: '📄',
+    description: 'Full content analysis',
+    steps: ['summarize', 'sentiment_analysis', 'generate_questions', 'auto-tag']
+  }
+];
+
 export default function PDFWorkflowBuilder({ document, isDark }) {
   const [workflow, setWorkflow] = useState([]);
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
+  const [savedWorkflows, setSavedWorkflows] = useState([]);
+  const [workflowName, setWorkflowName] = useState('');
 
   const addStep = (stepId) => {
     const step = workflowSteps.find(s => s.id === stepId);
@@ -33,6 +59,33 @@ export default function PDFWorkflowBuilder({ document, isDark }) {
 
   const removeStep = (index) => {
     setWorkflow(workflow.filter((_, i) => i !== index));
+  };
+
+  const applyTemplate = (templateId) => {
+    const template = workflowTemplates.find(t => t.id === templateId);
+    if (template) {
+      const steps = template.steps.map(stepId => ({
+        ...workflowSteps.find(s => s.id === stepId),
+        status: 'pending'
+      }));
+      setWorkflow(steps);
+      toast.success(`Applied ${template.name} template`);
+    }
+  };
+
+  const saveWorkflow = () => {
+    if (!workflowName || workflow.length === 0) {
+      toast.error('Enter a name and add steps');
+      return;
+    }
+    setSavedWorkflows([...savedWorkflows, { name: workflowName, steps: workflow }]);
+    toast.success('Workflow saved');
+    setWorkflowName('');
+  };
+
+  const loadWorkflow = (saved) => {
+    setWorkflow(saved.steps.map(s => ({ ...s, status: 'pending' })));
+    toast.success(`Loaded ${saved.name}`);
   };
 
   const runWorkflow = async () => {
@@ -104,6 +157,23 @@ export default function PDFWorkflowBuilder({ document, isDark }) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            {workflowTemplates.map(template => (
+              <Button
+                key={template.id}
+                variant="outline"
+                onClick={() => applyTemplate(template.id)}
+                className={`h-auto py-3 flex flex-col items-start ${isDark ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-100'}`}
+              >
+                <div className="text-2xl mb-1">{template.icon}</div>
+                <div className="text-xs font-medium text-left">{template.name}</div>
+                <div className={`text-xs text-left ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                  {template.steps.length} steps
+                </div>
+              </Button>
+            ))}
+          </div>
+
           <div className="flex gap-2">
             <Select onValueChange={addStep}>
               <SelectTrigger className={isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}>
@@ -124,6 +194,35 @@ export default function PDFWorkflowBuilder({ document, isDark }) {
               </SelectContent>
             </Select>
           </div>
+
+          {workflow.length > 0 && (
+            <div className="flex gap-2">
+              <Input
+                placeholder="Workflow name (optional)"
+                value={workflowName}
+                onChange={(e) => setWorkflowName(e.target.value)}
+                className={isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}
+              />
+              <Button onClick={saveWorkflow} variant="outline" disabled={!workflowName}>
+                Save
+              </Button>
+            </div>
+          )}
+
+          {savedWorkflows.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {savedWorkflows.map((saved, i) => (
+                <Badge
+                  key={i}
+                  variant="secondary"
+                  className="cursor-pointer hover:bg-violet-500/20"
+                  onClick={() => loadWorkflow(saved)}
+                >
+                  {saved.name}
+                </Badge>
+              ))}
+            </div>
+          )}
 
           {workflow.length > 0 && (
             <div className="space-y-2">
