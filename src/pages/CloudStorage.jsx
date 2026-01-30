@@ -108,54 +108,76 @@ export default function CloudStorage({ theme = 'dark' }) {
 
   const importFromCloud = async (service) => {
     setSelectedService(service);
+    setImporting(true);
     
-    if (service.id === 'google-drive') {
-      setImporting(true);
-      try {
-        const result = await base44.functions.invoke('googleDriveImport', { 
-          action: 'list' 
-        });
-        
-        if (result.data.success && result.data.files?.length > 0) {
-          // Auto-import first PDF file for demo
-          const pdfFile = result.data.files.find(f => 
-            f.mimeType === 'application/pdf' || f.name?.endsWith('.pdf')
-          );
-          
-          if (pdfFile) {
-            const downloadResult = await base44.functions.invoke('googleDriveImport', {
-              action: 'download',
-              fileId: pdfFile.id
-            });
-            
-            const document = await base44.entities.Document.create({
-              name: pdfFile.name,
-              file_url: downloadResult.data.fileUrl,
-              file_type: 'pdf',
-              file_size: pdfFile.size || 0,
-              tags: ['imported', 'google-drive']
-            });
-            
-            await base44.entities.ActivityLog.create({
-              action: 'upload',
-              document_id: document.id,
-              document_name: pdfFile.name,
-              details: { source: 'Google Drive' }
-            });
-            
-            queryClient.invalidateQueries(['documents']);
-            toast.success(`Imported ${pdfFile.name} from Google Drive`);
-          } else {
-            toast.error('No PDF files found in Google Drive');
-          }
-        }
-      } catch (error) {
-        toast.error(error.response?.data?.error || 'Failed to import from Google Drive');
-      } finally {
-        setImporting(false);
+    try {
+      let functionName, fileIdKey;
+      
+      switch (service.id) {
+        case 'google-drive':
+          functionName = 'googleDriveImport';
+          fileIdKey = 'fileId';
+          break;
+        case 'onedrive':
+          functionName = 'oneDriveIntegration';
+          fileIdKey = 'itemId';
+          break;
+        case 'dropbox':
+          functionName = 'dropboxIntegration';
+          fileIdKey = 'path';
+          break;
+        case 'box':
+          functionName = 'boxIntegration';
+          fileIdKey = 'fileId';
+          break;
+        default:
+          setShowImportDialog(true);
+          setImporting(false);
+          return;
       }
-    } else {
-      setShowImportDialog(true);
+      
+      const result = await base44.functions.invoke(functionName, { action: 'list' });
+      
+      if (result.data.success && result.data.files?.length > 0) {
+        const pdfFile = result.data.files.find(f => 
+          f.mimeType === 'application/pdf' || 
+          f.name?.endsWith('.pdf') ||
+          f.type === 'file'
+        );
+        
+        if (pdfFile) {
+          const downloadParams = { 
+            action: 'download',
+            [fileIdKey]: pdfFile.id || pdfFile.path_display
+          };
+          
+          const downloadResult = await base44.functions.invoke(functionName, downloadParams);
+          
+          const document = await base44.entities.Document.create({
+            name: pdfFile.name,
+            file_url: downloadResult.data.fileUrl,
+            file_type: 'pdf',
+            file_size: pdfFile.size || 0,
+            tags: ['imported', service.id]
+          });
+          
+          await base44.entities.ActivityLog.create({
+            action: 'upload',
+            document_id: document.id,
+            document_name: pdfFile.name,
+            details: { source: service.name }
+          });
+          
+          queryClient.invalidateQueries(['documents']);
+          toast.success(`Imported ${pdfFile.name} from ${service.name}`);
+        } else {
+          toast.error(`No PDF files found in ${service.name}`);
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || `Failed to import from ${service.name}`);
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -183,25 +205,40 @@ export default function CloudStorage({ theme = 'dark' }) {
     setSyncing(prev => ({ ...prev, [file.id]: serviceId }));
     
     try {
-      if (serviceId === 'google-drive') {
-        const result = await base44.functions.invoke('googleDriveImport', {
-          action: 'upload',
-          fileName: file.name,
-          fileUrl: file.file_url
+      let functionName;
+      
+      switch (serviceId) {
+        case 'google-drive':
+          functionName = 'googleDriveImport';
+          break;
+        case 'onedrive':
+          functionName = 'oneDriveIntegration';
+          break;
+        case 'dropbox':
+          functionName = 'dropboxIntegration';
+          break;
+        case 'box':
+          functionName = 'boxIntegration';
+          break;
+        default:
+          throw new Error('Unsupported service');
+      }
+      
+      const result = await base44.functions.invoke(functionName, {
+        action: 'upload',
+        fileName: file.name,
+        fileUrl: file.file_url
+      });
+      
+      if (result.data.success) {
+        await base44.entities.ActivityLog.create({
+          action: 'share',
+          document_id: file.id,
+          document_name: file.name,
+          details: { destination: cloudServices.find(s => s.id === serviceId)?.name }
         });
         
-        if (result.data.success) {
-          await base44.entities.ActivityLog.create({
-            action: 'share',
-            document_id: file.id,
-            document_name: file.name,
-            details: { destination: 'Google Drive' }
-          });
-          
-          toast.success(`Exported to Google Drive`);
-        }
-      } else {
-        toast.error(`${cloudServices.find(s => s.id === serviceId)?.name} export coming soon`);
+        toast.success(`Exported to ${cloudServices.find(s => s.id === serviceId)?.name}`);
       }
     } catch (error) {
       toast.error(error.response?.data?.error || 'Export failed');
