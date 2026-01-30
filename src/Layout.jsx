@@ -42,12 +42,12 @@ function LayoutContent({ children, currentPageName }) {
   // SEO Metadata
   useEffect(() => {
     const metadata = {
-      title: 'OmniPDF - Enterprise PDF Management & Conversion Platform',
+      title: 'OmniPDFs - Enterprise PDF Management & Conversion Platform',
       description: 'Convert, edit, and manage PDFs with AI-powered tools. GDPR, HIPAA, SOC 2 compliant. 50+ file formats, real-time collaboration, OCR, and more.',
       keywords: 'PDF converter, PDF editor, document management, AI PDF tools, GDPR compliant, HIPAA compliant, PDF to Word, merge PDF, compress PDF',
-      ogTitle: 'OmniPDF - Professional PDF Tools with AI',
+      ogTitle: 'OmniPDFs - Professional PDF Tools with AI',
       ogDescription: 'Enterprise-grade PDF management with AI assistance, collaboration, and compliance',
-      ogImage: 'https://omnipdf.com/og-image.png',
+      ogImage: 'https://omnipdfs.com/og-image.png',
     };
 
     document.title = metadata.title;
@@ -82,13 +82,13 @@ function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('omnipdf-theme') || 'dark';
+      return localStorage.getItem('omnipdfs-theme') || 'dark';
     }
     return 'dark';
   });
 
   useEffect(() => {
-    localStorage.setItem('omnipdf-theme', theme);
+    localStorage.setItem('omnipdfs-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
