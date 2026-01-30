@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
 const workflowSteps = [
@@ -39,6 +41,20 @@ const workflowTemplates = [
     icon: '📄',
     description: 'Full content analysis',
     steps: ['summarize', 'sentiment_analysis', 'generate_questions', 'auto-tag']
+  },
+  {
+    id: 'translation',
+    name: 'Translation Bundle',
+    icon: '🌐',
+    description: 'Translate and summarize',
+    steps: ['translate', 'summarize', 'auto-tag']
+  },
+  {
+    id: 'comprehensive',
+    name: 'Comprehensive Review',
+    icon: '📊',
+    description: 'Full document analysis package',
+    steps: ['summarize', 'extract_data', 'create_outline', 'sentiment_analysis', 'generate_questions', 'auto-tag']
   }
 ];
 
@@ -157,21 +173,24 @@ export default function PDFWorkflowBuilder({ document, isDark }) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {workflowTemplates.map(template => (
-              <Button
-                key={template.id}
-                variant="outline"
-                onClick={() => applyTemplate(template.id)}
-                className={`h-auto py-3 flex flex-col items-start ${isDark ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-100'}`}
-              >
-                <div className="text-2xl mb-1">{template.icon}</div>
-                <div className="text-xs font-medium text-left">{template.name}</div>
-                <div className={`text-xs text-left ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                  {template.steps.length} steps
-                </div>
-              </Button>
-            ))}
+          <div className="space-y-2 mb-4">
+            <Label className={isDark ? 'text-slate-300' : 'text-slate-700'}>Quick Start Templates</Label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {workflowTemplates.map(template => (
+                <Button
+                  key={template.id}
+                  variant="outline"
+                  onClick={() => applyTemplate(template.id)}
+                  className={`h-auto py-3 flex flex-col items-start ${isDark ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-100'}`}
+                >
+                  <div className="text-2xl mb-1">{template.icon}</div>
+                  <div className="text-xs font-medium text-left">{template.name}</div>
+                  <div className={`text-xs text-left ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                    {template.steps.length} steps
+                  </div>
+                </Button>
+              ))}
+            </div>
           </div>
 
           <div className="flex gap-2">

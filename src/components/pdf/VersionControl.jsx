@@ -9,13 +9,43 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 export default function VersionControl({ document, isDark }) {
-  const [versions, setVersions] = useState([
-    { id: 1, version: 'v1.0', author: 'John Doe', date: new Date(), notes: 'Initial version', isCurrent: false },
-    { id: 2, version: 'v1.1', author: 'Jane Smith', date: new Date(), notes: 'Added new section', isCurrent: false },
-    { id: 3, version: 'v2.0', author: 'You', date: new Date(), notes: 'Major revision', isCurrent: true },
-  ]);
+  const [versions, setVersions] = useState([]);
   const [newVersionNotes, setNewVersionNotes] = useState('');
   const [creating, setCreating] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    loadVersions();
+  }, [document?.id]);
+
+  const loadVersions = async () => {
+    if (!document?.id) return;
+    
+    try {
+      const collab = await base44.entities.Collaboration.filter({ document_id: document.id });
+      if (collab[0]?.version_history) {
+        setVersions(collab[0].version_history.map((v, i) => ({
+          ...v,
+          id: i + 1,
+          date: new Date(v.created_at || Date.now()),
+          isCurrent: i === collab[0].version_history.length - 1
+        })));
+      } else {
+        setVersions([{
+          id: 1,
+          version: 'v1.0',
+          author: document.created_by || 'System',
+          date: new Date(document.created_date),
+          notes: 'Initial version',
+          isCurrent: true
+        }]);
+      }
+    } catch (error) {
+      console.error('Failed to load versions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const createVersion = async () => {
     if (!newVersionNotes) {
@@ -23,34 +53,67 @@ export default function VersionControl({ document, isDark }) {
       return;
     }
 
-    const latestVersion = versions[versions.length - 1];
-    const versionNumber = parseFloat(latestVersion.version.replace('v', '')) + 0.1;
-    
-    const newVersion = {
-      id: Date.now(),
-      version: `v${versionNumber.toFixed(1)}`,
-      author: 'You',
-      date: new Date(),
-      notes: newVersionNotes,
-      isCurrent: true
-    };
+    try {
+      const user = await base44.auth.me();
+      const latestVersion = versions[versions.length - 1];
+      const versionNumber = parseFloat(latestVersion.version.replace('v', '')) + 0.1;
+      
+      const newVersion = {
+        version: `v${versionNumber.toFixed(1)}`,
+        author: user.email,
+        changes: newVersionNotes,
+        created_at: new Date().toISOString()
+      };
 
-    setVersions(versions.map(v => ({ ...v, isCurrent: false })).concat(newVersion));
-    setNewVersionNotes('');
-    setCreating(false);
-    toast.success('New version created');
+      const collab = await base44.entities.Collaboration.filter({ document_id: document.id });
+      
+      if (collab[0]) {
+        await base44.entities.Collaboration.update(collab[0].id, {
+          version_history: [...(collab[0].version_history || []), newVersion]
+        });
+      } else {
+        await base44.entities.Collaboration.create({
+          document_id: document.id,
+          version_history: [newVersion]
+        });
+      }
 
-    await base44.entities.ActivityLog.create({
-      action: 'convert',
-      document_id: document?.id,
-      details: { type: 'version_created', version: newVersion.version }
-    });
+      await base44.entities.ActivityLog.create({
+        action: 'convert',
+        document_id: document?.id,
+        document_name: document?.name,
+        details: { type: 'version_created', version: newVersion.version, notes: newVersionNotes }
+      });
+
+      setNewVersionNotes('');
+      setCreating(false);
+      toast.success('New version created');
+      loadVersions();
+    } catch (error) {
+      toast.error('Failed to create version');
+      console.error(error);
+    }
   };
 
   const restoreVersion = async (version) => {
-    setVersions(versions.map(v => ({ ...v, isCurrent: v.id === version.id })));
-    toast.success(`Restored to ${version.version}`);
+    try {
+      await base44.entities.ActivityLog.create({
+        action: 'convert',
+        document_id: document?.id,
+        document_name: document?.name,
+        details: { type: 'version_restored', version: version.version }
+      });
+      
+      setVersions(versions.map(v => ({ ...v, isCurrent: v.version === version.version })));
+      toast.success(`Restored to ${version.version}`);
+    } catch (error) {
+      toast.error('Failed to restore version');
+    }
   };
+
+  if (loading) {
+    return <div className={`text-center py-8 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Loading versions...</div>;
+  }
 
   return (
     <div className="space-y-4">
@@ -99,7 +162,7 @@ export default function VersionControl({ document, isDark }) {
                     )}
                   </div>
                   <p className={`text-sm mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                    {version.notes}
+                    {version.notes || version.changes || 'No description'}
                   </p>
                   <div className={`flex items-center gap-4 text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                     <span className="flex items-center gap-1">

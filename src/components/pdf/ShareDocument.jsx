@@ -23,14 +23,20 @@ export default function ShareDocument({ document, isDark }) {
   const [emailRecipients, setEmailRecipients] = useState('');
 
   const generateShareLink = async () => {
-    const link = `https://omnipdf.app/share/${document?.id || 'abc123'}`;
+    const link = `${window.location.origin}/share/${document?.id || 'abc123'}`;
     setShareLink(link);
     setLinkGenerated(true);
+
+    await base44.entities.Document.update(document.id, {
+      is_shared: true,
+      shared_with: [...(document.shared_with || []), ...emailRecipients.split(',').map(e => e.trim()).filter(Boolean)]
+    });
 
     await base44.entities.ActivityLog.create({
       action: 'share',
       document_id: document?.id,
-      details: { type: 'link_generated', access: settings.access }
+      document_name: document?.name,
+      details: { type: 'link_generated', access: settings.access, settings }
     });
 
     toast.success('Share link generated');
@@ -51,12 +57,26 @@ export default function ShareDocument({ document, isDark }) {
     
     toast.promise(
       async () => {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await base44.entities.Document.update(document.id, {
+          is_shared: true,
+          shared_with: [...new Set([...(document.shared_with || []), ...emails])]
+        });
+
+        for (const email of emails) {
+          await base44.integrations.Core.SendEmail({
+            to: email,
+            subject: `Document shared: ${document.name}`,
+            body: `You have been granted ${settings.access} access to: ${document.name}\n\nAccess link: ${shareLink || window.location.origin + '/share/' + document.id}\n\n${settings.password ? 'Password protection enabled.' : ''}\n${settings.expiry ? `Link expires: ${new Date(settings.expiry).toLocaleDateString()}` : ''}`
+          });
+        }
+
         await base44.entities.ActivityLog.create({
           action: 'share',
           document_id: document?.id,
-          details: { type: 'email_share', recipients: emails }
+          document_name: document?.name,
+          details: { type: 'email_share', recipients: emails, access: settings.access }
         });
+        
         setEmailRecipients('');
       },
       {
