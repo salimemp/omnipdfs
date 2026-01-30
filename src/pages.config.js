@@ -70,6 +70,7 @@ import Subscription from './pages/Subscription';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
+import CustomDashboard from './pages/CustomDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -97,6 +98,7 @@ export const PAGES = {
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
+    "CustomDashboard": CustomDashboard,
 }
 
 export const pagesConfig = {

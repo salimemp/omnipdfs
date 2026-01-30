@@ -104,7 +104,7 @@ function LayoutContent({ children, currentPageName }) {
   }, []);
 
   const navigation = [
-    { name: 'Dashboard', page: 'Dashboard', icon: Home },
+    { name: 'Dashboard', page: 'CustomDashboard', icon: Home },
     { name: 'Convert', page: 'Convert', icon: Zap },
     { name: 'PDF Tools', page: 'PDFTools', icon: Layers },
     { name: 'PDF Editor', page: 'PDFEditor', icon: PenTool },
@@ -115,9 +115,9 @@ function LayoutContent({ children, currentPageName }) {
     { name: 'Compare PDFs', page: 'Compare', icon: GitCompare },
     { name: 'AI Assistant', page: 'AIAssistant', icon: Sparkles },
     { name: 'Collaboration', page: 'Collaboration', icon: Users },
+    { name: 'Cloud Storage', page: 'CloudStorage', icon: Cloud },
     { name: 'Project Files', page: 'ProjectFiles', icon: FolderOpen },
     { name: 'Legal Docs', page: 'LegalDocs', icon: Shield },
-    { name: 'Translation', page: 'TranslationMemory', icon: Cloud },
     { name: 'My Files', page: 'Files', icon: FolderOpen },
     { name: 'Analytics', page: 'Analytics', icon: History },
     { name: 'API Docs', page: 'APIDocs', icon: Webhook },

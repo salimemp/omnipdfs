@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AIDocumentGenerator from '@/components/ai/AIDocumentGenerator';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
