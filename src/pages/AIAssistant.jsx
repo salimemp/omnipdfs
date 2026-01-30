@@ -18,8 +18,11 @@ import {
   Wand2,
   BookOpen,
   Volume2,
-  FileSearch
+  FileSearch,
+  Play
 } from 'lucide-react';
+import UserStatisticsBar from '@/components/shared/UserStatisticsBar';
+import OnboardingVideo from '@/components/shared/OnboardingVideo';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -107,6 +110,7 @@ export default function AIAssistant({ theme = 'dark' }) {
   const [suggestedTags, setSuggestedTags] = useState([]);
   const [detectedLang, setDetectedLang] = useState('en');
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const isDark = theme === 'dark';
 
@@ -286,19 +290,39 @@ Be specific and actionable.`;
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-10"
+        className="mb-8"
       >
-        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${isDark ? 'bg-violet-500/10' : 'bg-violet-100'} border border-violet-500/20 mb-6`}>
-          <Brain className="w-4 h-4 text-violet-400" />
-          <span className={`text-sm ${isDark ? 'text-violet-300' : 'text-violet-600'}`}>Powered by Gemini AI</span>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${isDark ? 'bg-violet-500/10' : 'bg-violet-100'} border border-violet-500/20 mb-4`}>
+              <Brain className="w-4 h-4 text-violet-400" />
+              <span className={`text-sm ${isDark ? 'text-violet-300' : 'text-violet-600'}`}>Powered by Gemini AI</span>
+            </div>
+            <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              AI Document Assistant
+            </h1>
+            <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+              Summarize, translate, auto-tag, and get intelligent suggestions for your documents
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowOnboarding(true)}
+            variant="outline"
+            className="gap-2"
+          >
+            <Play className="w-4 h-4" />
+            Watch Tour
+          </Button>
         </div>
-        <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-          AI Document Assistant
-        </h1>
-        <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
-          Summarize, translate, auto-tag, and get intelligent suggestions for your documents
-        </p>
+
+        <UserStatisticsBar isDark={isDark} />
       </motion.div>
+
+      <AnimatePresence>
+        {showOnboarding && (
+          <OnboardingVideo onClose={() => setShowOnboarding(false)} isDark={isDark} />
+        )}
+      </AnimatePresence>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className={`grid grid-cols-9 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border p-1`}>
