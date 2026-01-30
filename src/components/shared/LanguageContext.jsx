@@ -2,38 +2,100 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const translations = {
   en: {
+    // Navigation
     dashboard: 'Dashboard', convert: 'Convert', pdfTools: 'PDF Tools', pdfEditor: 'PDF Editor', formFiller: 'Form Filler',
     ocr: 'OCR', templates: 'Templates', aiGenerator: 'AI Generator', comparePdfs: 'Compare PDFs', aiAssistant: 'AI Assistant',
     collaboration: 'Collaboration', projectFiles: 'Project Files', legalDocs: 'Legal Docs', translation: 'Translation',
-    myFiles: 'My Files', analytics: 'Analytics', apiDocs: 'API Docs', settings: 'Settings', signIn: 'Sign In',
-    signOut: 'Sign Out', upload: 'Upload', download: 'Download', delete: 'Delete', save: 'Save', cancel: 'Cancel',
+    myFiles: 'My Files', analytics: 'Analytics', apiDocs: 'API Docs', settings: 'Settings', cloudStorage: 'Cloud Storage',
+    taskAutomation: 'Task Automation', advancedFeatures: 'Advanced Features', history: 'History', webhooks: 'Webhooks',
+    
+    // Auth
+    signIn: 'Sign In', signOut: 'Sign Out',
+    
+    // Common Actions
+    upload: 'Upload', download: 'Download', delete: 'Delete', save: 'Save', cancel: 'Cancel',
     confirm: 'Confirm', edit: 'Edit', share: 'Share', search: 'Search', filter: 'Filter', sort: 'Sort',
+    copy: 'Copy', clear: 'Clear', restore: 'Restore', sync: 'Sync', import: 'Import', export: 'Export',
+    
+    // Cookie Consent
     cookieConsent: 'Cookie Consent', privacyPolicy: 'Privacy Policy', acceptAll: 'Accept All', decline: 'Decline',
     cookieMessage: 'We use cookies to enhance your experience, analyze site usage, and improve our services. Your privacy is important to us.',
+    
+    // AI Features
     summarize: 'Summarize', translate: 'Translate', autoTag: 'Auto-Tag', suggestions: 'Suggestions', aiChat: 'AI Chat',
     review: 'Review', workflows: 'Workflows', uploadDocument: 'Upload Document', pasteText: 'Or Paste Text',
-    processing: 'Processing...', success: 'Success', error: 'Error', quickConvert: 'Quick Convert', enterprise: 'Enterprise',
-    startConverting: 'Start converting', dropFiles: 'Drop files to convert', copy: 'Copy', clear: 'Clear',
-    copiedToClipboard: 'Copied to clipboard', targetLanguage: 'Target Language', generateSummary: 'Generate Summary',
+    generateSummary: 'Generate Summary', aiPoweredInsights: 'AI-Powered Insights', targetLanguage: 'Target Language',
+    
+    // Status
+    processing: 'Processing...', success: 'Success', error: 'Error', loading: 'Loading...', complete: 'Complete',
+    pending: 'Pending', failed: 'Failed', active: 'Active', inactive: 'Inactive',
+    
+    // Features
+    quickConvert: 'Quick Convert', enterprise: 'Enterprise', startConverting: 'Start converting', 
+    dropFiles: 'Drop files to convert', copiedToClipboard: 'Copied to clipboard',
+    
+    // Security
     security: 'Security', encryption: 'Encryption', passwordProtect: 'Password Protect', permissions: 'Permissions',
     watermark: 'Watermark', digitalSignature: 'Digital Signature', auditLog: 'Audit Log', accessControl: 'Access Control',
+    
+    // Analytics
+    totalDocuments: 'Total Documents', totalConversions: 'Total Conversions', successRate: 'Success Rate',
+    fileTypes: 'File Types', activityTypes: 'Activity Types', insights: 'Insights',
+    
+    // Versioning
+    versionHistory: 'Version History', currentVersion: 'Current', version: 'Version', restoreVersion: 'Restore',
+    
+    // Integration
+    externalServiceSync: 'External Service Sync', selectService: 'Select service...', syncToService: 'Sync to',
+    syncing: 'Syncing...', importFromService: 'Import from',
   },
   es: {
+    // Navigation
     dashboard: 'Tablero', convert: 'Convertir', pdfTools: 'Herramientas PDF', pdfEditor: 'Editor PDF', formFiller: 'Rellenar Formularios',
     ocr: 'OCR', templates: 'Plantillas', aiGenerator: 'Generador IA', comparePdfs: 'Comparar PDFs', aiAssistant: 'Asistente IA',
     collaboration: 'Colaboración', projectFiles: 'Archivos del Proyecto', legalDocs: 'Documentos Legales', translation: 'Traducción',
-    myFiles: 'Mis Archivos', analytics: 'Análisis', apiDocs: 'Documentación API', settings: 'Configuración', signIn: 'Iniciar Sesión',
-    signOut: 'Cerrar Sesión', upload: 'Subir', download: 'Descargar', delete: 'Eliminar', save: 'Guardar', cancel: 'Cancelar',
+    myFiles: 'Mis Archivos', analytics: 'Análisis', apiDocs: 'Documentación API', settings: 'Configuración', cloudStorage: 'Almacenamiento en la Nube',
+    taskAutomation: 'Automatización de Tareas', advancedFeatures: 'Funciones Avanzadas', history: 'Historial', webhooks: 'Webhooks',
+    
+    // Auth
+    signIn: 'Iniciar Sesión', signOut: 'Cerrar Sesión',
+    
+    // Common Actions
+    upload: 'Subir', download: 'Descargar', delete: 'Eliminar', save: 'Guardar', cancel: 'Cancelar',
     confirm: 'Confirmar', edit: 'Editar', share: 'Compartir', search: 'Buscar', filter: 'Filtrar', sort: 'Ordenar',
+    copy: 'Copiar', clear: 'Limpiar', restore: 'Restaurar', sync: 'Sincronizar', import: 'Importar', export: 'Exportar',
+    
+    // Cookie Consent
     cookieConsent: 'Consentimiento de Cookies', privacyPolicy: 'Política de Privacidad', acceptAll: 'Aceptar Todo', decline: 'Rechazar',
     cookieMessage: 'Utilizamos cookies para mejorar su experiencia, analizar el uso del sitio y mejorar nuestros servicios. Su privacidad es importante para nosotros.',
+    
+    // AI Features
     summarize: 'Resumir', translate: 'Traducir', autoTag: 'Etiquetar Auto', suggestions: 'Sugerencias', aiChat: 'Chat IA',
     review: 'Revisar', workflows: 'Flujos de Trabajo', uploadDocument: 'Subir Documento', pasteText: 'O Pegar Texto',
-    processing: 'Procesando...', success: 'Éxito', error: 'Error', quickConvert: 'Conversión Rápida', enterprise: 'Empresarial',
-    startConverting: 'Comenzar a convertir', dropFiles: 'Suelta archivos para convertir', copy: 'Copiar', clear: 'Limpiar',
-    copiedToClipboard: 'Copiado al portapapeles', targetLanguage: 'Idioma Objetivo', generateSummary: 'Generar Resumen',
+    generateSummary: 'Generar Resumen', aiPoweredInsights: 'Información Impulsada por IA', targetLanguage: 'Idioma Objetivo',
+    
+    // Status
+    processing: 'Procesando...', success: 'Éxito', error: 'Error', loading: 'Cargando...', complete: 'Completo',
+    pending: 'Pendiente', failed: 'Fallido', active: 'Activo', inactive: 'Inactivo',
+    
+    // Features
+    quickConvert: 'Conversión Rápida', enterprise: 'Empresarial', startConverting: 'Comenzar a convertir',
+    dropFiles: 'Suelta archivos para convertir', copiedToClipboard: 'Copiado al portapapeles',
+    
+    // Security
     security: 'Seguridad', encryption: 'Cifrado', passwordProtect: 'Proteger con Contraseña', permissions: 'Permisos',
     watermark: 'Marca de Agua', digitalSignature: 'Firma Digital', auditLog: 'Registro de Auditoría', accessControl: 'Control de Acceso',
+    
+    // Analytics
+    totalDocuments: 'Documentos Totales', totalConversions: 'Conversiones Totales', successRate: 'Tasa de Éxito',
+    fileTypes: 'Tipos de Archivo', activityTypes: 'Tipos de Actividad', insights: 'Información',
+    
+    // Versioning
+    versionHistory: 'Historial de Versiones', currentVersion: 'Actual', version: 'Versión', restoreVersion: 'Restaurar',
+    
+    // Integration
+    externalServiceSync: 'Sincronización de Servicio Externo', selectService: 'Seleccionar servicio...', syncToService: 'Sincronizar con',
+    syncing: 'Sincronizando...', importFromService: 'Importar desde',
   },
   fr: {
     dashboard: 'Tableau de Bord', convert: 'Convertir', pdfTools: 'Outils PDF', pdfEditor: 'Éditeur PDF', formFiller: 'Remplisseur de Formulaires',
