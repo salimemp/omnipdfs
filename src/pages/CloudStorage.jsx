@@ -108,13 +108,59 @@ export default function CloudStorage({ theme = 'dark' }) {
 
   const importFromCloud = async (service) => {
     setSelectedService(service);
-    setShowImportDialog(true);
+    
+    if (service.id === 'google-drive') {
+      setImporting(true);
+      try {
+        const result = await base44.functions.invoke('googleDriveImport', { 
+          action: 'list' 
+        });
+        
+        if (result.data.success && result.data.files?.length > 0) {
+          // Auto-import first PDF file for demo
+          const pdfFile = result.data.files.find(f => 
+            f.mimeType === 'application/pdf' || f.name?.endsWith('.pdf')
+          );
+          
+          if (pdfFile) {
+            const downloadResult = await base44.functions.invoke('googleDriveImport', {
+              action: 'download',
+              fileId: pdfFile.id
+            });
+            
+            const document = await base44.entities.Document.create({
+              name: pdfFile.name,
+              file_url: downloadResult.data.fileUrl,
+              file_type: 'pdf',
+              file_size: pdfFile.size || 0,
+              tags: ['imported', 'google-drive']
+            });
+            
+            await base44.entities.ActivityLog.create({
+              action: 'upload',
+              document_id: document.id,
+              document_name: pdfFile.name,
+              details: { source: 'Google Drive' }
+            });
+            
+            queryClient.invalidateQueries(['documents']);
+            toast.success(`Imported ${pdfFile.name} from Google Drive`);
+          } else {
+            toast.error('No PDF files found in Google Drive');
+          }
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.error || 'Failed to import from Google Drive');
+      } finally {
+        setImporting(false);
+      }
+    } else {
+      setShowImportDialog(true);
+    }
   };
 
   const handleImport = async (fileData) => {
     setImporting(true);
-    
-    await new Promise(resolve => setTimeout(resolve, 1500));
     
     const document = await base44.entities.Document.create({
       ...fileData,
@@ -136,17 +182,32 @@ export default function CloudStorage({ theme = 'dark' }) {
   const exportToCloud = async (file, serviceId) => {
     setSyncing(prev => ({ ...prev, [file.id]: serviceId }));
     
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    await base44.entities.ActivityLog.create({
-      action: 'share',
-      document_id: file.id,
-      document_name: file.name,
-      details: { destination: serviceId }
-    });
-
-    setSyncing(prev => ({ ...prev, [file.id]: null }));
-    toast.success(`Exported to ${cloudServices.find(s => s.id === serviceId)?.name}`);
+    try {
+      if (serviceId === 'google-drive') {
+        const result = await base44.functions.invoke('googleDriveImport', {
+          action: 'upload',
+          fileName: file.name,
+          fileUrl: file.file_url
+        });
+        
+        if (result.data.success) {
+          await base44.entities.ActivityLog.create({
+            action: 'share',
+            document_id: file.id,
+            document_name: file.name,
+            details: { destination: 'Google Drive' }
+          });
+          
+          toast.success(`Exported to Google Drive`);
+        }
+      } else {
+        toast.error(`${cloudServices.find(s => s.id === serviceId)?.name} export coming soon`);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Export failed');
+    } finally {
+      setSyncing(prev => ({ ...prev, [file.id]: null }));
+    }
   };
 
   const syncAll = async (serviceId) => {
