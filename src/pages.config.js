@@ -72,6 +72,7 @@ import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
 import CustomDashboard from './pages/CustomDashboard';
 import TaskAutomation from './pages/TaskAutomation';
+import AdvancedFeatures from './pages/AdvancedFeatures';
 import __Layout from './Layout.jsx';
 
 
@@ -101,6 +102,7 @@ export const PAGES = {
     "Webhooks": Webhooks,
     "CustomDashboard": CustomDashboard,
     "TaskAutomation": TaskAutomation,
+    "AdvancedFeatures": AdvancedFeatures,
 }
 
 export const pagesConfig = {
