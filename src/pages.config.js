@@ -66,10 +66,10 @@ import PDFTools from './pages/PDFTools';
 import ProjectFiles from './pages/ProjectFiles';
 import Security from './pages/Security';
 import Settings from './pages/Settings';
+import Subscription from './pages/Subscription';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
-import Subscription from './pages/Subscription';
 import __Layout from './Layout.jsx';
 
 
@@ -93,10 +93,10 @@ export const PAGES = {
     "ProjectFiles": ProjectFiles,
     "Security": Security,
     "Settings": Settings,
+    "Subscription": Subscription,
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
-    "Subscription": Subscription,
 }
 
 export const pagesConfig = {

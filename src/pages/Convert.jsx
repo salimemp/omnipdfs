@@ -38,6 +38,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import DropZone from '@/components/shared/DropZone';
 import FileIcon from '@/components/shared/FileIcon';
+import QualitySettings from '@/components/conversion/QualitySettings';
+import BatchConversionProgress from '@/components/conversion/BatchConversionProgress';
 
 // Extended format support
 const formatCategories = {
