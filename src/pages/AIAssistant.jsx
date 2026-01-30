@@ -223,13 +223,30 @@ Be specific and actionable.`;
           break;
       }
 
-      const response = await base44.integrations.Core.InvokeLLM({
+      const response = await base44.functions.invoke('processWithGemini', {
         prompt,
-        response_json_schema: schema,
-        file_urls: uploadedFile?.file_url ? [uploadedFile.file_url] : undefined
+        fileUrl: uploadedFile?.file_url,
+        action
       });
 
-      setResult({ action, data: response });
+      if (response.data.success) {
+        // Try to parse JSON result if it's a string
+        let parsedData;
+        try {
+          parsedData = typeof response.data.result === 'string' 
+            ? JSON.parse(response.data.result) 
+            : response.data.result;
+        } catch {
+          parsedData = { text: response.data.result };
+        }
+        setResult({ action, data: parsedData });
+        
+        if (action === 'tags' && parsedData.tags) {
+          setSuggestedTags(parsedData.tags);
+        }
+      } else {
+        throw new Error(response.data.error || 'Processing failed');
+      }
 
       if (action === 'tags' && response.tags) {
         setSuggestedTags(response.tags);
