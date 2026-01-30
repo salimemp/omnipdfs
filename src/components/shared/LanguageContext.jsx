@@ -299,7 +299,10 @@ export const LanguageProvider = ({ children }) => {
     document.documentElement.dir = ['ar', 'he'].includes(language) ? 'rtl' : 'ltr';
   }, [language]);
 
-  const t = (key) => translations[language]?.[key] || translations['en'][key] || key;
+  const t = (key) => {
+    const translation = translations[language]?.[key] || translations['en']?.[key] || key;
+    return translation;
+  };
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, translations }}>
