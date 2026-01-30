@@ -163,57 +163,30 @@ export default function Convert({ theme = 'dark' }) {
         options: options
       });
 
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Simulate a file conversion from ${file.file_type.toUpperCase()} to ${targetFormat.toUpperCase()}. 
-                 File name: ${file.name}
-                 Options: Quality=${options.quality}, OCR=${options.ocr_enabled}, Compress=${options.compress}, DPI=${options.dpi}
-                 Return a success message with estimated file size and processing details.`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            success: { type: "boolean" },
-            message: { type: "string" },
-            estimated_size: { type: "number" },
-            processing_time: { type: "number" },
-            pages_converted: { type: "number" }
+      const response = await base44.functions.invoke('convertFile', {
+        documentId: file.id,
+        targetFormat: targetFormat,
+        options: options
+      });
+
+      if (response.data.success) {
+        setConvertingFiles(prev => ({ 
+          ...prev, 
+          [file.id]: { 
+            status: 'completed',
+            downloadUrl: response.data.downloadUrl,
+            convertedDoc: response.data.convertedDocument
           }
-        }
-      });
-
-      await base44.entities.ConversionJob.update(job.id, {
-        status: 'completed',
-        output_url: file.file_url,
-        processing_time: result.processing_time || 2500
-      });
-
-      await base44.entities.Document.update(file.id, {
-        conversion_history: [
-          ...(file.conversion_history || []),
-          {
-            from_format: file.file_type,
-            to_format: targetFormat,
-            date: new Date().toISOString(),
-            output_url: file.file_url
-          }
-        ]
-      });
-
-      setConvertingFiles(prev => ({ ...prev, [file.id]: 'completed' }));
-      queryClient.invalidateQueries(['documents']);
-      queryClient.invalidateQueries(['recent-jobs']);
-
-      await base44.entities.ActivityLog.create({
-        action: 'convert',
-        document_id: file.id,
-        document_name: file.name,
-        details: {
-          from: file.file_type,
-          to: targetFormat,
-          options
-        }
-      });
+        }));
+        
+        queryClient.invalidateQueries(['documents']);
+        queryClient.invalidateQueries(['recent-jobs']);
+      } else {
+        throw new Error('Conversion failed');
+      }
 
     } catch (error) {
+      console.error('Conversion error:', error);
       setConvertingFiles(prev => ({ ...prev, [file.id]: 'error' }));
     }
   };
@@ -374,14 +347,14 @@ export default function Convert({ theme = 'dark' }) {
                       {status === 'converting' && (
                         <Loader2 className="w-5 h-5 text-violet-400 animate-spin" />
                       )}
-                      {status === 'completed' && (
+                      {status?.status === 'completed' && (
                         <>
                           <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                           <Button
                             size="sm"
                             variant="ghost"
                             className="text-violet-400 hover:text-violet-300"
-                            onClick={() => window.open(file.file_url, '_blank')}
+                            onClick={() => window.open(status.downloadUrl, '_blank')}
                           >
                             <Download className="w-4 h-4 mr-1" />
                             Download
