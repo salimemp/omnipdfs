@@ -48,6 +48,8 @@ import DocumentReview from '@/components/ai/DocumentReview';
 import AIWorkflowEngine from '@/components/workflows/AIWorkflowEngine';
 import PDFChatAssistant from '@/components/ai/PDFChatAssistant';
 import PDFWorkflowBuilder from '@/components/workflows/PDFWorkflowBuilder';
+import RealtimeEditor from '@/components/editor/RealtimeEditor';
+import AdvancedWorkflowAutomation from '@/components/workflows/AdvancedWorkflowAutomation';
 import { useEffect } from 'react';
 
 const detectLanguage = (text) => {
@@ -299,34 +301,40 @@ Be specific and actionable.`;
       </motion.div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className={`grid grid-cols-7 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border p-1`}>
+        <TabsList className={`grid grid-cols-9 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border p-1`}>
           <TabsTrigger value="summarize" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
-            <BookOpen className="w-4 h-4 mr-2" />
+            <BookOpen className="w-4 h-4 mr-1" />
             Summarize
           </TabsTrigger>
           <TabsTrigger value="translate" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
-            <Languages className="w-4 h-4 mr-2" />
+            <Languages className="w-4 h-4 mr-1" />
             Translate
           </TabsTrigger>
           <TabsTrigger value="tags" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
-            <Tags className="w-4 h-4 mr-2" />
-            Auto-Tag
+            <Tags className="w-4 h-4 mr-1" />
+            Tags
           </TabsTrigger>
           <TabsTrigger value="suggestions" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
-            <Lightbulb className="w-4 h-4 mr-2" />
-            Suggestions
+            <Lightbulb className="w-4 h-4 mr-1" />
+            Tips
           </TabsTrigger>
           <TabsTrigger value="assistant" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
-            <Brain className="w-4 h-4 mr-2" />
-            AI Chat
+            <Brain className="w-4 h-4 mr-1" />
+            Chat
           </TabsTrigger>
           <TabsTrigger value="review" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
-            <FileSearch className="w-4 h-4 mr-2" />
+            <FileSearch className="w-4 h-4 mr-1" />
             Review
           </TabsTrigger>
           <TabsTrigger value="workflows" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
-            <Wand2 className="w-4 h-4 mr-2" />
+            <Wand2 className="w-4 h-4 mr-1" />
             Workflows
+          </TabsTrigger>
+          <TabsTrigger value="editor" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
+            Edit
+          </TabsTrigger>
+          <TabsTrigger value="automation" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-400">
+            Auto
           </TabsTrigger>
         </TabsList>
 
@@ -592,6 +600,25 @@ Be specific and actionable.`;
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="editor" className="mt-6">
+          {uploadedFile ? (
+            <RealtimeEditor documentId={uploadedFile.id} isDark={isDark} />
+          ) : (
+            <Card className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
+              <CardContent className="py-12 text-center">
+                <FileText className={`w-16 h-16 mx-auto mb-4 ${isDark ? 'text-slate-700' : 'text-slate-300'}`} />
+                <p className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                  Upload a document to start real-time editing
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="automation" className="mt-6">
+          <AdvancedWorkflowAutomation isDark={isDark} />
         </TabsContent>
       </Tabs>
 
