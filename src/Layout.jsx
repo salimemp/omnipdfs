@@ -27,7 +27,8 @@ import {
   PenTool,
   Wand2,
   Users,
-  Accessibility
+  Accessibility,
+  Bot
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -114,6 +115,7 @@ function LayoutContent({ children, currentPageName }) {
     { name: 'AI Generator', page: 'AIDocGenerator', icon: Wand2 },
     { name: 'Compare PDFs', page: 'Compare', icon: GitCompare },
     { name: 'AI Assistant', page: 'AIAssistant', icon: Sparkles },
+    { name: 'Task Automation', page: 'TaskAutomation', icon: Bot },
     { name: 'Collaboration', page: 'Collaboration', icon: Users },
     { name: 'Cloud Storage', page: 'CloudStorage', icon: Cloud },
     { name: 'Project Files', page: 'ProjectFiles', icon: FolderOpen },
