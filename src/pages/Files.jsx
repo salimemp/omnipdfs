@@ -128,7 +128,7 @@ export default function Files({ theme = 'dark' }) {
         <div className="flex gap-3">
           <Button
             variant="outline"
-            className="border-slate-700 text-slate-300 hover:bg-slate-800"
+            className={isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-100'}
             onClick={() => setShowNewFolder(true)}
           >
             <FolderPlus className="w-4 h-4 mr-2" />
@@ -153,44 +153,44 @@ export default function Files({ theme = 'dark' }) {
               placeholder="Search files..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-slate-900 border-slate-700 text-white"
+              className={`pl-10 ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
             />
           </div>
           
           <div className="flex gap-3">
             <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-36 bg-slate-900 border-slate-700 text-white">
+              <SelectTrigger className={`w-36 ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
                 <Filter className="w-4 h-4 mr-2 text-slate-400" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700">
-                <SelectItem value="all" className="text-white">All Files</SelectItem>
-                <SelectItem value="favorites" className="text-white">Favorites</SelectItem>
-                <SelectItem value="shared" className="text-white">Shared</SelectItem>
-                <SelectItem value="pdf" className="text-white">PDF</SelectItem>
-                <SelectItem value="docx" className="text-white">Word</SelectItem>
-                <SelectItem value="xlsx" className="text-white">Excel</SelectItem>
-                <SelectItem value="jpg" className="text-white">Images</SelectItem>
+              <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
+                <SelectItem value="all" className={isDark ? 'text-white' : 'text-slate-900'}>All Files</SelectItem>
+                <SelectItem value="favorites" className={isDark ? 'text-white' : 'text-slate-900'}>Favorites</SelectItem>
+                <SelectItem value="shared" className={isDark ? 'text-white' : 'text-slate-900'}>Shared</SelectItem>
+                <SelectItem value="pdf" className={isDark ? 'text-white' : 'text-slate-900'}>PDF</SelectItem>
+                <SelectItem value="docx" className={isDark ? 'text-white' : 'text-slate-900'}>Word</SelectItem>
+                <SelectItem value="xlsx" className={isDark ? 'text-white' : 'text-slate-900'}>Excel</SelectItem>
+                <SelectItem value="jpg" className={isDark ? 'text-white' : 'text-slate-900'}>Images</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-36 bg-slate-900 border-slate-700 text-white">
+              <SelectTrigger className={`w-36 ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
                 <SortAsc className="w-4 h-4 mr-2 text-slate-400" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700">
-                <SelectItem value="recent" className="text-white">Recent</SelectItem>
-                <SelectItem value="name" className="text-white">Name</SelectItem>
-                <SelectItem value="size" className="text-white">Size</SelectItem>
+              <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
+                <SelectItem value="recent" className={isDark ? 'text-white' : 'text-slate-900'}>Recent</SelectItem>
+                <SelectItem value="name" className={isDark ? 'text-white' : 'text-slate-900'}>Name</SelectItem>
+                <SelectItem value="size" className={isDark ? 'text-white' : 'text-slate-900'}>Size</SelectItem>
               </SelectContent>
             </Select>
 
-            <div className="hidden md:flex border border-slate-700 rounded-lg overflow-hidden">
+            <div className={`hidden md:flex border rounded-lg overflow-hidden ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
               <Button
                 variant="ghost"
                 size="icon"
-                className={`rounded-none ${viewMode === 'grid' ? 'bg-slate-800 text-white' : 'text-slate-400'}`}
+                className={`rounded-none ${viewMode === 'grid' ? (isDark ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-900') : 'text-slate-400'}`}
                 onClick={() => setViewMode('grid')}
               >
                 <Grid3X3 className="w-4 h-4" />
@@ -198,7 +198,7 @@ export default function Files({ theme = 'dark' }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`rounded-none ${viewMode === 'list' ? 'bg-slate-800 text-white' : 'text-slate-400'}`}
+                className={`rounded-none ${viewMode === 'list' ? (isDark ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-900') : 'text-slate-400'}`}
                 onClick={() => setViewMode('list')}
               >
                 <List className="w-4 h-4" />
@@ -211,17 +211,17 @@ export default function Files({ theme = 'dark' }) {
       {/* Folders */}
       {folders.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-sm font-medium text-slate-400 mb-3">Folders</h2>
+          <h2 className={`text-sm font-medium mb-3 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Folders</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {folders.map((folder) => (
               <motion.div
                 key={folder.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="glass-light rounded-xl p-4 hover:border-violet-500/30 transition-all cursor-pointer group"
+                className={`rounded-xl p-4 hover:border-violet-500/30 transition-all cursor-pointer group ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
               >
                 <FolderOpen className="w-10 h-10 text-amber-400 mb-2" />
-                <p className="text-white text-sm font-medium truncate">{folder.name}</p>
+                <p className={`text-sm font-medium truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{folder.name}</p>
               </motion.div>
             ))}
           </div>
@@ -232,12 +232,12 @@ export default function Files({ theme = 'dark' }) {
       {isLoading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="glass-light rounded-2xl p-4 animate-pulse">
+            <div key={i} className={`rounded-2xl p-4 animate-pulse ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}>
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-xl bg-slate-700" />
+                <div className={`w-14 h-14 rounded-xl ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`} />
                 <div className="flex-1">
-                  <div className="h-4 bg-slate-700 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-slate-700 rounded w-1/2" />
+                  <div className={`h-4 rounded w-3/4 mb-2 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`} />
+                  <div className={`h-3 rounded w-1/2 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`} />
                 </div>
               </div>
             </div>
@@ -255,6 +255,7 @@ export default function Files({ theme = 'dark' }) {
                 onDelete={(f) => deleteMutation.mutate(f.id)}
                 onToggleFavorite={(f) => updateMutation.mutate({ id: f.id, data: { is_favorite: !f.is_favorite } })}
                 onShare={(f) => updateMutation.mutate({ id: f.id, data: { is_shared: true } })}
+                isDark={isDark}
               />
             ))}
           </AnimatePresence>
@@ -263,15 +264,15 @@ export default function Files({ theme = 'dark' }) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="glass-light rounded-2xl p-12 text-center"
+          className={`rounded-2xl p-12 text-center ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}
         >
           <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center mb-4">
             <FolderOpen className="w-8 h-8 text-violet-400" />
           </div>
-          <h3 className="text-white font-medium mb-2">
+          <h3 className={`font-medium mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
             {searchQuery ? 'No files found' : 'No files yet'}
           </h3>
-          <p className="text-slate-400 text-sm mb-6">
+          <p className={`text-sm mb-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
             {searchQuery ? 'Try adjusting your search or filters' : 'Upload your first document to get started'}
           </p>
           {!searchQuery && (
@@ -288,37 +289,38 @@ export default function Files({ theme = 'dark' }) {
 
       {/* Upload Dialog */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
-        <DialogContent className="bg-slate-900 border-slate-800 max-w-xl">
+        <DialogContent className={`max-w-xl ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
           <DialogHeader>
-            <DialogTitle className="text-white">Upload Files</DialogTitle>
+            <DialogTitle className={isDark ? 'text-white' : 'text-slate-900'}>Upload Files</DialogTitle>
           </DialogHeader>
           <DropZone
             onFileUploaded={handleFileUploaded}
             maxSize={25 * 1024 * 1024}
+            isDark={isDark}
           />
         </DialogContent>
       </Dialog>
 
       {/* New Folder Dialog */}
       <Dialog open={showNewFolder} onOpenChange={setShowNewFolder}>
-        <DialogContent className="bg-slate-900 border-slate-800">
+        <DialogContent className={isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}>
           <DialogHeader>
-            <DialogTitle className="text-white">Create New Folder</DialogTitle>
+            <DialogTitle className={isDark ? 'text-white' : 'text-slate-900'}>Create New Folder</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <Label className="text-slate-400 text-sm">Folder Name</Label>
+            <Label className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Folder Name</Label>
             <Input
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
               placeholder="Enter folder name"
-              className="mt-2 bg-slate-800 border-slate-700 text-white"
+              className={`mt-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}
             />
           </div>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setShowNewFolder(false)}
-              className="border-slate-700 text-slate-300"
+              className={isDark ? 'border-slate-700 text-slate-300' : 'border-slate-200 text-slate-600'}
             >
               Cancel
             </Button>
