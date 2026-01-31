@@ -15,11 +15,13 @@ export default function Home() {
 
   const checkAuth = async () => {
     try {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (isAuth) {
+      const userData = await base44.auth.me();
+      if (userData) {
         navigate(createPageUrl('CustomDashboard'));
       }
-    } catch (e) {}
+    } catch (e) {
+      // User not authenticated, stay on landing page
+    }
   };
 
   const features = [
