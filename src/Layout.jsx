@@ -38,7 +38,6 @@ import CookieConsent from '@/components/shared/CookieConsent';
 import AppLogo from '@/components/shared/AppLogo';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { LanguageProvider } from '@/components/shared/LanguageContext';
-import SessionVerifier from '@/components/auth/SessionVerifier';
 
 function LayoutContent({ children, currentPageName }) {
   // SEO Metadata
@@ -358,12 +357,9 @@ function LayoutContent({ children, currentPageName }) {
 
       {/* Cookie Consent */}
       <CookieConsent />
-
-      {/* Session Verification */}
-      <SessionVerifier isDark={isDark} />
-      </div>
-      );
-      }
+    </div>
+  );
+}
 
 export default function Layout({ children, currentPageName }) {
   return (
