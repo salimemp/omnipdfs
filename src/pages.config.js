@@ -50,13 +50,11 @@
 import AIAssistant from './pages/AIAssistant';
 import AIDocGenerator from './pages/AIDocGenerator';
 import APIDocs from './pages/APIDocs';
-import AdvancedFeatures from './pages/AdvancedFeatures';
 import Analytics from './pages/Analytics';
 import CloudStorage from './pages/CloudStorage';
 import Collaboration from './pages/Collaboration';
 import Compare from './pages/Compare';
 import Convert from './pages/Convert';
-import CustomDashboard from './pages/CustomDashboard';
 import Dashboard from './pages/Dashboard';
 import Files from './pages/Files';
 import FormFiller from './pages/FormFiller';
@@ -69,12 +67,12 @@ import ProjectFiles from './pages/ProjectFiles';
 import Security from './pages/Security';
 import Settings from './pages/Settings';
 import Subscription from './pages/Subscription';
-import TaskAutomation from './pages/TaskAutomation';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
-import EmailVerification from './pages/EmailVerification';
-import Home from './pages/Home';
+import CustomDashboard from './pages/CustomDashboard';
+import TaskAutomation from './pages/TaskAutomation';
+import AdvancedFeatures from './pages/AdvancedFeatures';
 import __Layout from './Layout.jsx';
 
 
@@ -82,13 +80,11 @@ export const PAGES = {
     "AIAssistant": AIAssistant,
     "AIDocGenerator": AIDocGenerator,
     "APIDocs": APIDocs,
-    "AdvancedFeatures": AdvancedFeatures,
     "Analytics": Analytics,
     "CloudStorage": CloudStorage,
     "Collaboration": Collaboration,
     "Compare": Compare,
     "Convert": Convert,
-    "CustomDashboard": CustomDashboard,
     "Dashboard": Dashboard,
     "Files": Files,
     "FormFiller": FormFiller,
@@ -101,12 +97,12 @@ export const PAGES = {
     "Security": Security,
     "Settings": Settings,
     "Subscription": Subscription,
-    "TaskAutomation": TaskAutomation,
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
-    "EmailVerification": EmailVerification,
-    "Home": Home,
+    "CustomDashboard": CustomDashboard,
+    "TaskAutomation": TaskAutomation,
+    "AdvancedFeatures": AdvancedFeatures,
 }
 
 export const pagesConfig = {
