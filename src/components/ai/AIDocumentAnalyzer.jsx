@@ -21,12 +21,17 @@ export default function AIDocumentAnalyzer({ document, isDark = true }) {
       const response = await base44.functions.invoke('aiDocumentAnalysis', {
         documentId: document.id,
         analysisType: type,
-        options: { standards: ['GDPR', 'HIPAA', 'SOC2'] }
+        options: { 
+          standards: ['GDPR', 'HIPAA', 'SOC2'],
+          deep_analysis: true,
+          sentiment_analysis: true,
+          keyword_extraction: true
+        }
       });
 
       if (response.data.success) {
         setAnalysis(response.data.analysis);
-        toast.success('Analysis complete');
+        toast.success('Deep analysis complete');
       }
     } catch (error) {
       toast.error('Analysis failed');
@@ -147,17 +152,53 @@ export default function AIDocumentAnalyzer({ document, isDark = true }) {
           </Card>
         )}
 
+        {analysis.keywords && (
+          <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white'}>
+            <CardHeader>
+              <CardTitle>Key Topics</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {analysis.keywords.map((keyword, i) => (
+                  <span key={i} className="px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 text-sm">
+                    {keyword}
+                  </span>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {analysis.sentiment && (
+          <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white'}>
+            <CardHeader>
+              <CardTitle>Sentiment Analysis</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Overall Tone</span>
+                <span className="font-semibold capitalize">{analysis.sentiment.tone}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Sentiment Score</span>
+                <span className="font-semibold">{analysis.sentiment.score}/100</span>
+              </div>
+              <Progress value={analysis.sentiment.score} className="mt-2" />
+            </CardContent>
+          </Card>
+        )}
+
         {analysis.recommendations && (
           <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white'}>
             <CardHeader>
-              <CardTitle>Recommendations</CardTitle>
+              <CardTitle>AI Recommendations</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {analysis.recommendations.map((rec, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm">
-                    <span className="text-violet-400 font-bold">{i + 1}.</span>
-                    <span>{rec}</span>
+                  <li key={i} className="flex items-start gap-3 p-3 rounded-lg bg-violet-500/5 border border-violet-500/10">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-500 text-white text-xs flex items-center justify-center font-bold">{i + 1}</span>
+                    <span className="text-sm">{rec}</span>
                   </li>
                 ))}
               </ul>

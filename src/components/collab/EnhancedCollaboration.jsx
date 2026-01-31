@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, MessageSquare, Video, Share2, UserPlus, Bell, Activity } from 'lucide-react';
+import { Users, MessageSquare, Video, Share2, UserPlus, Bell, Activity, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -93,7 +93,11 @@ export default function EnhancedCollaboration({ document, isDark }) {
       </Card>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <Button variant="outline" className={`h-auto py-4 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+        <Button 
+          variant="outline" 
+          className={`h-auto py-4 ${isDark ? 'border-slate-700 hover:bg-violet-500/10 hover:border-violet-500/30' : 'border-slate-200 hover:bg-violet-50'}`}
+          onClick={() => toast.success('Live chat opened')}
+        >
           <div className="flex flex-col items-center gap-2">
             <MessageSquare className="w-6 h-6 text-violet-400" />
             <span className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>Live Chat</span>
@@ -101,7 +105,11 @@ export default function EnhancedCollaboration({ document, isDark }) {
           </div>
         </Button>
 
-        <Button variant="outline" className={`h-auto py-4 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+        <Button 
+          variant="outline" 
+          className={`h-auto py-4 ${isDark ? 'border-slate-700 hover:bg-cyan-500/10 hover:border-cyan-500/30' : 'border-slate-200 hover:bg-cyan-50'}`}
+          onClick={() => toast.success('Video call starting...')}
+        >
           <div className="flex flex-col items-center gap-2">
             <Video className="w-6 h-6 text-cyan-400" />
             <span className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>Video Call</span>
@@ -109,7 +117,14 @@ export default function EnhancedCollaboration({ document, isDark }) {
           </div>
         </Button>
 
-        <Button variant="outline" className={`h-auto py-4 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+        <Button 
+          variant="outline" 
+          className={`h-auto py-4 ${isDark ? 'border-slate-700 hover:bg-emerald-500/10 hover:border-emerald-500/30' : 'border-slate-200 hover:bg-emerald-50'}`}
+          onClick={() => {
+            navigator.clipboard.writeText(window.location.href);
+            toast.success('Share link copied!');
+          }}
+        >
           <div className="flex flex-col items-center gap-2">
             <Share2 className="w-6 h-6 text-emerald-400" />
             <span className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>Share Link</span>
@@ -117,7 +132,11 @@ export default function EnhancedCollaboration({ document, isDark }) {
           </div>
         </Button>
 
-        <Button variant="outline" className={`h-auto py-4 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+        <Button 
+          variant="outline" 
+          className={`h-auto py-4 ${isDark ? 'border-slate-700 hover:bg-amber-500/10 hover:border-amber-500/30' : 'border-slate-200 hover:bg-amber-50'}`}
+          onClick={() => toast.info('Activity log opened')}
+        >
           <div className="flex flex-col items-center gap-2">
             <Activity className="w-6 h-6 text-amber-400" />
             <span className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>Activity Log</span>
@@ -125,6 +144,33 @@ export default function EnhancedCollaboration({ document, isDark }) {
           </div>
         </Button>
       </div>
+
+      <Card className={isDark ? 'bg-gradient-to-br from-violet-500/10 to-cyan-500/10 border-violet-500/20' : 'bg-gradient-to-br from-violet-50 to-cyan-50 border-violet-200'}>
+        <CardHeader>
+          <CardTitle className={isDark ? 'text-white' : 'text-slate-900'}>Advanced Collaboration</CardTitle>
+          <CardDescription className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+            Premium features for enterprise teams
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="flex items-center gap-2 text-sm">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>Screen sharing & presentations</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>Threaded discussions & mentions</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>Workflow approvals & e-signatures</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>Unlimited version history</span>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

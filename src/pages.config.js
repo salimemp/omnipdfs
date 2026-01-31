@@ -73,6 +73,7 @@ import TaskAutomation from './pages/TaskAutomation';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
+import Guide from './pages/Guide';
 import __Layout from './Layout.jsx';
 
 
@@ -103,6 +104,7 @@ export const PAGES = {
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
+    "Guide": Guide,
 }
 
 export const pagesConfig = {

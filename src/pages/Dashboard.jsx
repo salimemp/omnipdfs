@@ -132,10 +132,10 @@ export default function Dashboard({ theme = 'dark' }) {
                 Start Converting
               </Button>
             </Link>
-            <Link to={createPageUrl('PDFTools')}>
+            <Link to={createPageUrl('Guide')}>
               <Button variant="outline" className={`px-6 py-6 text-base rounded-xl ${isDark ? 'border-slate-700 bg-white text-slate-900 hover:bg-slate-100' : 'border-slate-300 text-slate-900 hover:bg-slate-100'}`}>
-                <Layers className="w-5 h-5 mr-2" />
-                PDF Tools
+                <FileText className="w-5 h-5 mr-2" />
+                View Guide
               </Button>
             </Link>
           </div>

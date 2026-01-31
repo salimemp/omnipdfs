@@ -28,7 +28,8 @@ import {
   Wand2,
   Users,
   Accessibility,
-  Bot
+  Bot,
+  BookOpen
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -108,6 +109,7 @@ function LayoutContent({ children, currentPageName }) {
 
   const navigation = [
     { name: 'Dashboard', page: 'Dashboard', icon: Home },
+    { name: 'Guide', page: 'Guide', icon: BookOpen },
     { name: 'Convert', page: 'Convert', icon: Zap },
     { name: 'PDF Tools', page: 'PDFTools', icon: Layers },
     { name: 'PDF Editor', page: 'PDFEditor', icon: PenTool },
