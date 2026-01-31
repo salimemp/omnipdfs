@@ -110,7 +110,7 @@ function LayoutContent({ children, currentPageName }) {
   }, []);
 
   const navigation = [
-    { name: 'Dashboard', page: 'CustomDashboard', icon: Home },
+    { name: 'Dashboard', page: 'Dashboard', icon: Home },
     { name: 'Convert', page: 'Convert', icon: Zap },
     { name: 'PDF Tools', page: 'PDFTools', icon: Layers },
     { name: 'PDF Editor', page: 'PDFEditor', icon: PenTool },
