@@ -97,13 +97,10 @@ function LayoutContent({ children, currentPageName }) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const isAuth = await base44.auth.isAuthenticated();
-        if (isAuth) {
-          const userData = await base44.auth.me();
-          setUser(userData);
-        }
+        const userData = await base44.auth.me();
+        setUser(userData);
       } catch (e) {
-        console.error('Auth check failed:', e);
+        // User not authenticated or error - this is fine for public apps
       }
     };
     fetchUser();
