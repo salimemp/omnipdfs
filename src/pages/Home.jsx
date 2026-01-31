@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '../utils';
@@ -8,21 +8,6 @@ import AppLogo from '@/components/shared/AppLogo';
 
 export default function Home() {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const userData = await base44.auth.me();
-      if (userData) {
-        navigate(createPageUrl('CustomDashboard'));
-      }
-    } catch (e) {
-      // User not authenticated, stay on landing page
-    }
-  };
 
   const features = [
     {
