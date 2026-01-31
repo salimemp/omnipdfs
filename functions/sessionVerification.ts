@@ -77,6 +77,22 @@ Deno.serve(async (req) => {
           session_token: sessionToken
         });
 
+        // Send re-verification email
+        await base44.functions.invoke('emailVerification', {
+          action: 'send_verification_email',
+          data: {
+            email: user.email,
+            verificationType: 're-verification',
+            deviceInfo: {
+              os,
+              browser,
+              location,
+              ipAddress
+            },
+            reason
+          }
+        });
+
         // Log suspicious activity
         await base44.entities.ActivityLog.create({
           action: 'security_alert',

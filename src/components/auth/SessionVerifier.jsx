@@ -75,6 +75,18 @@ export default function SessionVerifier({ isDark = true }) {
       const user = await base44.auth.isAuthenticated();
       if (!user) return;
 
+      // Check if email is verified
+      const verificationStatus = await base44.functions.invoke('emailVerification', {
+        action: 'check_verification_status',
+        data: { email: user.email }
+      });
+
+      if (verificationStatus.data.success && !verificationStatus.data.emailVerified) {
+        toast.error('Please verify your email address to continue');
+        base44.auth.logout();
+        return;
+      }
+
       const deviceInfo = getDeviceInfo();
       const location = await getLocation();
       const ipAddress = await getIpAddress();
