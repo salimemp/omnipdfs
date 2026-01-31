@@ -74,6 +74,7 @@ import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
 import EmailVerification from './pages/EmailVerification';
+import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
@@ -105,6 +106,7 @@ export const PAGES = {
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
     "EmailVerification": EmailVerification,
+    "Home": Home,
 }
 
 export const pagesConfig = {
