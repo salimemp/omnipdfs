@@ -88,16 +88,14 @@ export default function OnboardingVideo({ isDark = true }) {
             >
               {/* Video Player */}
               <div className={`relative ${isFullscreen ? 'h-full' : 'aspect-video'} bg-black`}>
-                <video
+                <iframe
                   className="w-full h-full"
-                  controls
-                  autoPlay
-                  muted={isMuted}
-                  poster={videoThumbnail}
-                >
-                  <source src="https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+                  src={`https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=${isMuted ? 1 : 0}`}
+                  title="Getting Started with OmniPDFs"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
 
                 {/* Custom Controls Overlay */}
                 <div className="absolute top-4 right-4 flex gap-2">
@@ -108,14 +106,6 @@ export default function OnboardingVideo({ isDark = true }) {
                     className="bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm"
                   >
                     {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setIsFullscreen(!isFullscreen)}
-                    className="bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm"
-                  >
-                    {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
                   </Button>
                   <Button
                     size="icon"
