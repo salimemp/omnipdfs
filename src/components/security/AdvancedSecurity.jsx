@@ -15,11 +15,17 @@ export default function AdvancedSecurity({ document, isDark }) {
   const [password, setPassword] = useState('');
   const [encryption, setEncryption] = useState('AES-256');
   const [watermarkText, setWatermarkText] = useState('');
+  const [expiryDate, setExpiryDate] = useState('');
+  const [allowedIPs, setAllowedIPs] = useState('');
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [auditLog, setAuditLog] = useState(true);
   const [permissions, setPermissions] = useState({
     printing: true,
     copying: true,
     editing: true,
     commenting: true,
+    downloading: true,
+    sharing: true,
   });
 
   const handlePasswordProtect = () => {
@@ -57,22 +63,26 @@ export default function AdvancedSecurity({ document, isDark }) {
       </div>
 
       <Tabs defaultValue="password" className="space-y-4">
-        <TabsList className={`grid grid-cols-4 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
+        <TabsList className={`grid grid-cols-5 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
           <TabsTrigger value="password" className="data-[state=active]:bg-violet-500/20">
             <Lock className="w-4 h-4 mr-2" />
-            {t('passwordProtect')}
+            Password
           </TabsTrigger>
           <TabsTrigger value="encryption" className="data-[state=active]:bg-violet-500/20">
             <Key className="w-4 h-4 mr-2" />
-            {t('encryption')}
+            Encryption
           </TabsTrigger>
           <TabsTrigger value="watermark" className="data-[state=active]:bg-violet-500/20">
             <FileCheck className="w-4 h-4 mr-2" />
-            {t('watermark')}
+            Watermark
           </TabsTrigger>
           <TabsTrigger value="permissions" className="data-[state=active]:bg-violet-500/20">
             <UserCheck className="w-4 h-4 mr-2" />
-            {t('permissions')}
+            Permissions
+          </TabsTrigger>
+          <TabsTrigger value="advanced" className="data-[state=active]:bg-violet-500/20">
+            <Shield className="w-4 h-4 mr-2" />
+            Advanced
           </TabsTrigger>
         </TabsList>
 
@@ -182,6 +192,81 @@ export default function AdvancedSecurity({ document, isDark }) {
               <Button className="w-full bg-gradient-to-r from-violet-500 to-purple-500">
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Save Permissions
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="advanced" className="space-y-4">
+          <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}>
+            <CardHeader>
+              <CardTitle className={isDark ? 'text-white' : 'text-slate-900'}>Advanced Security</CardTitle>
+              <CardDescription className={isDark ? 'text-slate-400' : 'text-slate-500'}>
+                Enterprise-grade protection features
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Document Expiry</Label>
+                <Input
+                  type="datetime-local"
+                  value={expiryDate}
+                  onChange={(e) => setExpiryDate(e.target.value)}
+                  className={`mt-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}`}
+                />
+                <p className={`text-xs mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Auto-delete after specified time</p>
+              </div>
+
+              <div>
+                <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>IP Whitelist</Label>
+                <Input
+                  value={allowedIPs}
+                  onChange={(e) => setAllowedIPs(e.target.value)}
+                  placeholder="192.168.1.1, 10.0.0.1"
+                  className={`mt-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}`}
+                />
+                <p className={`text-xs mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Comma-separated IP addresses</p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className={isDark ? 'text-slate-300' : 'text-slate-700'}>Two-Factor Authentication</Label>
+                  <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Require 2FA for access</p>
+                </div>
+                <Switch
+                  checked={twoFactorEnabled}
+                  onCheckedChange={setTwoFactorEnabled}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className={isDark ? 'text-slate-300' : 'text-slate-700'}>Audit Logging</Label>
+                  <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Track all access and changes</p>
+                </div>
+                <Switch
+                  checked={auditLog}
+                  onCheckedChange={setAuditLog}
+                />
+              </div>
+
+              <div className={`p-3 rounded-lg ${isDark ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-amber-50 border border-amber-200'}`}>
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className={`text-sm font-medium ${isDark ? 'text-amber-300' : 'text-amber-700'}`}>
+                      Zero-Knowledge Encryption
+                    </p>
+                    <p className={`text-xs ${isDark ? 'text-amber-400/70' : 'text-amber-600'}`}>
+                      Documents encrypted client-side. Even we cannot access your data.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500">
+                <Shield className="w-4 h-4 mr-2" />
+                Apply Advanced Security
               </Button>
             </CardContent>
           </Card>

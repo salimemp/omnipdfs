@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Users, MessageSquare, Video, Share2, UserPlus, Bell, Activity, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, MessageSquare, Video, Share2, UserPlus, Bell, Activity, CheckCircle2, Eye, Edit3, Sparkles } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -11,8 +12,11 @@ import { toast } from 'sonner';
 export default function EnhancedCollaboration({ document, isDark }) {
   const { t } = useLanguage();
   const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('editor');
+  const [cursorPositions, setCursorPositions] = useState([]);
+  const [liveEdits, setLiveEdits] = useState([]);
   const [collaborators] = useState([
-    { name: 'John Doe', email: 'john@example.com', role: 'Editor', online: true },
+    { name: 'John Doe', email: 'john@example.com', role: 'Editor', online: true, cursor: { line: 5, col: 12 } },
     { name: 'Jane Smith', email: 'jane@example.com', role: 'Viewer', online: false },
   ]);
 
@@ -53,8 +57,18 @@ export default function EnhancedCollaboration({ document, isDark }) {
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               placeholder="email@example.com"
-              className={isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}
+              className={`flex-1 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}`}
             />
+            <Select value={inviteRole} onValueChange={setInviteRole}>
+              <SelectTrigger className={`w-32 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}`}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="editor">Editor</SelectItem>
+                <SelectItem value="viewer">Viewer</SelectItem>
+              </SelectContent>
+            </Select>
             <Button onClick={handleInvite} className="bg-gradient-to-r from-blue-500 to-cyan-500">
               <UserPlus className="w-4 h-4 mr-2" />
               Invite
@@ -75,11 +89,25 @@ export default function EnhancedCollaboration({ document, isDark }) {
                       </AvatarFallback>
                     </Avatar>
                     {collab.online && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-900" />
+                      <>
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-900" />
+                        {collab.cursor && (
+                          <div className="absolute -top-1 -right-1">
+                            <Edit3 className="w-3 h-3 text-cyan-400 animate-pulse" />
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                   <div>
-                    <p className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{collab.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className={`font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{collab.name}</p>
+                      {collab.online && collab.cursor && (
+                        <span className={`text-xs px-1.5 py-0.5 rounded ${isDark ? 'bg-cyan-500/20 text-cyan-400' : 'bg-cyan-100 text-cyan-600'}`}>
+                          Editing
+                        </span>
+                      )}
+                    </div>
                     <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{collab.email}</p>
                   </div>
                 </div>
@@ -88,6 +116,16 @@ export default function EnhancedCollaboration({ document, isDark }) {
                 </Badge>
               </div>
             ))}
+          </div>
+
+          <div className={`p-3 rounded-lg ${isDark ? 'bg-violet-500/10 border border-violet-500/20' : 'bg-violet-50 border border-violet-200'}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-4 h-4 text-violet-400" />
+              <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>AI Presence Detection</span>
+            </div>
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              See real-time cursor positions and editing activity from team members
+            </p>
           </div>
         </CardContent>
       </Card>

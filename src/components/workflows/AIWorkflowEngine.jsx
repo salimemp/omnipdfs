@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Zap, Play, Plus, Trash2, Edit, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { Zap, Play, Plus, Trash2, Edit, CheckCircle2, Clock, AlertCircle, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,9 @@ export default function AIWorkflowEngine({ isDark }) {
     { id: 1, name: 'Auto-OCR & Translate', trigger: 'upload', steps: ['OCR', 'Translate'], status: 'active' },
     { id: 2, name: 'Compress & Archive', trigger: 'daily', steps: ['Compress', 'Archive'], status: 'active' },
   ]);
-  const [newWorkflow, setNewWorkflow] = useState({ name: '', trigger: 'upload', steps: [] });
+  const [newWorkflow, setNewWorkflow] = useState({ name: '', trigger: 'upload', steps: [], conditions: [] });
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
 
   const availableActions = [
     'OCR', 'Translate', 'Compress', 'Watermark', 'Encrypt', 'Convert', 'Split', 'Merge', 'Archive', 
@@ -128,6 +130,60 @@ export default function AIWorkflowEngine({ isDark }) {
               ))}
             </div>
           </div>
+
+          <div className="flex gap-2">
+            <Button onClick={() => setShowAdvanced(!showAdvanced)} variant="outline" className="flex-1">
+              {showAdvanced ? 'Hide' : 'Show'} Advanced
+            </Button>
+            <Button 
+              onClick={async () => {
+                setAiGenerating(true);
+                try {
+                  const response = await base44.integrations.Core.InvokeLLM({
+                    prompt: `Suggest an intelligent document workflow based on: "${newWorkflow.name || 'document processing'}". Include 3-5 relevant automation steps.`,
+                    response_json_schema: {
+                      type: "object",
+                      properties: {
+                        steps: { type: "array", items: { type: "string" } },
+                        description: { type: "string" }
+                      }
+                    }
+                  });
+                  setNewWorkflow({ ...newWorkflow, steps: response.steps });
+                  toast.success('AI suggested workflow steps');
+                } catch (e) {
+                  toast.error('AI suggestion failed');
+                }
+                setAiGenerating(false);
+              }}
+              disabled={aiGenerating}
+              className="flex-1 bg-gradient-to-r from-violet-500 to-purple-500"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              {aiGenerating ? 'Generating...' : 'AI Suggest'}
+            </Button>
+          </div>
+
+          {showAdvanced && (
+            <div className="space-y-3 p-3 rounded-lg bg-slate-800/30">
+              <Label className={isDark ? 'text-slate-400' : 'text-slate-600'}>Conditions (Optional)</Label>
+              <Input
+                placeholder="e.g., file size > 5MB, file type = pdf"
+                className={isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}
+              />
+              <div className="flex gap-2">
+                <Select defaultValue="all">
+                  <SelectTrigger className={isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}>
+                    <SelectItem value="all">Run if all conditions met</SelectItem>
+                    <SelectItem value="any">Run if any condition met</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
 
           <Button onClick={handleCreateWorkflow} className="w-full bg-gradient-to-r from-purple-500 to-pink-500">
             <Plus className="w-4 h-4 mr-2" />
