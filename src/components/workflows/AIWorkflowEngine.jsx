@@ -19,7 +19,8 @@ export default function AIWorkflowEngine({ isDark }) {
   const [newWorkflow, setNewWorkflow] = useState({ name: '', trigger: 'upload', steps: [] });
 
   const availableActions = [
-    'OCR', 'Translate', 'Compress', 'Watermark', 'Encrypt', 'Convert', 'Split', 'Merge', 'Archive'
+    'OCR', 'Translate', 'Compress', 'Watermark', 'Encrypt', 'Convert', 'Split', 'Merge', 'Archive', 
+    'Summarize', 'Extract Data', 'Auto-Tag', 'Quality Check', 'Email Notification'
   ];
 
   const handleCreateWorkflow = async () => {
@@ -28,14 +29,23 @@ export default function AIWorkflowEngine({ isDark }) {
       return;
     }
 
-    const workflow = { id: Date.now(), ...newWorkflow, status: 'active' };
+    const workflow = { id: Date.now(), ...newWorkflow, status: 'active', executions: 0, lastRun: null };
     setWorkflows([...workflows, workflow]);
     setNewWorkflow({ name: '', trigger: 'upload', steps: [] });
-    toast.success('Workflow created successfully');
+    
+    try {
+      await base44.functions.invoke('workflowAutomation', {
+        action: 'create',
+        workflow: workflow
+      });
+      toast.success('Workflow created and activated');
+    } catch (error) {
+      toast.error('Workflow created but activation failed');
+    }
 
     await base44.entities.ActivityLog.create({
       action: 'workflow_created',
-      details: { workflow_name: workflow.name }
+      details: { workflow_name: workflow.name, steps: workflow.steps }
     });
   };
 
@@ -140,12 +150,16 @@ export default function AIWorkflowEngine({ isDark }) {
                       {workflow.status}
                     </Badge>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-2">
                     {workflow.steps.map((step, i) => (
                       <Badge key={i} variant="outline" className={isDark ? 'border-violet-500/30 text-violet-300' : 'border-violet-300 text-violet-600'}>
                         {step}
                       </Badge>
                     ))}
+                  </div>
+                  <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                    {workflow.executions || 0} executions • Trigger: {workflow.trigger}
+                    {workflow.lastRun && ` • Last run: ${new Date(workflow.lastRun).toLocaleDateString()}`}
                   </div>
                 </div>
                 <div className="flex gap-2">

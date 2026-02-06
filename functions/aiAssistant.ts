@@ -17,13 +17,24 @@ Deno.serve(async (req) => {
 
     switch (task) {
       case 'summarize':
-        prompt = `Summarize this document: ${input.text || ''}`;
+        prompt = `Provide a comprehensive summary of this document. Include:
+1. A concise executive summary (2-3 sentences)
+2. Main points and key findings
+3. Important details and context
+4. Action items or conclusions (if applicable)
+
+Document content: ${input.text || ''}`;
         fileUrls = input.fileUrl ? [input.fileUrl] : [];
         schema = {
           type: "object",
           properties: {
-            summary: { type: "string" },
-            key_points: { type: "array", items: { type: "string" } }
+            executive_summary: { type: "string" },
+            main_summary: { type: "string" },
+            key_points: { type: "array", items: { type: "string" } },
+            details: { type: "array", items: { type: "string" } },
+            action_items: { type: "array", items: { type: "string" } },
+            word_count: { type: "number" },
+            reading_time_minutes: { type: "number" }
           }
         };
         break;
