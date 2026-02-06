@@ -6,7 +6,8 @@ import {
   UserPlus, 
   MessageSquare,
   Clock,
-  Activity
+  Activity,
+  Shield
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,7 @@ export default function CollaboratorCard({
   onStatusChange,
   onInviteClick,
   onCommentsClick,
+  onAuditClick,
   isDark = true,
   index = 0
 }) {
@@ -97,6 +99,12 @@ export default function CollaboratorCard({
                   Set as {config.label}
                 </DropdownMenuItem>
               ))}
+              {onAuditClick && (
+                <DropdownMenuItem onClick={() => onAuditClick(collab)} className={isDark ? 'text-white' : ''}>
+                  <Shield className="w-4 h-4 mr-2" />
+                  Audit Trail
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
