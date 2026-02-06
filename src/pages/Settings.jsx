@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdvancedAuthOptions from '@/components/auth/AdvancedAuthOptions';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import {
@@ -191,6 +192,10 @@ export default function Settings({ theme = 'dark' }) {
         </TabsContent>
 
         {/* Security Tab */}
+        <TabsContent value="auth">
+          <AdvancedAuthOptions isDark={isDark} />
+        </TabsContent>
+
         <TabsContent value="security">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

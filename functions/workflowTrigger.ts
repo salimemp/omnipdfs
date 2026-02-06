@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { workflowId, documentId, event, metadata } = await req.json();
+    const { workflowId, documentId, event, metadata, triggerType, conditions } = await req.json();
 
     // Fetch workflow configuration
     const workflows = await base44.entities.ActivityLog.filter({
@@ -24,6 +24,20 @@ Deno.serve(async (req) => {
 
     const workflowConfig = workflow.details;
     const steps = workflowConfig.steps || [];
+
+    // Check conditions before execution
+    if (conditions && conditions.length > 0) {
+      const document = await base44.entities.Document.get(documentId);
+      const conditionsMet = await checkConditions(conditions, document, metadata);
+      
+      if (!conditionsMet) {
+        return Response.json({
+          success: false,
+          message: 'Workflow conditions not met',
+          skipped: true
+        });
+      }
+    }
 
     const results = [];
 
@@ -189,4 +203,44 @@ async function sendEmailNotification(document, base44, metadata) {
     body: `Your document "${document.name}" has been processed successfully.`
   });
   return { action: 'Email Notification', sent: true };
+}
+
+async function checkConditions(conditions, document, metadata) {
+  for (const condition of conditions) {
+    const { field, operator, value } = condition;
+    
+    let fieldValue;
+    if (field === 'file_size') fieldValue = document.file_size;
+    else if (field === 'file_type') fieldValue = document.file_type;
+    else if (field === 'created_date') fieldValue = new Date(document.created_date);
+    else fieldValue = document[field];
+
+    let met = false;
+    switch (operator) {
+      case 'equals':
+        met = fieldValue === value;
+        break;
+      case 'not_equals':
+        met = fieldValue !== value;
+        break;
+      case 'greater_than':
+        met = fieldValue > value;
+        break;
+      case 'less_than':
+        met = fieldValue < value;
+        break;
+      case 'contains':
+        met = String(fieldValue).includes(value);
+        break;
+      case 'starts_with':
+        met = String(fieldValue).startsWith(value);
+        break;
+      default:
+        met = true;
+    }
+
+    if (!met) return false;
+  }
+  
+  return true;
 }
