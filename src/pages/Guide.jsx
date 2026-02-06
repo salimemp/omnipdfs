@@ -367,6 +367,7 @@ const faqs = [
 
 export default function Guide({ theme = 'dark' }) {
   const [activeGuide, setActiveGuide] = useState('getting-started');
+  const [expandedGuide, setExpandedGuide] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const isDark = theme === 'dark';
 
@@ -438,70 +439,94 @@ export default function Guide({ theme = 'dark' }) {
 
         {/* Guides Tab */}
         <TabsContent value="guides" className="space-y-6">
-          <div className="grid md:grid-cols-3 gap-4">
-            {guides.map((guide) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {guides.map((guide, i) => {
               const GuideIcon = guide.icon;
+              const isExpanded = expandedGuide === guide.id;
               return (
-                <motion.button
+                <motion.div
                   key={guide.id}
-                  onClick={() => setActiveGuide(guide.id)}
-                  whileHover={{ scale: 1.02 }}
-                  className={`p-6 rounded-2xl text-left transition-all ${
-                    activeGuide === guide.id
-                      ? 'ring-2 ring-violet-500 bg-gradient-to-br ' + guide.color
-                      : isDark ? 'glass-light hover:border-violet-500/30' : 'bg-white border border-slate-200 hover:border-violet-300'
-                  }`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className={`${isExpanded ? 'sm:col-span-2 lg:col-span-3 xl:col-span-4' : ''}`}
                 >
-                  <GuideIcon className={`w-8 h-8 mb-3 ${activeGuide === guide.id ? 'text-white' : 'text-violet-400'}`} />
-                  <h3 className={`font-semibold mb-1 ${activeGuide === guide.id ? 'text-white' : isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {guide.title}
-                  </h3>
-                  <p className={`text-sm ${activeGuide === guide.id ? 'text-white/80' : isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    {guide.steps.length} steps
-                  </p>
-                </motion.button>
+                  <Card 
+                    className={`cursor-pointer overflow-hidden transition-all duration-300 ${
+                      isDark ? 'bg-slate-900/50 border-slate-800 hover:border-violet-500/50' : 'bg-white border-slate-200 hover:border-violet-300'
+                    } ${isExpanded ? 'ring-2 ring-violet-500' : ''}`}
+                    onClick={() => setExpandedGuide(isExpanded ? null : guide.id)}
+                  >
+                    <CardHeader className={isExpanded ? '' : 'pb-3'}>
+                      <div className="flex items-start gap-4">
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${guide.color} flex items-center justify-center flex-shrink-0`}>
+                          <GuideIcon className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className={`mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                            {guide.title}
+                          </CardTitle>
+                          <CardDescription className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                            {guide.steps.length} step guide
+                          </CardDescription>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: isExpanded ? 90 : 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <ChevronRight className={`w-5 h-5 flex-shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                        </motion.div>
+                      </div>
+                    </CardHeader>
+
+                    {isExpanded && (
+                      <CardContent>
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-4"
+                        >
+                          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {guide.steps.map((step, index) => {
+                              const StepIcon = step.icon;
+                              return (
+                                <div
+                                  key={index}
+                                  className={`p-4 rounded-xl ${isDark ? 'bg-slate-800/50 border border-slate-700' : 'bg-slate-50 border border-slate-200'}`}
+                                >
+                                  <div className="flex items-center gap-3 mb-3">
+                                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${guide.color} flex items-center justify-center text-xl`}>
+                                      {step.illustration}
+                                    </div>
+                                    <Badge variant="secondary" className={isDark ? 'bg-violet-500/20 text-violet-300 text-xs' : 'bg-violet-100 text-violet-700 text-xs'}>
+                                      Step {index + 1}
+                                    </Badge>
+                                  </div>
+                                  <h4 className={`font-semibold mb-2 text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                    {step.title}
+                                  </h4>
+                                  <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                    {step.description}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-3">
+                                    <StepIcon className="w-4 h-4 text-violet-400" />
+                                    <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                                      Key feature
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      </CardContent>
+                    )}
+                  </Card>
+                </motion.div>
               );
             })}
           </div>
-
-          {currentGuide && (
-            <motion.div
-              key={activeGuide}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
-            >
-              {currentGuide.steps.map((step, index) => {
-                const StepIcon = step.icon;
-                return (
-                  <Card key={index} className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}>
-                    <CardHeader>
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0">
-                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${currentGuide.color} flex items-center justify-center text-2xl`}>
-                            {step.illustration}
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <Badge variant="secondary" className={isDark ? 'bg-violet-500/20 text-violet-300' : 'bg-violet-100 text-violet-700'}>
-                              Step {index + 1}
-                            </Badge>
-                            <StepIcon className="w-4 h-4 text-violet-400" />
-                          </div>
-                          <CardTitle className={isDark ? 'text-white' : 'text-slate-900'}>{step.title}</CardTitle>
-                          <CardDescription className={isDark ? 'text-slate-400' : 'text-slate-600'}>
-                            {step.description}
-                          </CardDescription>
-                        </div>
-                        <ChevronRight className={`w-5 h-5 ${isDark ? 'text-slate-600' : 'text-slate-300'}`} />
-                      </div>
-                    </CardHeader>
-                  </Card>
-                );
-              })}
-            </motion.div>
-          )}
         </TabsContent>
 
         {/* Features Tab */}
