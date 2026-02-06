@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/components/shared/LanguageContext';
 import AdvancedSecurity from '@/components/security/AdvancedSecurity';
 import SecurityDashboard from '@/components/security/SecurityDashboard';
+import SessionManager from '@/components/security/SessionManager';
 import EnhancedCollaboration from '@/components/collab/EnhancedCollaboration';
 import DropZone from '@/components/shared/DropZone';
 import { base44 } from '@/api/base44Client';
@@ -110,13 +111,18 @@ export default function Security({ theme = 'dark' }) {
 
           {activeTab === 'security' ? (
             <Tabs value={securityTab} onValueChange={setSecurityTab} className="space-y-6">
-              <TabsList className={`grid grid-cols-2 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
+              <TabsList className={`grid grid-cols-3 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
                 <TabsTrigger value="dashboard">Security Dashboard</TabsTrigger>
+                <TabsTrigger value="sessions">Sessions</TabsTrigger>
                 <TabsTrigger value="advanced">Document Security</TabsTrigger>
               </TabsList>
 
               <TabsContent value="dashboard">
                 <SecurityDashboard isDark={isDark} />
+              </TabsContent>
+
+              <TabsContent value="sessions">
+                <SessionManager isDark={isDark} />
               </TabsContent>
 
               <TabsContent value="advanced">

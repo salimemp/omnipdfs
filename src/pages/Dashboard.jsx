@@ -26,19 +26,11 @@ import StatsCard from '@/components/shared/StatsCard';
 import FileCard from '@/components/shared/FileCard';
 import ComplianceWidget from '@/components/compliance/ComplianceWidget';
 
-export default function Dashboard({ theme = 'dark' }) {
-  const [user, setUser] = useState(null);
-  const isDark = theme === 'dark';
+import { useAuth } from '@/components/auth/AuthContext';
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await base44.auth.me();
-        setUser(userData);
-      } catch (e) {}
-    };
-    fetchUser();
-  }, []);
+export default function Dashboard({ theme = 'dark' }) {
+  const { user } = useAuth();
+  const isDark = theme === 'dark';
 
   const { data: documents = [] } = useQuery({
     queryKey: ['documents'],

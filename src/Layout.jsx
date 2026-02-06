@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from './utils';
-import { base44 } from '@/api/base44Client';
+import { AuthProvider, useAuth } from '@/components/auth/AuthContext';
 import {
   FileText,
   Home,
@@ -41,8 +41,10 @@ import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { LanguageProvider } from '@/components/shared/LanguageContext';
 
 function LayoutContent({ children, currentPageName }) {
+  const { user, logout, login } = useAuth();
+  
   // SEO Metadata
-  useEffect(() => {
+  React.useEffect(() => {
     const metadata = {
       title: 'OmniPDFs - Enterprise PDF Management & Conversion Platform',
       description: 'Convert, edit, and manage PDFs with AI-powered tools. GDPR, HIPAA, SOC 2 compliant. 50+ file formats, real-time collaboration, OCR, and more.',
@@ -80,7 +82,6 @@ function LayoutContent({ children, currentPageName }) {
       tag.setAttribute('content', content);
     });
   }, []);
-  const [user, setUser] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -89,23 +90,11 @@ function LayoutContent({ children, currentPageName }) {
     return 'dark';
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     localStorage.setItem('omnipdfs-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await base44.auth.me();
-        setUser(userData);
-      } catch (e) {
-        // User not authenticated or error - this is fine for public apps
-      }
-    };
-    fetchUser();
-  }, []);
 
   const navigation = [
     { name: 'Dashboard', page: 'Dashboard', icon: Home },
@@ -334,7 +323,7 @@ function LayoutContent({ children, currentPageName }) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => base44.auth.logout()}
+                  onClick={() => logout()}
                   className={`shrink-0 ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
                 >
                   <LogOut className="w-4 h-4" />
@@ -342,7 +331,7 @@ function LayoutContent({ children, currentPageName }) {
               </div>
             ) : (
               <Button
-                onClick={() => base44.auth.redirectToLogin()}
+                onClick={() => login()}
                 className="w-full bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 text-white"
               >
                 Sign In
@@ -367,8 +356,10 @@ function LayoutContent({ children, currentPageName }) {
 
 export default function Layout({ children, currentPageName }) {
   return (
-    <LanguageProvider>
-      <LayoutContent children={children} currentPageName={currentPageName} />
-    </LanguageProvider>
+    <AuthProvider>
+      <LanguageProvider>
+        <LayoutContent children={children} currentPageName={currentPageName} />
+      </LanguageProvider>
+    </AuthProvider>
   );
 }
