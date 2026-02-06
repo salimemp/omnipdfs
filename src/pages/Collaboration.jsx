@@ -63,6 +63,8 @@ import {
 import { toast } from 'sonner';
 import moment from 'moment';
 import CollaboratorCard from '@/components/collab/CollaboratorCard';
+import CollaborationAudit from '@/components/collab/CollaborationAudit';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const roleConfig = {
   admin: { label: 'Admin', icon: Crown, color: 'text-amber-400', bg: 'bg-amber-500/20' },
@@ -102,6 +104,7 @@ export default function Collaboration({ theme = 'dark' }) {
   const [aiInsights, setAiInsights] = useState(null);
   const [showWorkflows, setShowWorkflows] = useState(null);
   const [showPermissions, setShowPermissions] = useState(null);
+  const [showAudit, setShowAudit] = useState(null);
 
   const isDark = theme === 'dark';
   const queryClient = useQueryClient();
@@ -491,12 +494,23 @@ export default function Collaboration({ theme = 'dark' }) {
                 setSelectedCollab(c);
                 setShowCommentDialog(true);
               }}
+              onAuditClick={(c) => setShowAudit(c)}
               isDark={isDark}
               index={index}
             />
           ))
         )}
       </div>
+
+      {/* Audit Dialog */}
+      <Dialog open={!!showAudit} onOpenChange={() => setShowAudit(null)}>
+        <DialogContent className={`max-w-4xl max-h-[90vh] overflow-y-auto ${isDark ? 'bg-slate-900 border-slate-700' : ''}`}>
+          <DialogHeader>
+            <DialogTitle className={isDark ? 'text-white' : ''}>Collaboration Audit Trail</DialogTitle>
+          </DialogHeader>
+          {showAudit && <CollaborationAudit collaboration={showAudit} isDark={isDark} />}
+        </DialogContent>
+      </Dialog>
 
       {/* Workflow Automation Dialog */}
       <Dialog open={!!showWorkflows} onOpenChange={() => setShowWorkflows(null)}>

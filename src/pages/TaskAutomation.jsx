@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import WorkflowVisualizer from '@/components/workflows/WorkflowVisualizer';
+import AutomationInsights from '@/components/automation/AutomationInsights';
 import { motion } from 'framer-motion';
 import { Bot } from 'lucide-react';
 import AITaskEngine from '@/components/automation/AITaskEngine';
