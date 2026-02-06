@@ -30,7 +30,8 @@ import {
   Calendar,
   Sparkles,
   Loader2,
-  BarChart3
+  BarChart3,
+  Zap
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,6 +100,8 @@ export default function Collaboration({ theme = 'dark' }) {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [aiAnalyzing, setAiAnalyzing] = useState(false);
   const [aiInsights, setAiInsights] = useState(null);
+  const [showWorkflows, setShowWorkflows] = useState(null);
+  const [showPermissions, setShowPermissions] = useState(null);
 
   const isDark = theme === 'dark';
   const queryClient = useQueryClient();
@@ -271,6 +274,68 @@ export default function Collaboration({ theme = 'dark' }) {
       toast.success('AI assigned tasks');
     } catch (e) {
       toast.error('Task assignment failed');
+    }
+    setAiAnalyzing(false);
+  };
+
+  const smartMergeVersions = async (collabId) => {
+    setAiAnalyzing(true);
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: 'Analyze document versions and suggest intelligent merge strategy to resolve conflicts.',
+        response_json_schema: {
+          type: "object",
+          properties: {
+            merge_strategy: { type: "string" },
+            conflicts: { type: "array", items: { type: "string" } },
+            recommendations: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+      toast.success(`Merge analysis complete: ${response.merge_strategy}`);
+    } catch (e) {
+      toast.error('Merge analysis failed');
+    }
+    setAiAnalyzing(false);
+  };
+
+  const generateMeetingNotes = async (collabId) => {
+    setAiAnalyzing(true);
+    try {
+      const collab = collaborations.find(c => c.id === collabId);
+      const allComments = collab?.comments?.map(c => c.content).join('\n') || '';
+      
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Generate structured meeting notes from these discussion comments:\n${allComments}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            summary: { type: "string" },
+            decisions: { type: "array", items: { type: "string" } },
+            action_items: { type: "array", items: { type: "string" } },
+            next_steps: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+      
+      const notesComment = {
+        id: Date.now().toString(),
+        author: 'AI Meeting Notes',
+        content: `📝 Meeting Summary:\n${response.summary}\n\nDecisions:\n${response.decisions.map((d, i) => `${i + 1}. ${d}`).join('\n')}\n\nAction Items:\n${response.action_items.map((a, i) => `${i + 1}. ${a}`).join('\n')}`,
+        created_at: new Date().toISOString(),
+        resolved: false
+      };
+
+      await updateCollabMutation.mutateAsync({
+        id: collabId,
+        data: {
+          comments: [...(collab?.comments || []), notesComment]
+        }
+      });
+      
+      toast.success('Meeting notes generated');
+    } catch (e) {
+      toast.error('Note generation failed');
     }
     setAiAnalyzing(false);
   };

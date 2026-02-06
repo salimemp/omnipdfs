@@ -60,6 +60,7 @@ import CustomDashboard from './pages/CustomDashboard';
 import Dashboard from './pages/Dashboard';
 import Files from './pages/Files';
 import FormFiller from './pages/FormFiller';
+import Guide from './pages/Guide';
 import History from './pages/History';
 import LegalDocs from './pages/LegalDocs';
 import OCR from './pages/OCR';
@@ -73,7 +74,6 @@ import TaskAutomation from './pages/TaskAutomation';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
-import Guide from './pages/Guide';
 import __Layout from './Layout.jsx';
 
 
@@ -91,6 +91,7 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "Files": Files,
     "FormFiller": FormFiller,
+    "Guide": Guide,
     "History": History,
     "LegalDocs": LegalDocs,
     "OCR": OCR,
@@ -104,7 +105,6 @@ export const PAGES = {
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
-    "Guide": Guide,
 }
 
 export const pagesConfig = {
