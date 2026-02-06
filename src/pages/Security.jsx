@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Shield, Lock, FileCheck, Key, Eye, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/components/shared/LanguageContext';
 import AdvancedSecurity from '@/components/security/AdvancedSecurity';
+import SecurityDashboard from '@/components/security/SecurityDashboard';
 import EnhancedCollaboration from '@/components/collab/EnhancedCollaboration';
 import DropZone from '@/components/shared/DropZone';
 import { base44 } from '@/api/base44Client';
@@ -13,6 +15,7 @@ export default function Security({ theme = 'dark' }) {
   const { t } = useLanguage();
   const [uploadedFile, setUploadedFile] = useState(null);
   const [activeTab, setActiveTab] = useState('security');
+  const [securityTab, setSecurityTab] = useState('dashboard');
   const isDark = theme === 'dark';
 
   const handleFileUploaded = async (fileData) => {
@@ -106,7 +109,20 @@ export default function Security({ theme = 'dark' }) {
           </div>
 
           {activeTab === 'security' ? (
-            <AdvancedSecurity document={uploadedFile} isDark={isDark} />
+            <Tabs value={securityTab} onValueChange={setSecurityTab} className="space-y-6">
+              <TabsList className={`grid grid-cols-2 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
+                <TabsTrigger value="dashboard">Security Dashboard</TabsTrigger>
+                <TabsTrigger value="advanced">Document Security</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="dashboard">
+                <SecurityDashboard isDark={isDark} />
+              </TabsContent>
+
+              <TabsContent value="advanced">
+                <AdvancedSecurity document={uploadedFile} isDark={isDark} />
+              </TabsContent>
+            </Tabs>
           ) : (
             <EnhancedCollaboration document={uploadedFile} isDark={isDark} />
           )}
