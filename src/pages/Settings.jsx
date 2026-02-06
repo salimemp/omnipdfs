@@ -108,6 +108,10 @@ export default function Settings({ theme = 'dark' }) {
             <User className="w-4 h-4 mr-2" />
             Account
           </TabsTrigger>
+          <TabsTrigger value="auth" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-300 text-slate-400">
+            <Key className="w-4 h-4 mr-2" />
+            Auth
+          </TabsTrigger>
           <TabsTrigger value="security" className="data-[state=active]:bg-violet-500/20 data-[state=active]:text-violet-300 text-slate-400">
             <Shield className="w-4 h-4 mr-2" />
             Security

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
+import AIDocumentComparison from '@/components/compare/AIDocumentComparison';
 import {
   GitCompare,
   Upload,
@@ -119,19 +120,40 @@ Be thorough and specific about the differences.`,
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-10"
+        className="mb-8"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6">
-          <GitCompare className="w-4 h-4 text-violet-400" />
-          <span className="text-sm text-violet-300">Advanced PDF Comparison</span>
-        </div>
-        <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-          Compare PDFs Side-by-Side
+        <h1 className={`text-2xl md:text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          Document Comparison
         </h1>
         <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
-          Upload two documents to see detailed differences, changes, and similarities
+          Compare documents with AI-powered analysis or side-by-side view
         </p>
       </motion.div>
+
+      <Tabs defaultValue="ai" className="space-y-6">
+        <TabsList className={`grid grid-cols-2 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
+          <TabsTrigger value="ai">AI Comparison</TabsTrigger>
+          <TabsTrigger value="visual">Visual Diff</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="ai">
+          <AIDocumentComparison isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="visual">
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6">
+                <GitCompare className="w-4 h-4 text-violet-400" />
+                <span className="text-sm text-violet-300">Advanced PDF Comparison</span>
+              </div>
+              <h2 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Compare PDFs Side-by-Side
+              </h2>
+              <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                Upload two documents to see detailed differences, changes, and similarities
+              </p>
+            </div>
 
       {/* Upload Section */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -510,6 +532,9 @@ Be thorough and specific about the differences.`,
           </motion.div>
         )}
       </AnimatePresence>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
