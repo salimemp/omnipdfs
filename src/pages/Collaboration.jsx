@@ -64,7 +64,6 @@ import { toast } from 'sonner';
 import moment from 'moment';
 import CollaboratorCard from '@/components/collab/CollaboratorCard';
 import CollaborationAudit from '@/components/collab/CollaborationAudit';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const roleConfig = {
   admin: { label: 'Admin', icon: Crown, color: 'text-amber-400', bg: 'bg-amber-500/20' },
