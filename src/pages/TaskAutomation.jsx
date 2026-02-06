@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import WorkflowVisualizer from '@/components/workflows/WorkflowVisualizer';
 import AutomationInsights from '@/components/automation/AutomationInsights';
+import AIWorkflowOptimizer from '@/components/workflows/AIWorkflowOptimizer';
 import { motion } from 'framer-motion';
 import { Bot } from 'lucide-react';
 import AITaskEngine from '@/components/automation/AITaskEngine';
@@ -40,9 +41,10 @@ export default function TaskAutomationPage({ theme = 'dark' }) {
       </motion.div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className={`grid grid-cols-3 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
+        <TabsList className={`grid grid-cols-4 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
           <TabsTrigger value="engine">Workflow Builder</TabsTrigger>
           <TabsTrigger value="visualizer">Visualizer</TabsTrigger>
+          <TabsTrigger value="optimizer">AI Optimizer</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
         </TabsList>
 
@@ -52,6 +54,10 @@ export default function TaskAutomationPage({ theme = 'dark' }) {
 
         <TabsContent value="visualizer">
           <WorkflowVisualizer workflow={mockWorkflow} isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="optimizer">
+          <AIWorkflowOptimizer workflow={mockWorkflow} isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="insights">

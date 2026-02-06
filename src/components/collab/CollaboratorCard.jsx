@@ -7,7 +7,8 @@ import {
   MessageSquare,
   Clock,
   Activity,
-  Shield
+  Shield,
+  BarChart3
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +41,7 @@ export default function CollaboratorCard({
   onInviteClick,
   onCommentsClick,
   onAuditClick,
+  onDeepDiveClick,
   isDark = true,
   index = 0
 }) {
@@ -103,6 +105,12 @@ export default function CollaboratorCard({
                 <DropdownMenuItem onClick={() => onAuditClick(collab)} className={isDark ? 'text-white' : ''}>
                   <Shield className="w-4 h-4 mr-2" />
                   Audit Trail
+                </DropdownMenuItem>
+              )}
+              {onDeepDiveClick && (
+                <DropdownMenuItem onClick={() => onDeepDiveClick(collab)} className={isDark ? 'text-white' : ''}>
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Deep Dive Analytics
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>

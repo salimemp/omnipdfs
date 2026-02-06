@@ -64,6 +64,7 @@ import { toast } from 'sonner';
 import moment from 'moment';
 import CollaboratorCard from '@/components/collab/CollaboratorCard';
 import CollaborationAudit from '@/components/collab/CollaborationAudit';
+import CollaborationDeepDive from '@/components/collab/CollaborationDeepDive';
 
 const roleConfig = {
   admin: { label: 'Admin', icon: Crown, color: 'text-amber-400', bg: 'bg-amber-500/20' },
@@ -104,6 +105,7 @@ export default function Collaboration({ theme = 'dark' }) {
   const [showWorkflows, setShowWorkflows] = useState(null);
   const [showPermissions, setShowPermissions] = useState(null);
   const [showAudit, setShowAudit] = useState(null);
+  const [showDeepDive, setShowDeepDive] = useState(null);
 
   const isDark = theme === 'dark';
   const queryClient = useQueryClient();
@@ -494,6 +496,7 @@ export default function Collaboration({ theme = 'dark' }) {
                 setShowCommentDialog(true);
               }}
               onAuditClick={(c) => setShowAudit(c)}
+              onDeepDiveClick={(c) => setShowDeepDive(c)}
               isDark={isDark}
               index={index}
             />
@@ -508,6 +511,16 @@ export default function Collaboration({ theme = 'dark' }) {
             <DialogTitle className={isDark ? 'text-white' : ''}>Collaboration Audit Trail</DialogTitle>
           </DialogHeader>
           {showAudit && <CollaborationAudit collaboration={showAudit} isDark={isDark} />}
+        </DialogContent>
+      </Dialog>
+
+      {/* Deep Dive Dialog */}
+      <Dialog open={!!showDeepDive} onOpenChange={() => setShowDeepDive(null)}>
+        <DialogContent className={`max-w-5xl max-h-[90vh] overflow-y-auto ${isDark ? 'bg-slate-900 border-slate-700' : ''}`}>
+          <DialogHeader>
+            <DialogTitle className={isDark ? 'text-white' : ''}>Collaboration Deep Dive</DialogTitle>
+          </DialogHeader>
+          {showDeepDive && <CollaborationDeepDive collaboration={showDeepDive} isDark={isDark} />}
         </DialogContent>
       </Dialog>
 
