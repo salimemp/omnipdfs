@@ -35,6 +35,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import OnboardingVideo from '@/components/shared/OnboardingVideo';
 
 const guides = [
   {
@@ -228,6 +229,70 @@ const guides = [
         illustration: '📋'
       }
     ]
+  },
+  {
+    id: 'automation',
+    title: 'Workflow Automation',
+    icon: Bot,
+    color: 'from-purple-500 to-indigo-600',
+    steps: [
+      {
+        title: 'Create Workflows',
+        description: 'Build automated workflows with visual drag-and-drop builder.',
+        icon: Bot,
+        illustration: '🤖'
+      },
+      {
+        title: 'AI Optimization',
+        description: 'Get intelligent suggestions to improve workflow performance.',
+        icon: Sparkles,
+        illustration: '✨'
+      },
+      {
+        title: 'Workflow Visualizer',
+        description: 'Track execution status and view detailed step-by-step progress.',
+        icon: Layers,
+        illustration: '📊'
+      },
+      {
+        title: 'Analytics & Insights',
+        description: 'Monitor performance metrics and get AI-powered recommendations.',
+        icon: Bot,
+        illustration: '📈'
+      }
+    ]
+  },
+  {
+    id: 'advanced',
+    title: 'Advanced Features',
+    icon: Sparkles,
+    color: 'from-rose-500 to-pink-600',
+    steps: [
+      {
+        title: 'Document Comparison',
+        description: 'Compare PDFs with AI-powered visual and textual analysis.',
+        icon: GitCompare,
+        illustration: '🔍'
+      },
+      {
+        title: 'Security Dashboard',
+        description: 'Monitor security events, manage settings, and track threats.',
+        icon: Shield,
+        illustration: '🛡️'
+      },
+      {
+        title: 'Collaboration Deep Dive',
+        description: 'Detailed analytics on team activity, versions, and statistics.',
+        icon: Users,
+        illustration: '👥'
+      },
+      {
+        title: 'Cloud Integration',
+        description: 'Sync with Google Drive, Dropbox, OneDrive, and Box.',
+        icon: Cloud,
+        illustration: '☁️'
+      }
+    ]
   }
 ];
 
@@ -241,7 +306,12 @@ const features = [
   { name: 'Cloud Sync', icon: Cloud, description: 'Multi-cloud support' },
   { name: 'Collaboration', icon: Users, description: 'Team workspaces' },
   { name: 'Automation', icon: Bot, description: 'Workflow automation' },
-  { name: 'Security', icon: Shield, description: 'Enterprise-grade' }
+  { name: 'Security', icon: Shield, description: 'Enterprise-grade' },
+  { name: 'AI Workflow Optimizer', icon: Sparkles, description: 'Intelligent optimization' },
+  { name: 'Deep Analytics', icon: Bot, description: 'Collaboration insights' },
+  { name: 'Audit Trails', icon: Shield, description: 'Complete activity logs' },
+  { name: 'Version Control', icon: Layers, description: 'Track all changes' },
+  { name: 'Legal Docs', icon: FileText, description: 'Compliance templates' }
 ];
 
 const faqs = [
@@ -275,7 +345,23 @@ const faqs = [
   },
   {
     question: 'Can I automate workflows?',
-    answer: 'Yes. Use our Task Automation feature to create workflows that automatically process documents based on triggers and conditions.'
+    answer: 'Yes. Use our Task Automation feature to create workflows that automatically process documents based on triggers and conditions. Includes AI workflow optimizer and real-time visualizer.'
+  },
+  {
+    question: 'What advanced features are available?',
+    answer: 'Advanced features include AI workflow optimization, collaboration deep dive analytics, comprehensive security dashboard, audit trails, document comparison with AI analysis, and cloud storage integration.'
+  },
+  {
+    question: 'How does the AI Workflow Optimizer work?',
+    answer: 'The AI Optimizer analyzes your workflows and suggests improvements for performance, efficiency, reliability, and cost. It identifies parallel execution opportunities, redundant steps, and provides confidence scores for each optimization.'
+  },
+  {
+    question: 'What insights are available in Collaboration Deep Dive?',
+    answer: 'Track total edits, comments, versions, and active time. View detailed activity feeds, version history with changes, and per-user statistics including edits, comments, views, and time spent.'
+  },
+  {
+    question: 'What security monitoring features are included?',
+    answer: 'Security dashboard shows real-time events, active sessions, encrypted files, failed attempts, and security score. Configure 2FA, encryption at rest, IP whitelisting, audit logging, session timeout, and zero-knowledge encryption.'
   }
 ];
 
@@ -330,6 +416,9 @@ export default function Guide({ theme = 'dark' }) {
           ))}
         </div>
       </motion.div>
+
+      {/* Onboarding Video */}
+      <OnboardingVideo isDark={isDark} />
 
       <Tabs defaultValue="guides" className="space-y-6">
         <TabsList className={isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-slate-100 border border-slate-200'}>
@@ -549,6 +638,74 @@ export default function Guide({ theme = 'dark' }) {
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5" />
                     <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Permission management</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}>
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                    <Bot className="w-5 h-5 text-white" />
+                  </div>
+                  <CardTitle className={isDark ? 'text-white' : 'text-slate-900'}>Workflow Automation</CardTitle>
+                </div>
+                <CardDescription className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  Automate document processing with AI
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5" />
+                    <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Visual workflow builder</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5" />
+                    <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>AI optimization suggestions</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5" />
+                    <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Real-time execution tracking</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5" />
+                    <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Performance analytics</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}>
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                  <CardTitle className={isDark ? 'text-white' : 'text-slate-900'}>Advanced Analytics</CardTitle>
+                </div>
+                <CardDescription className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  Deep insights into collaboration and security
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5" />
+                    <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Collaboration deep dive</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5" />
+                    <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Security dashboard</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5" />
+                    <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Complete audit trails</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5" />
+                    <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Activity monitoring</span>
                   </li>
                 </ul>
               </CardContent>

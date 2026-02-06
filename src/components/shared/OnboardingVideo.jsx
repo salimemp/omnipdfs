@@ -1,185 +1,149 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Sparkles, Zap, Shield, Users, Brain, Cloud } from 'lucide-react';
+import { PlayCircle, X, Volume2, VolumeX, Maximize2, Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
-export default function OnboardingVideo({ onClose, isDark = true }) {
-  const [currentFeature, setCurrentFeature] = useState(0);
+export default function OnboardingVideo({ isDark = true }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const features = [
-    {
-      icon: Sparkles,
-      title: 'AI-Powered Intelligence',
-      description: 'Advanced AI analyzes, summarizes, and enhances your documents automatically',
-      gradient: 'from-violet-500 to-purple-600',
-      animation: 'scale'
-    },
-    {
-      icon: Zap,
-      title: 'Lightning-Fast Conversions',
-      description: 'Convert between 50+ formats instantly with industry-leading speed',
-      gradient: 'from-cyan-500 to-blue-600',
-      animation: 'rotate'
-    },
-    {
-      icon: Users,
-      title: 'Real-Time Collaboration',
-      description: 'Work together seamlessly with live editing and instant syncing',
-      gradient: 'from-emerald-500 to-green-600',
-      animation: 'bounce'
-    },
-    {
-      icon: Shield,
-      title: 'Enterprise-Grade Security',
-      description: 'GDPR, HIPAA, SOC2 compliant with end-to-end encryption',
-      gradient: 'from-amber-500 to-orange-600',
-      animation: 'pulse'
-    },
-    {
-      icon: Brain,
-      title: 'Smart Automation',
-      description: 'Build powerful workflows that automate your document processing',
-      gradient: 'from-pink-500 to-rose-600',
-      animation: 'wiggle'
-    },
-    {
-      icon: Cloud,
-      title: 'Universal Cloud Integration',
-      description: 'Connect Google Drive, Dropbox, OneDrive, Box seamlessly',
-      gradient: 'from-indigo-500 to-violet-600',
-      animation: 'float'
-    }
-  ];
+  const videoThumbnail = "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=450&fit=crop";
 
-  const animations = {
-    scale: {
-      animate: { scale: [1, 1.2, 1] },
-      transition: { repeat: Infinity, duration: 2 }
-    },
-    rotate: {
-      animate: { rotate: [0, 360] },
-      transition: { repeat: Infinity, duration: 3, ease: 'linear' }
-    },
-    bounce: {
-      animate: { y: [0, -20, 0] },
-      transition: { repeat: Infinity, duration: 2 }
-    },
-    pulse: {
-      animate: { scale: [1, 1.1, 1], opacity: [1, 0.8, 1] },
-      transition: { repeat: Infinity, duration: 2 }
-    },
-    wiggle: {
-      animate: { rotate: [-5, 5, -5] },
-      transition: { repeat: Infinity, duration: 1.5 }
-    },
-    float: {
-      animate: { y: [0, -15, 0] },
-      transition: { repeat: Infinity, duration: 3, ease: 'easeInOut' }
-    }
+  const handlePlay = () => {
+    setIsPlaying(true);
   };
 
-  const feature = features[currentFeature];
-  const Icon = feature.icon;
-
-  const nextFeature = () => {
-    if (currentFeature < features.length - 1) {
-      setCurrentFeature(currentFeature + 1);
-    } else {
-      onClose();
-    }
+  const handleClose = () => {
+    setIsPlaying(false);
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-3xl mx-4 rounded-3xl overflow-hidden ${
-          isDark ? 'bg-slate-900' : 'bg-white'
-        }`}
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10"
+    <>
+      {/* Thumbnail Card */}
+      {!isPlaying && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
         >
-          <X className="w-5 h-5" />
-        </Button>
-
-        <div className="p-12 min-h-[500px] flex flex-col items-center justify-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentFeature}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              className="text-center"
-            >
-              <motion.div
-                {...animations[feature.animation]}
-                className="mb-8"
-              >
-                <div className={`inline-flex p-8 rounded-3xl bg-gradient-to-br ${feature.gradient}`}>
-                  <Icon className="w-24 h-24 text-white" />
-                </div>
-              </motion.div>
-
-              <h2 className={`text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                {feature.title}
-              </h2>
-              <p className={`text-xl mb-8 max-w-2xl ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                {feature.description}
-              </p>
-
-              <div className="flex items-center gap-2 justify-center mb-8">
-                {features.map((_, index) => (
-                  <motion.div
-                    key={index}
-                    className={`h-2 rounded-full transition-all ${
-                      index === currentFeature
-                        ? 'w-12 bg-gradient-to-r ' + feature.gradient
-                        : `w-2 ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`
-                    }`}
-                  />
-                ))}
+          <Card className={`overflow-hidden cursor-pointer group ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}
+            onClick={handlePlay}
+          >
+            <div className="relative aspect-video">
+              <img 
+                src={videoThumbnail} 
+                alt="Video tutorial"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-all" />
+              
+              {/* Play Button */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-20 h-20 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-2xl"
+                >
+                  <PlayCircle className="w-12 h-12 text-violet-600 ml-1" />
+                </motion.div>
               </div>
 
-              <Button
-                onClick={nextFeature}
-                size="lg"
-                className={`bg-gradient-to-r ${feature.gradient} text-white px-8`}
-              >
-                {currentFeature < features.length - 1 ? (
-                  <>
-                    Next Feature
-                    <Play className="w-5 h-5 ml-2" />
-                  </>
-                ) : (
-                  "Let's Get Started!"
-                )}
-              </Button>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+              {/* Duration Badge */}
+              <div className="absolute bottom-4 right-4 px-3 py-1 rounded-lg bg-black/70 backdrop-blur-sm">
+                <span className="text-white text-sm font-medium">5:30</span>
+              </div>
 
-        <div className={`absolute bottom-0 left-0 right-0 h-1 ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
+              {/* Title Overlay */}
+              <div className="absolute bottom-4 left-4">
+                <h3 className="text-white font-semibold text-lg mb-1">
+                  Getting Started with OmniPDFs
+                </h3>
+                <p className="text-white/80 text-sm">
+                  Learn the basics in under 6 minutes
+                </p>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Video Player Modal */}
+      <AnimatePresence>
+        {isPlaying && (
           <motion.div
-            className={`h-full bg-gradient-to-r ${feature.gradient}`}
-            initial={{ width: 0 }}
-            animate={{ width: `${((currentFeature + 1) / features.length) * 100}%` }}
-            transition={{ duration: 0.5 }}
-          />
-        </div>
-      </motion.div>
-    </motion.div>
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={handleClose}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`relative w-full max-w-5xl rounded-2xl overflow-hidden shadow-2xl ${isFullscreen ? 'max-w-none h-screen' : ''}`}
+            >
+              {/* Video Player */}
+              <div className={`relative ${isFullscreen ? 'h-full' : 'aspect-video'} bg-black`}>
+                <video
+                  className="w-full h-full"
+                  controls
+                  autoPlay
+                  muted={isMuted}
+                  poster={videoThumbnail}
+                >
+                  <source src="https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+
+                {/* Custom Controls Overlay */}
+                <div className="absolute top-4 right-4 flex gap-2">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setIsMuted(!isMuted)}
+                    className="bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm"
+                  >
+                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setIsFullscreen(!isFullscreen)}
+                    className="bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm"
+                  >
+                    {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleClose}
+                    className="bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm"
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Video Info */}
+              {!isFullscreen && (
+                <div className={`p-6 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+                  <h3 className={`font-semibold text-lg mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    Getting Started with OmniPDFs
+                  </h3>
+                  <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    This tutorial covers the basics of uploading, converting, and managing documents on OmniPDFs. 
+                    You'll learn about our core features, AI tools, and collaboration capabilities.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
