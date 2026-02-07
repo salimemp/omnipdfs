@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MoreHorizontal, Download, Trash2, Share2, Star, StarOff } from 'lucide-react';
+import { MoreHorizontal, Download, Trash2, Share2, Star, StarOff, WifiOff } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import FileIcon from './FileIcon';
 import { format } from 'date-fns';
+import { saveForOffline, loadFromOffline } from './OfflineManager';
+import { toast } from 'sonner';
 
 export default function FileCard({ 
   file, 
@@ -26,6 +28,17 @@ export default function FileCard({
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
+  const saveOffline = () => {
+    const offlineDocs = loadFromOffline('documents') || [];
+    if (!offlineDocs.find(d => d.id === file.id)) {
+      offlineDocs.push(file);
+      saveForOffline('documents', offlineDocs);
+      toast.success('Saved for offline access');
+    } else {
+      toast.info('Already saved offline');
+    }
   };
 
   return (
@@ -69,6 +82,10 @@ export default function FileCard({
                 <DropdownMenuItem onClick={() => onShare?.(file)} className={isDark ? 'text-slate-300 focus:text-white focus:bg-slate-800' : 'text-slate-700 focus:text-slate-900 focus:bg-slate-100'}>
                   <Share2 className="w-4 h-4 mr-2" />
                   Share
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={saveOffline} className={isDark ? 'text-slate-300 focus:text-white focus:bg-slate-800' : 'text-slate-700 focus:text-slate-900 focus:bg-slate-100'}>
+                  <WifiOff className="w-4 h-4 mr-2" />
+                  Save Offline
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onToggleFavorite?.(file)} className={isDark ? 'text-slate-300 focus:text-white focus:bg-slate-800' : 'text-slate-700 focus:text-slate-900 focus:bg-slate-100'}>
                   {file.is_favorite ? (
