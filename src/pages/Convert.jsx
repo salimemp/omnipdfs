@@ -349,7 +349,7 @@ export default function Convert({ theme = 'dark' }) {
                       {status === 'converting' && (
                         <Loader2 className="w-5 h-5 text-violet-400 animate-spin" />
                       )}
-                      {typeof status === 'object' && status.status === 'completed' && (
+                      {status?.downloadUrl && (
                         <>
                           <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                           <Button
@@ -362,6 +362,9 @@ export default function Convert({ theme = 'dark' }) {
                             Download
                           </Button>
                         </>
+                      )}
+                      {status === 'error' && (
+                        <span className="text-red-400 text-sm">Failed</span>
                       )}
                       {!status && (
                         <Button
