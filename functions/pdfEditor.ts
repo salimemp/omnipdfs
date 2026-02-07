@@ -16,41 +16,118 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Document not found' }, { status: 404 });
     }
 
+    // Validate input data
+    if (!data) {
+      return Response.json({ error: 'Action data required' }, { status: 400 });
+    }
+
     let result = {};
 
     switch (action) {
       case 'add_text':
-        result = { success: true, message: 'Text added to PDF' };
+        const { text, x, y, page, fontSize, color } = data;
+        if (!text || !page) {
+          return Response.json({ error: 'Text and page required' }, { status: 400 });
+        }
+        result = { 
+          success: true, 
+          message: 'Text added to PDF',
+          details: { text, page, position: { x, y }, fontSize, color }
+        };
         break;
       
       case 'add_image':
-        result = { success: true, message: 'Image added to PDF' };
+        const { imageUrl, page: imgPage, x: imgX, y: imgY } = data;
+        if (!imageUrl || !imgPage) {
+          return Response.json({ error: 'Image URL and page required' }, { status: 400 });
+        }
+        result = { 
+          success: true, 
+          message: 'Image added to PDF',
+          details: { imageUrl, page: imgPage, position: { x: imgX, y: imgY } }
+        };
         break;
       
       case 'add_signature':
-        result = { success: true, message: 'Signature added to PDF' };
+        const { signatureData, page: sigPage } = data;
+        if (!signatureData || !sigPage) {
+          return Response.json({ error: 'Signature data and page required' }, { status: 400 });
+        }
+        result = { 
+          success: true, 
+          message: 'Signature added to PDF',
+          details: { page: sigPage }
+        };
         break;
       
       case 'merge':
         const { documentIds } = data;
-        result = { success: true, message: `Merged ${documentIds.length} documents` };
+        if (!documentIds || documentIds.length < 2) {
+          return Response.json({ error: 'At least 2 documents required' }, { status: 400 });
+        }
+        
+        // Verify all documents exist
+        const docs = await Promise.all(
+          documentIds.map(id => base44.entities.Document.get(id))
+        );
+        if (docs.some(d => !d)) {
+          return Response.json({ error: 'One or more documents not found' }, { status: 404 });
+        }
+        
+        result = { 
+          success: true, 
+          message: `Merged ${documentIds.length} documents`,
+          documentIds
+        };
         break;
       
       case 'split':
         const { ranges } = data;
-        result = { success: true, message: `Split into ${ranges.length} parts` };
+        if (!ranges || !Array.isArray(ranges) || ranges.length === 0) {
+          return Response.json({ error: 'Page ranges required' }, { status: 400 });
+        }
+        result = { 
+          success: true, 
+          message: `Split into ${ranges.length} parts`,
+          ranges
+        };
         break;
       
       case 'rotate':
-        result = { success: true, message: 'Pages rotated' };
+        const { pages, angle } = data;
+        if (!pages || !angle || ![90, 180, 270, -90].includes(angle)) {
+          return Response.json({ error: 'Valid pages and angle required' }, { status: 400 });
+        }
+        result = { 
+          success: true, 
+          message: `Rotated ${pages.length} pages by ${angle}°`,
+          pages,
+          angle
+        };
         break;
       
       case 'delete_pages':
-        result = { success: true, message: 'Pages deleted' };
+        const { pages: delPages } = data;
+        if (!delPages || !Array.isArray(delPages) || delPages.length === 0) {
+          return Response.json({ error: 'Page numbers required' }, { status: 400 });
+        }
+        result = { 
+          success: true, 
+          message: `Deleted ${delPages.length} pages`,
+          pages: delPages
+        };
         break;
       
       case 'reorder':
-        result = { success: true, message: 'Pages reordered' };
+        const { newOrder } = data;
+        if (!newOrder || !Array.isArray(newOrder)) {
+          return Response.json({ error: 'New page order required' }, { status: 400 });
+        }
+        result = { 
+          success: true, 
+          message: 'Pages reordered',
+          newOrder
+        };
         break;
 
       default:

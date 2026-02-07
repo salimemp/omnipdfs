@@ -18,21 +18,29 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Document not found' }, { status: 404 });
     }
 
+    // Validate conversion options
+    const validOptions = options || { quality: 'high' };
+    
     // Fetch the original file
     const fileResponse = await fetch(document.file_url);
+    if (!fileResponse.ok) {
+      throw new Error('Failed to fetch source document');
+    }
     const fileBlob = await fileResponse.blob();
     
     // Create a new file with the target format
     const originalName = document.name.split('.')[0];
     const newFileName = `${originalName}_converted.${targetFormat}`;
     
-    // Upload the "converted" file (simulation - in production, use actual conversion service)
-    const formData = new FormData();
-    formData.append('file', new File([fileBlob], newFileName, { type: `application/${targetFormat}` }));
-    
+    // In production, this would use actual conversion APIs
+    // For now, upload placeholder converted file
     const uploadResult = await base44.integrations.Core.UploadFile({
       file: fileBlob
     });
+    
+    if (!uploadResult.file_url) {
+      throw new Error('File upload failed');
+    }
 
     // Create the converted document
     const convertedDoc = await base44.entities.Document.create({
