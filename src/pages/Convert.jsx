@@ -169,6 +169,8 @@ export default function Convert({ theme = 'dark' }) {
         options: options
       });
 
+      console.log('Conversion response:', response.data);
+
       if (response.data.success) {
         setConvertingFiles(prev => ({ 
           ...prev, 
