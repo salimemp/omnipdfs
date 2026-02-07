@@ -347,7 +347,7 @@ export default function Convert({ theme = 'dark' }) {
                       {status === 'converting' && (
                         <Loader2 className="w-5 h-5 text-violet-400 animate-spin" />
                       )}
-                      {status?.status === 'completed' && (
+                      {typeof status === 'object' && status.status === 'completed' && (
                         <>
                           <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                           <Button

@@ -48,6 +48,7 @@
  * The mainPage value must match a key in the PAGES object exactly.
  */
 import AIAssistant from './pages/AIAssistant';
+import AIContentGen from './pages/AIContentGen';
 import AIDocGenerator from './pages/AIDocGenerator';
 import APIDocs from './pages/APIDocs';
 import APIIntegrations from './pages/APIIntegrations';
@@ -65,6 +66,7 @@ import Guide from './pages/Guide';
 import History from './pages/History';
 import LegalDocs from './pages/LegalDocs';
 import OCR from './pages/OCR';
+import Offline from './pages/Offline';
 import PDFEditor from './pages/PDFEditor';
 import PDFTools from './pages/PDFTools';
 import Profile from './pages/Profile';
@@ -78,13 +80,12 @@ import TeamDashboard from './pages/TeamDashboard';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
-import AIContentGen from './pages/AIContentGen';
-import Offline from './pages/Offline';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "AIAssistant": AIAssistant,
+    "AIContentGen": AIContentGen,
     "AIDocGenerator": AIDocGenerator,
     "APIDocs": APIDocs,
     "APIIntegrations": APIIntegrations,
@@ -102,6 +103,7 @@ export const PAGES = {
     "History": History,
     "LegalDocs": LegalDocs,
     "OCR": OCR,
+    "Offline": Offline,
     "PDFEditor": PDFEditor,
     "PDFTools": PDFTools,
     "Profile": Profile,
@@ -115,8 +117,6 @@ export const PAGES = {
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
-    "AIContentGen": AIContentGen,
-    "Offline": Offline,
 }
 
 export const pagesConfig = {
