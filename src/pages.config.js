@@ -79,6 +79,7 @@ import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
 import AIContentGen from './pages/AIContentGen';
+import Offline from './pages/Offline';
 import __Layout from './Layout.jsx';
 
 
@@ -115,6 +116,7 @@ export const PAGES = {
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
     "AIContentGen": AIContentGen,
+    "Offline": Offline,
 }
 
 export const pagesConfig = {

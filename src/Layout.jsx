@@ -41,6 +41,7 @@ import AppLogo from '@/components/shared/AppLogo';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { LanguageProvider } from '@/components/shared/LanguageContext';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
+import OfflineManager from '@/components/shared/OfflineManager';
 
 function LayoutContent({ children, currentPageName }) {
   const { user, logout, login } = useAuth();
@@ -125,8 +126,9 @@ function LayoutContent({ children, currentPageName }) {
             { name: 'API Docs', page: 'APIDocs', icon: Webhook },
             { name: 'Security', page: 'Security', icon: Shield },
             { name: 'Profile', page: 'Profile', icon: Users },
+            { name: 'Offline Access', page: 'Offline', icon: Cloud },
             { name: 'Settings', page: 'Settings', icon: Settings },
-          ];
+            ];
 
   const isActive = (page) => currentPageName === page;
   const isDark = theme === 'dark';
@@ -356,11 +358,14 @@ function LayoutContent({ children, currentPageName }) {
         </div>
       </main>
 
+      {/* Offline Manager */}
+      <OfflineManager isDark={isDark} />
+
       {/* Cookie Consent */}
       <CookieConsent />
-    </div>
-  );
-}
+      </div>
+      );
+      }
 
 export default function Layout({ children, currentPageName }) {
   return (
