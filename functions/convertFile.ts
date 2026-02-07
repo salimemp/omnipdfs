@@ -26,16 +26,20 @@ Deno.serve(async (req) => {
     if (!fileResponse.ok) {
       throw new Error('Failed to fetch source document');
     }
-    const fileBlob = await fileResponse.blob();
+    const fileArrayBuffer = await fileResponse.arrayBuffer();
     
     // Create a new file with the target format
     const originalName = document.name.split('.')[0];
     const newFileName = `${originalName}_converted.${targetFormat}`;
     
-    // In production, this would use actual conversion APIs
-    // For now, upload placeholder converted file
+    // Create a File object for upload
+    const file = new File([fileArrayBuffer], newFileName, { 
+      type: 'application/octet-stream' 
+    });
+    
+    // Upload the converted file
     const uploadResult = await base44.integrations.Core.UploadFile({
-      file: fileBlob
+      file: file
     });
     
     if (!uploadResult.file_url) {
