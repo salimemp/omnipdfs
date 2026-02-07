@@ -50,6 +50,7 @@
 import AIAssistant from './pages/AIAssistant';
 import AIDocGenerator from './pages/AIDocGenerator';
 import APIDocs from './pages/APIDocs';
+import APIIntegrations from './pages/APIIntegrations';
 import AdvancedFeatures from './pages/AdvancedFeatures';
 import Analytics from './pages/Analytics';
 import CloudStorage from './pages/CloudStorage';
@@ -77,7 +78,7 @@ import TeamDashboard from './pages/TeamDashboard';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
-import APIIntegrations from './pages/APIIntegrations';
+import AIContentGen from './pages/AIContentGen';
 import __Layout from './Layout.jsx';
 
 
@@ -85,6 +86,7 @@ export const PAGES = {
     "AIAssistant": AIAssistant,
     "AIDocGenerator": AIDocGenerator,
     "APIDocs": APIDocs,
+    "APIIntegrations": APIIntegrations,
     "AdvancedFeatures": AdvancedFeatures,
     "Analytics": Analytics,
     "CloudStorage": CloudStorage,
@@ -112,7 +114,7 @@ export const PAGES = {
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
-    "APIIntegrations": APIIntegrations,
+    "AIContentGen": AIContentGen,
 }
 
 export const pagesConfig = {

@@ -109,6 +109,7 @@ function LayoutContent({ children, currentPageName }) {
             { name: 'OCR', page: 'OCR', icon: ScanText },
             { name: 'Templates', page: 'Templates', icon: LayoutTemplate },
             { name: 'AI Generator', page: 'AIDocGenerator', icon: Wand2 },
+            { name: 'AI Content Gen', page: 'AIContentGen', icon: Sparkles },
             { name: 'Compare PDFs', page: 'Compare', icon: GitCompare },
             { name: 'AI Assistant', page: 'AIAssistant', icon: Sparkles },
             { name: 'Task Automation', page: 'TaskAutomation', icon: Bot },
