@@ -40,6 +40,7 @@ import CookieConsent from '@/components/shared/CookieConsent';
 import AppLogo from '@/components/shared/AppLogo';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { LanguageProvider } from '@/components/shared/LanguageContext';
+import NotificationCenter from '@/components/notifications/NotificationCenter';
 
 function LayoutContent({ children, currentPageName }) {
   const { user, logout, login } = useAuth();
@@ -119,6 +120,7 @@ function LayoutContent({ children, currentPageName }) {
             { name: 'Legal Docs', page: 'LegalDocs', icon: Shield },
             { name: 'My Files', page: 'Files', icon: FolderOpen },
             { name: 'Analytics', page: 'Analytics', icon: History },
+            { name: 'API Integration', page: 'APIIntegrations', icon: Webhook },
             { name: 'API Docs', page: 'APIDocs', icon: Webhook },
             { name: 'Security', page: 'Security', icon: Shield },
             { name: 'Profile', page: 'Profile', icon: Users },
@@ -179,6 +181,7 @@ function LayoutContent({ children, currentPageName }) {
         <div className="flex items-center justify-between px-4 py-3">
           <AppLogo size="small" showText={true} isDark={isDark} />
           <div className="flex items-center gap-2">
+            <NotificationCenter isDark={isDark} />
             <AccessibilityPanel isDark={isDark} />
             <LanguageSwitcher isDark={isDark} />
             <Button
