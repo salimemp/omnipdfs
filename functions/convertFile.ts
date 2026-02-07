@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.ConversionJob.update(jobs[0].id, {
         status: 'completed',
         output_url: uploadResult.file_url,
-        output_size: fileBlob.size,
+        output_size: file.size,
         processing_time: 2500
       });
     }
