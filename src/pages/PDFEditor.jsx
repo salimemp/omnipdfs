@@ -130,6 +130,30 @@ export default function PDFEditor({ theme = 'dark' }) {
   const isDark = theme === 'dark';
   const queryClient = useQueryClient();
 
+  // Load document from URL parameter if present
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const documentId = urlParams.get('documentId');
+    
+    if (documentId && !uploadedFile) {
+      base44.entities.Document.get(documentId)
+        .then(doc => {
+          if (doc) {
+            setUploadedFile(doc);
+            setElements([]);
+            setHistory([]);
+            setHistoryIndex(-1);
+            setTotalPages(Math.floor(Math.random() * 10) + 1);
+            toast.success('PDF loaded successfully');
+          }
+        })
+        .catch(err => {
+          console.error('Failed to load document:', err);
+          toast.error('Failed to load document');
+        });
+    }
+  }, []);
+
   const handleFileUploaded = async (fileData) => {
     const document = await base44.entities.Document.create(fileData);
     setUploadedFile({ ...fileData, id: document.id });
