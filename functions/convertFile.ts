@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
       name: newFileName,
       file_url: uploadResult.file_url,
       file_type: targetFormat,
-      file_size: fileBlob.size,
+      file_size: file.size,
       status: 'ready'
     });
 
