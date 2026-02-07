@@ -19,7 +19,9 @@ import {
   Merge,
   Scissors,
   Lock,
-  Image
+  Image,
+  WifiOff,
+  Code
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import StatsCard from '@/components/shared/StatsCard';
@@ -49,10 +51,25 @@ export default function Dashboard({ theme = 'dark' }) {
 
   const quickActions = [
     { 
-      name: 'PDF to Word', 
-      icon: FileOutput, 
-      color: 'from-blue-500 to-blue-600',
-      formats: 'pdf → docx'
+      name: 'AI Content', 
+      page: 'AIContentGen',
+      icon: Sparkles, 
+      color: 'from-violet-500 to-purple-600',
+      formats: 'Generate with AI'
+    },
+    { 
+      name: 'API', 
+      page: 'APIIntegrations',
+      icon: Code, 
+      color: 'from-cyan-500 to-blue-600',
+      formats: 'Developer API'
+    },
+    { 
+      name: 'Offline', 
+      page: 'Offline',
+      icon: WifiOff, 
+      color: 'from-emerald-500 to-green-600',
+      formats: 'Work offline'
     },
     { 
       name: 'Merge PDFs', 
@@ -71,18 +88,6 @@ export default function Dashboard({ theme = 'dark' }) {
       icon: Layers, 
       color: 'from-emerald-500 to-emerald-600',
       formats: 'Reduce size'
-    },
-    { 
-      name: 'Protect PDF', 
-      icon: Lock, 
-      color: 'from-amber-500 to-amber-600',
-      formats: 'Add password'
-    },
-    { 
-      name: 'Image to PDF', 
-      icon: Image, 
-      color: 'from-cyan-500 to-cyan-600',
-      formats: 'jpg, png → pdf'
     },
   ];
 
@@ -198,7 +203,7 @@ export default function Dashboard({ theme = 'dark' }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <Link to={createPageUrl(action.name === 'Merge PDFs' ? 'PDFTools' : 'Convert')}>
+                <Link to={createPageUrl(action.page || (action.name === 'Merge PDFs' ? 'PDFTools' : 'Convert'))}>
                   <div className={`rounded-xl md:rounded-2xl p-3 md:p-5 hover:border-violet-500/30 transition-all group cursor-pointer text-center active:scale-95 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}>
                     <div className={`w-10 h-10 md:w-12 md:h-12 mx-auto rounded-lg md:rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform`}>
                       <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
