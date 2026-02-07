@@ -2,9 +2,14 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, TrendingUp, Clock, Cloud } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { Users, Workflow, Code, Brain } from 'lucide-react';
 import AIAnalyticsDashboard from '@/components/analytics/AIAnalyticsDashboard';
 import VersionControl from '@/components/versioning/VersionControl';
 import ServiceSync from '@/components/integration/ServiceSync';
+import WorkflowIntegrations from '@/components/integration/WorkflowIntegrations';
 
 export default function AdvancedFeaturesPage({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -32,8 +37,9 @@ export default function AdvancedFeaturesPage({ theme = 'dark' }) {
         </div>
       </motion.div>
 
-      <Tabs defaultValue="analytics" className="space-y-6">
-        <TabsList className={`grid w-full md:w-auto grid-cols-3 ${isDark ? 'bg-slate-900/50' : 'bg-white'}`}>
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className={`grid w-full md:w-auto grid-cols-4 ${isDark ? 'bg-slate-900/50' : 'bg-white'}`}>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
             Analytics
@@ -42,11 +48,63 @@ export default function AdvancedFeaturesPage({ theme = 'dark' }) {
             <Clock className="w-4 h-4" />
             Versioning
           </TabsTrigger>
-          <TabsTrigger value="integration" className="flex items-center gap-2">
+          <TabsTrigger value="workflows" className="flex items-center gap-2">
             <Cloud className="w-4 h-4" />
-            Integration
+            Workflows
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="overview">
+          <div className="grid md:grid-cols-2 gap-4">
+            <Link to={createPageUrl('TeamDashboard')}>
+              <Card className={`group hover:shadow-lg transition-all cursor-pointer ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white'}`}>
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Team Dashboard</h3>
+                  <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Monitor team activity and collaboration</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to={createPageUrl('TaskAutomation')}>
+              <Card className={`group hover:shadow-lg transition-all cursor-pointer ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white'}`}>
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Workflow className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Workflow Automation</h3>
+                  <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Build custom workflows with AI</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to={createPageUrl('APIIntegrations')}>
+              <Card className={`group hover:shadow-lg transition-all cursor-pointer ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white'}`}>
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Code className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>API Integration</h3>
+                  <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>RESTful API for external apps</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to={createPageUrl('AIContentGen')}>
+              <Card className={`group hover:shadow-lg transition-all cursor-pointer ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white'}`}>
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Brain className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>AI Content Generation</h3>
+                  <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Generate content with AI</p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </TabsContent>
 
         <TabsContent value="analytics">
           <AIAnalyticsDashboard isDark={isDark} />
@@ -61,13 +119,8 @@ export default function AdvancedFeaturesPage({ theme = 'dark' }) {
           </div>
         </TabsContent>
 
-        <TabsContent value="integration">
-          <div className="space-y-4">
-            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Sync your documents to external services like Google Drive, Dropbox, OneDrive, and Box.
-            </p>
-            <ServiceSync documentId={selectedDocId} isDark={isDark} />
-          </div>
+        <TabsContent value="workflows">
+          <WorkflowIntegrations isDark={isDark} />
         </TabsContent>
       </Tabs>
     </div>
