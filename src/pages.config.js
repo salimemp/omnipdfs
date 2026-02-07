@@ -75,6 +75,8 @@ import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
 import TeamDashboard from './pages/TeamDashboard';
+import Search from './pages/Search';
+import Profile from './pages/Profile';
 import __Layout from './Layout.jsx';
 
 
@@ -107,6 +109,8 @@ export const PAGES = {
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
     "TeamDashboard": TeamDashboard,
+    "Search": Search,
+    "Profile": Profile,
 }
 
 export const pagesConfig = {
