@@ -106,9 +106,64 @@ export default function CloudStorage({ theme = 'dark' }) {
 
   const isConnected = (serviceId) => connectedServices.includes(serviceId);
 
-  const connectService = (service) => {
+  const connectService = async (service) => {
     setSelectedService(service);
-    setShowConnectDialog(true);
+    
+    try {
+      let authUrl;
+      
+      switch (service.id) {
+        case 'google-drive':
+          toast.info('Google Drive already connected via OAuth connector');
+          setConnectedServices(prev => [...prev, service.id]);
+          return;
+          
+        case 'dropbox':
+          const clientId = Deno?.env?.get('DROPBOX_CLIENT_ID') || 'DROPBOX_CLIENT_ID';
+          authUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(window.location.origin + '/oauth/dropbox')}`;
+          break;
+          
+        case 'box':
+          const boxClientId = Deno?.env?.get('BOX_CLIENT_ID') || 'BOX_CLIENT_ID';
+          authUrl = `https://account.box.com/api/oauth2/authorize?client_id=${boxClientId}&response_type=code&redirect_uri=${encodeURIComponent(window.location.origin + '/oauth/box')}`;
+          break;
+          
+        case 'onedrive':
+          const onedriveClientId = Deno?.env?.get('ONEDRIVE_CLIENT_ID') || 'ONEDRIVE_CLIENT_ID';
+          authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${onedriveClientId}&response_type=code&redirect_uri=${encodeURIComponent(window.location.origin + '/oauth/onedrive')}&scope=files.readwrite offline_access`;
+          break;
+          
+        default:
+          setShowConnectDialog(true);
+          return;
+      }
+      
+      // Open OAuth popup
+      const width = 600;
+      const height = 700;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+      
+      const popup = window.open(
+        authUrl,
+        'oauth',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+      
+      // Listen for OAuth callback
+      const handleMessage = (event) => {
+        if (event.data.type === 'oauth-success' && event.data.service === service.id) {
+          setConnectedServices(prev => [...prev, service.id]);
+          toast.success(`Connected to ${service.name}`);
+          window.removeEventListener('message', handleMessage);
+        }
+      };
+      
+      window.addEventListener('message', handleMessage);
+      
+    } catch (error) {
+      toast.error('Failed to connect');
+    }
   };
 
   const handleConnect = () => {

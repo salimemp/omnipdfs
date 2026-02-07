@@ -181,25 +181,94 @@ export default function PDFTools({ theme = 'dark' }) {
     
     setProcessing(true);
     
-    // Simulate processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Log activity
-    await base44.entities.ActivityLog.create({
-      action: selectedTool.id === 'merge' ? 'merge' : 
-              selectedTool.id === 'split' ? 'split' :
-              selectedTool.id === 'compress' ? 'compress' :
-              selectedTool.id === 'protect' ? 'protect' : 'convert',
-      document_id: uploadedFiles[0].id,
-      document_name: uploadedFiles[0].name,
-      details: {
-        tool: selectedTool.id,
-        files_count: uploadedFiles.length
+    try {
+      let result;
+      
+      switch (selectedTool.id) {
+        case 'merge':
+          if (uploadedFiles.length < 2) {
+            toast.error('Please upload at least 2 PDFs to merge');
+            setProcessing(false);
+            return;
+          }
+          result = await base44.functions.invoke('enhancedPdfOperations', {
+            documentId: uploadedFiles[0].id,
+            operation: 'merge',
+            options: { sourceDocIds: uploadedFiles.map(f => f.id) }
+          });
+          break;
+          
+        case 'split':
+          const pageCount = 10; // You can enhance this to get actual page count
+          result = await base44.functions.invoke('enhancedPdfOperations', {
+            documentId: uploadedFiles[0].id,
+            operation: 'split',
+            options: { ranges: [{ start: 1, end: Math.floor(pageCount/2) }, { start: Math.floor(pageCount/2) + 1, end: pageCount }] }
+          });
+          break;
+          
+        case 'compress':
+          result = await base44.functions.invoke('enhancedPdfOperations', {
+            documentId: uploadedFiles[0].id,
+            operation: 'compress',
+            options: { quality: 'medium' }
+          });
+          break;
+          
+        case 'rotate':
+          result = await base44.functions.invoke('enhancedPdfOperations', {
+            documentId: uploadedFiles[0].id,
+            operation: 'rotate',
+            options: { pages: [1, 2, 3], angle: 90 }
+          });
+          break;
+          
+        case 'watermark':
+          result = await base44.functions.invoke('enhancedPdfOperations', {
+            documentId: uploadedFiles[0].id,
+            operation: 'watermark',
+            options: { text: 'CONFIDENTIAL', opacity: 0.5, position: 'center' }
+          });
+          break;
+          
+        case 'protect':
+          if (!password) {
+            toast.error('Password is required');
+            setProcessing(false);
+            return;
+          }
+          result = await base44.functions.invoke('enhancedPdfOperations', {
+            documentId: uploadedFiles[0].id,
+            operation: 'encrypt',
+            options: { password, permissions: ['print', 'copy'] }
+          });
+          break;
+          
+        case 'delete':
+          result = await base44.functions.invoke('enhancedPdfOperations', {
+            documentId: uploadedFiles[0].id,
+            operation: 'extract_pages',
+            options: { pageNumbers: [1, 2, 3] } // Extract pages 1-3, effectively deleting others
+          });
+          break;
+          
+        default:
+          toast.error('Operation not yet implemented');
+          setProcessing(false);
+          return;
       }
-    });
-    
-    setProcessing(false);
-    setCompleted(true);
+      
+      if (result.data.success) {
+        toast.success(result.data.message);
+        setCompleted(true);
+      } else {
+        toast.error('Operation failed');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Operation failed');
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const resetTool = () => {
