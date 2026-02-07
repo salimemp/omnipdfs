@@ -66,17 +66,17 @@ import LegalDocs from './pages/LegalDocs';
 import OCR from './pages/OCR';
 import PDFEditor from './pages/PDFEditor';
 import PDFTools from './pages/PDFTools';
+import Profile from './pages/Profile';
 import ProjectFiles from './pages/ProjectFiles';
+import Search from './pages/Search';
 import Security from './pages/Security';
 import Settings from './pages/Settings';
 import Subscription from './pages/Subscription';
 import TaskAutomation from './pages/TaskAutomation';
+import TeamDashboard from './pages/TeamDashboard';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
-import TeamDashboard from './pages/TeamDashboard';
-import Search from './pages/Search';
-import Profile from './pages/Profile';
 import __Layout from './Layout.jsx';
 
 
@@ -100,17 +100,17 @@ export const PAGES = {
     "OCR": OCR,
     "PDFEditor": PDFEditor,
     "PDFTools": PDFTools,
+    "Profile": Profile,
     "ProjectFiles": ProjectFiles,
+    "Search": Search,
     "Security": Security,
     "Settings": Settings,
     "Subscription": Subscription,
     "TaskAutomation": TaskAutomation,
+    "TeamDashboard": TeamDashboard,
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
-    "TeamDashboard": TeamDashboard,
-    "Search": Search,
-    "Profile": Profile,
 }
 
 export const pagesConfig = {

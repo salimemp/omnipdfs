@@ -100,7 +100,7 @@ export default function Dashboard({ theme = 'dark' }) {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`relative overflow-hidden rounded-3xl p-8 md:p-12 ${isDark ? 'bg-gradient-to-br from-violet-500/10 via-slate-900 to-cyan-500/10 border border-slate-800/50' : 'bg-gradient-to-br from-violet-100 via-white to-cyan-100 border border-slate-200'}`}
+        className={`relative overflow-hidden rounded-2xl md:rounded-3xl p-6 md:p-12 ${isDark ? 'bg-gradient-to-br from-violet-500/10 via-slate-900 to-cyan-500/10 border border-slate-800/50' : 'bg-gradient-to-br from-violet-100 via-white to-cyan-100 border border-slate-200'}`}
       >
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-50" />
         
@@ -110,22 +110,22 @@ export default function Dashboard({ theme = 'dark' }) {
             <span className={`text-sm ${isDark ? 'text-violet-300' : 'text-violet-600'}`}>Enterprise-grade PDF tools</span>
           </div>
           
-          <h1 className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Welcome back{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}
           </h1>
-          <p className={`text-lg mb-8 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-base md:text-lg mb-6 md:mb-8 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
             Convert, edit, and manage your documents with military-grade security and blazing-fast performance.
           </p>
           
-          <div className="flex flex-wrap gap-4">
-            <Link to={createPageUrl('Convert')}>
-              <Button className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 text-white px-6 py-6 text-base rounded-xl">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+            <Link to={createPageUrl('Convert')} className="w-full sm:w-auto">
+              <Button className="w-full sm:w-auto bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 text-white px-6 py-3 md:py-6 text-base rounded-xl">
                 <Zap className="w-5 h-5 mr-2" />
                 Start Converting
               </Button>
             </Link>
-            <Link to={createPageUrl('Guide')}>
-              <Button variant="outline" className={`px-6 py-6 text-base rounded-xl ${isDark ? 'border-slate-700 bg-white text-slate-900 hover:bg-slate-100' : 'border-slate-300 text-slate-900 hover:bg-slate-100'}`}>
+            <Link to={createPageUrl('Guide')} className="w-full sm:w-auto">
+              <Button variant="outline" className={`w-full sm:w-auto px-6 py-3 md:py-6 text-base rounded-xl ${isDark ? 'border-slate-700 bg-white text-slate-900 hover:bg-slate-100' : 'border-slate-300 text-slate-900 hover:bg-slate-100'}`}>
                 <FileText className="w-5 h-5 mr-2" />
                 View Guide
               </Button>
@@ -188,7 +188,7 @@ export default function Dashboard({ theme = 'dark' }) {
           </Link>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             return (
@@ -199,12 +199,12 @@ export default function Dashboard({ theme = 'dark' }) {
                 transition={{ delay: index * 0.05 }}
               >
                 <Link to={createPageUrl(action.name === 'Merge PDFs' ? 'PDFTools' : 'Convert')}>
-                  <div className={`rounded-2xl p-5 hover:border-violet-500/30 transition-all group cursor-pointer text-center ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}>
-                    <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                      <Icon className="w-6 h-6 text-white" />
+                  <div className={`rounded-xl md:rounded-2xl p-3 md:p-5 hover:border-violet-500/30 transition-all group cursor-pointer text-center active:scale-95 ${isDark ? 'glass-light' : 'bg-white border border-slate-200 shadow-sm'}`}>
+                    <div className={`w-10 h-10 md:w-12 md:h-12 mx-auto rounded-lg md:rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform`}>
+                      <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
-                    <p className={`font-medium text-sm mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{action.name}</p>
-                    <p className="text-xs text-slate-500">{action.formats}</p>
+                    <p className={`font-medium text-xs md:text-sm mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{action.name}</p>
+                    <p className="text-[10px] md:text-xs text-slate-500 hidden sm:block">{action.formats}</p>
                   </div>
                 </Link>
               </motion.div>

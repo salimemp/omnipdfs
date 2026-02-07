@@ -4,6 +4,7 @@ import { LayoutTemplate } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TemplateGallery from '@/components/templates/TemplateGallery';
 import TemplateCreator from '@/components/templates/TemplateCreator';
+import ExpandedTemplateLibrary from '@/components/templates/ExpandedTemplateLibrary';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -27,12 +28,17 @@ export default function Templates({ theme = 'dark' }) {
         </p>
       </motion.div>
 
-      <Tabs defaultValue="gallery" className="space-y-6">
+      <Tabs defaultValue="library" className="space-y-6">
         <TabsList className={isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'}>
+          <TabsTrigger value="library">Browse Library</TabsTrigger>
           <TabsTrigger value="gallery">Template Gallery</TabsTrigger>
           <TabsTrigger value="create">Create Template</TabsTrigger>
           <TabsTrigger value="my-templates">My Templates</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="library">
+          <ExpandedTemplateLibrary isDark={isDark} />
+        </TabsContent>
 
         <TabsContent value="gallery">
           <TemplateGallery isDark={isDark} />
