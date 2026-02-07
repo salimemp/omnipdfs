@@ -155,14 +155,6 @@ export default function Convert({ theme = 'dark' }) {
     setConvertingFiles(prev => ({ ...prev, [file.id]: 'converting' }));
     
     try {
-      const job = await base44.entities.ConversionJob.create({
-        document_id: file.id,
-        source_format: file.file_type,
-        target_format: targetFormat,
-        status: 'processing',
-        options: options
-      });
-
       const response = await base44.functions.invoke('convertFile', {
         documentId: file.id,
         targetFormat: targetFormat,
@@ -171,11 +163,10 @@ export default function Convert({ theme = 'dark' }) {
 
       console.log('Conversion response:', response.data);
 
-      if (response.data.success) {
+      if (response.data.success && response.data.downloadUrl) {
         setConvertingFiles(prev => ({ 
           ...prev, 
           [file.id]: { 
-            status: 'completed',
             downloadUrl: response.data.downloadUrl,
             convertedDoc: response.data.convertedDocument
           }
@@ -184,7 +175,7 @@ export default function Convert({ theme = 'dark' }) {
         queryClient.invalidateQueries(['documents']);
         queryClient.invalidateQueries(['recent-jobs']);
       } else {
-        throw new Error('Conversion failed');
+        throw new Error('Conversion failed - no download URL');
       }
 
     } catch (error) {
