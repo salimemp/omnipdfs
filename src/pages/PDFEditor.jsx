@@ -153,10 +153,24 @@ export default function PDFEditor({ theme = 'dark' }) {
         .then(doc => {
           if (doc) {
             setUploadedFile(doc);
-            setElements([]);
-            setHistory([]);
-            setHistoryIndex(-1);
-            setTotalPages(Math.floor(Math.random() * 10) + 1);
+            
+            // Load saved elements if they exist
+            if (doc.content) {
+              try {
+                const savedElements = JSON.parse(doc.content);
+                if (Array.isArray(savedElements)) {
+                  setElements(savedElements);
+                  addToHistory(savedElements);
+                }
+              } catch (e) {
+                console.error('Failed to parse saved elements');
+              }
+            } else {
+              setElements([]);
+              setHistory([]);
+              setHistoryIndex(-1);
+            }
+            
             toast.success('PDF loaded successfully');
           }
         })
@@ -168,13 +182,32 @@ export default function PDFEditor({ theme = 'dark' }) {
   }, []);
 
   const handleFileUploaded = async (fileData) => {
-    const document = await base44.entities.Document.create(fileData);
-    setUploadedFile({ ...fileData, id: document.id });
-    setElements([]);
-    setHistory([]);
-    setHistoryIndex(-1);
-    setTotalPages(Math.floor(Math.random() * 10) + 1);
-    toast.success('PDF loaded successfully');
+    try {
+      const document = await base44.entities.Document.create({
+        ...fileData,
+        status: 'ready',
+        content: JSON.stringify([]) // Initialize with empty elements
+      });
+      
+      setUploadedFile({ ...fileData, id: document.id });
+      setElements([]);
+      setHistory([]);
+      setHistoryIndex(-1);
+      
+      toast.success('PDF loaded successfully');
+      
+      await base44.entities.ActivityLog.create({
+        action: 'upload',
+        document_id: document.id,
+        document_name: fileData.name,
+        details: { 
+          file_size: fileData.file_size,
+          file_type: fileData.file_type
+        }
+      });
+    } catch (error) {
+      toast.error('Failed to create document record');
+    }
   };
 
   const addToHistory = (newElements) => {
@@ -239,15 +272,36 @@ export default function PDFEditor({ theme = 'dark' }) {
     
     toast.promise(
       async () => {
+        // Save elements data with the document
+        const elementsData = JSON.stringify(elements);
+        
         await base44.entities.Document.update(uploadedFile.id, {
-          status: 'ready'
+          status: 'ready',
+          content: elementsData // Save the elements for later retrieval
         });
+        
+        // If there are actual edits, call the backend PDF editor function
+        if (elements.length > 0) {
+          await base44.functions.invoke('pdfEditor', {
+            documentId: uploadedFile.id,
+            action: 'add_annotations',
+            data: { elements }
+          });
+        }
+        
         await base44.entities.ActivityLog.create({
           action: 'convert',
           document_id: uploadedFile.id,
           document_name: uploadedFile.name,
-          details: { type: 'pdf_edit', elements_count: elements.length }
+          details: { 
+            type: 'pdf_edit', 
+            elements_count: elements.length,
+            last_saved: new Date().toISOString()
+          }
         });
+        
+        // Update history after save
+        addToHistory(elements);
       },
       {
         loading: 'Saving document...',
@@ -255,6 +309,28 @@ export default function PDFEditor({ theme = 'dark' }) {
         error: 'Failed to save document'
       }
     );
+  };
+
+  const exportDocument = async () => {
+    if (!uploadedFile) return;
+    
+    try {
+      // Trigger download
+      const link = document.createElement('a');
+      link.href = uploadedFile.file_url;
+      link.download = uploadedFile.name;
+      link.click();
+      
+      toast.success('Document exported');
+      
+      await base44.entities.ActivityLog.create({
+        action: 'download',
+        document_id: uploadedFile.id,
+        document_name: uploadedFile.name
+      });
+    } catch (error) {
+      toast.error('Export failed');
+    }
   };
 
   return (
@@ -284,6 +360,10 @@ export default function PDFEditor({ theme = 'dark' }) {
               <Button onClick={saveDocument} className="bg-gradient-to-r from-violet-500 to-cyan-500">
                 <Save className="w-4 h-4 mr-2" />
                 Save
+              </Button>
+              <Button onClick={exportDocument} variant="outline" className={isDark ? 'border-slate-700' : ''}>
+                <Download className="w-4 h-4 mr-2" />
+                Export
               </Button>
             </div>
           )}
