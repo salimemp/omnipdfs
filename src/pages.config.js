@@ -81,6 +81,7 @@ import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
 import OAuthSetupGuide from './pages/OAuthSetupGuide';
+import OAuthTroubleshooting from './pages/OAuthTroubleshooting';
 import __Layout from './Layout.jsx';
 
 
@@ -119,6 +120,7 @@ export const PAGES = {
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
     "OAuthSetupGuide": OAuthSetupGuide,
+    "OAuthTroubleshooting": OAuthTroubleshooting,
 }
 
 export const pagesConfig = {
