@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Save, Eye } from 'lucide-react';
+import { Plus, Save, Eye, Sparkles, Loader2, Tag, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,57 @@ export default function TemplateCreator({ isDark }) {
     category: '',
     isPublic: false,
   });
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [suggestedTags, setSuggestedTags] = useState([]);
+
+  const generateTemplateWithAI = async () => {
+    if (!template.name) {
+      toast.error('Please enter a template name first');
+      return;
+    }
+
+    setAiGenerating(true);
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Generate a professional document template structure for: "${template.name}"
+        
+        Create a detailed template including:
+        - Recommended sections and layout
+        - Sample content placeholders
+        - Best practices for this type of document
+        - Suggested styling and formatting
+        
+        ${template.description ? `Additional context: ${template.description}` : ''}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            sections: { type: "array", items: { type: "string" } },
+            description: { type: "string" },
+            suggested_tags: { type: "array", items: { type: "string" } },
+            best_practices: { type: "array", items: { type: "string" } },
+            template_content: { type: "string" }
+          }
+        }
+      });
+
+      setTemplate({
+        ...template,
+        description: result.description || template.description,
+        template_data: { 
+          sections: result.sections,
+          best_practices: result.best_practices,
+          content: result.template_content
+        }
+      });
+      
+      setSuggestedTags(result.suggested_tags || []);
+      toast.success('AI template structure generated!');
+    } catch (e) {
+      toast.error('AI generation failed');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   const saveTemplate = async () => {
     if (!template.name || !template.category) {
@@ -25,8 +76,12 @@ export default function TemplateCreator({ isDark }) {
 
     toast.promise(
       async () => {
-        await base44.entities.Template.create(template);
+        await base44.entities.Template.create({
+          ...template,
+          tags: suggestedTags
+        });
         setTemplate({ name: '', description: '', category: '', isPublic: false });
+        setSuggestedTags([]);
       },
       {
         loading: 'Saving template...',
@@ -76,10 +131,50 @@ export default function TemplateCreator({ isDark }) {
             value={template.description}
             onChange={(e) => setTemplate({ ...template, description: e.target.value })}
             placeholder="Describe your template..."
-            className={isDark ? 'bg-slate-800 border-slate-700' : ''}
+            className={isDark ? 'bg-slate-800 border-slate-700 text-white' : ''}
             rows={3}
           />
         </div>
+
+        {/* AI Generate Button */}
+        <Button
+          onClick={generateTemplateWithAI}
+          disabled={aiGenerating || !template.name}
+          variant="outline"
+          className={`w-full ${isDark ? 'border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10' : 'border-violet-300 bg-violet-50'}`}
+        >
+          {aiGenerating ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Generating Structure...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 mr-2 text-violet-400" />
+              Generate with AI
+            </>
+          )}
+        </Button>
+
+        {/* Suggested Tags */}
+        {suggestedTags.length > 0 && (
+          <div>
+            <Label className={`mb-2 block ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+              <Tag className="w-4 h-4 inline mr-1" />
+              AI Suggested Tags
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {suggestedTags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 text-xs border border-violet-500/30"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex gap-2">
           <Button onClick={saveTemplate} className="flex-1 bg-violet-500">

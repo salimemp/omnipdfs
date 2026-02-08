@@ -95,6 +95,32 @@ function LayoutContent({ children, currentPageName }) {
 
   React.useEffect(() => {
     localStorage.setItem('omnipdfs-theme', theme);
+    
+    // PWA viewport meta for mobile
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (viewport) {
+      viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover');
+    }
+    
+    // PWA theme color
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute('content', theme === 'dark' ? '#0f172a' : '#ffffff');
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      meta.content = theme === 'dark' ? '#0f172a' : '#ffffff';
+      document.head.appendChild(meta);
+    }
+    
+    // PWA manifest link
+    const manifestLink = document.querySelector('link[rel="manifest"]');
+    if (!manifestLink) {
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = '/manifest.json';
+      document.head.appendChild(link);
+    }
   }, [theme]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
@@ -352,11 +378,14 @@ function LayoutContent({ children, currentPageName }) {
       </aside>
 
       {/* Main Content */}
-      <main className="lg:ml-72 min-h-screen pt-16 lg:pt-0">
+      <main className="lg:ml-72 min-h-screen pt-16 lg:pt-0 pb-20 lg:pb-0">
         <div className="p-4 sm:p-6 lg:p-8">
           {React.cloneElement(children, { theme })}
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav currentPageName={currentPageName} isDark={isDark} />
 
       {/* Offline Manager */}
       <OfflineManager isDark={isDark} />

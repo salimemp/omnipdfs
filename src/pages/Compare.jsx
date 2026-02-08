@@ -398,14 +398,59 @@ Be thorough and specific about the differences.`,
               </CardContent>
             </Card>
 
+            {/* AI Insights & Critical Changes */}
+            {(comparisonResult.ai_insights?.length > 0 || comparisonResult.critical_changes?.length > 0) && (
+              <div className="grid md:grid-cols-2 gap-4">
+                {comparisonResult.critical_changes?.length > 0 && (
+                  <Card className={`${isDark ? 'bg-red-500/10 border-red-500/30' : 'bg-red-50 border-red-200'}`}>
+                    <CardHeader>
+                      <CardTitle className={`text-sm flex items-center gap-2 ${isDark ? 'text-red-400' : 'text-red-600'}`}>
+                        <AlertTriangle className="w-4 h-4" />
+                        Critical Changes
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {comparisonResult.critical_changes.map((change, i) => (
+                          <li key={i} className={`text-xs ${isDark ? 'text-red-300' : 'text-red-700'}`}>
+                            • {change}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {comparisonResult.ai_insights?.length > 0 && (
+                  <Card className={`${isDark ? 'bg-violet-500/10 border-violet-500/30' : 'bg-violet-50 border-violet-200'}`}>
+                    <CardHeader>
+                      <CardTitle className={`text-sm flex items-center gap-2 ${isDark ? 'text-violet-400' : 'text-violet-600'}`}>
+                        <Sparkles className="w-4 h-4" />
+                        AI Insights
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {comparisonResult.ai_insights.map((insight, i) => (
+                          <li key={i} className={`text-xs ${isDark ? 'text-violet-300' : 'text-violet-700'}`}>
+                            • {insight}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
+
             {/* Detailed Changes */}
             <Tabs defaultValue="differences" className="w-full">
-              <div className="flex items-center justify-between mb-4">
-                <TabsList className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
-                  <TabsTrigger value="differences">Key Differences</TabsTrigger>
-                  <TabsTrigger value="added">Added Content</TabsTrigger>
-                  <TabsTrigger value="removed">Removed Content</TabsTrigger>
-                  <TabsTrigger value="modified">Modified Sections</TabsTrigger>
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                <TabsList className={`${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border w-full md:w-auto overflow-x-auto`}>
+                  <TabsTrigger value="differences" className="text-xs md:text-sm">Key Differences</TabsTrigger>
+                  <TabsTrigger value="added" className="text-xs md:text-sm">Added Content</TabsTrigger>
+                  <TabsTrigger value="removed" className="text-xs md:text-sm">Removed Content</TabsTrigger>
+                  <TabsTrigger value="modified" className="text-xs md:text-sm">Modified Sections</TabsTrigger>
                 </TabsList>
 
                 <div className={`hidden md:flex ${isDark ? 'border-slate-700' : 'border-slate-200'} border rounded-lg overflow-hidden`}>
