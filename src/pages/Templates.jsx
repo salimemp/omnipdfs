@@ -6,6 +6,7 @@ import TemplateGallery from '@/components/templates/TemplateGallery';
 import TemplateCreator from '@/components/templates/TemplateCreator';
 import ExpandedTemplateLibrary from '@/components/templates/ExpandedTemplateLibrary';
 import AdvancedTemplateEditor from '@/components/templates/AdvancedTemplateEditor';
+import VisualTemplateEditor from '@/components/templates/VisualTemplateEditor';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -30,9 +31,10 @@ export default function Templates({ theme = 'dark' }) {
       </motion.div>
 
       <Tabs defaultValue="library" className="space-y-6">
-        <TabsList className={isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'}>
+        <TabsList className={`${isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'} overflow-x-auto`}>
           <TabsTrigger value="library">Browse Library</TabsTrigger>
           <TabsTrigger value="gallery">Template Gallery</TabsTrigger>
+          <TabsTrigger value="visual">Visual Editor</TabsTrigger>
           <TabsTrigger value="editor">Advanced Editor</TabsTrigger>
           <TabsTrigger value="create">Create Template</TabsTrigger>
           <TabsTrigger value="my-templates">My Templates</TabsTrigger>
@@ -44,6 +46,10 @@ export default function Templates({ theme = 'dark' }) {
 
         <TabsContent value="gallery">
           <TemplateGallery isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="visual">
+          <VisualTemplateEditor isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="editor">
