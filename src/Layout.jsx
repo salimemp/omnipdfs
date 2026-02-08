@@ -88,9 +88,9 @@ function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('omnipdfs-theme') || 'dark';
+      return localStorage.getItem('omnipdfs-theme') || 'light';
     }
-    return 'dark';
+    return 'light';
   });
 
   React.useEffect(() => {
