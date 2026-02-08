@@ -42,6 +42,7 @@ import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { LanguageProvider } from '@/components/shared/LanguageContext';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
 import OfflineManager from '@/components/shared/OfflineManager';
+import MobileBottomNav from '@/components/shared/MobileBottomNav';
 
 function LayoutContent({ children, currentPageName }) {
   const { user, logout, login } = useAuth();
