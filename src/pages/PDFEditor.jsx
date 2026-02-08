@@ -70,6 +70,8 @@ import AdvancedToolbar from '@/components/editor/AdvancedToolbar';
 import RealtimeEditor from '@/components/editor/RealtimeEditor';
 import ReadAloud from '@/components/shared/ReadAloud';
 import PDFChatAssistant from '@/components/ai/PDFChatAssistant';
+import AdvancedAnnotations from '@/components/editor/AdvancedAnnotations';
+import CollaborationPanel from '@/components/editor/CollaborationPanel';
 import { useLanguage } from '@/components/shared/LanguageContext';
 import { toast } from 'sonner';
 
@@ -86,6 +88,7 @@ const tools = [
   { id: 'chat', icon: MessageSquare, label: 'AI Chat', shortcut: 'Q' },
   { id: 'ai', icon: Sparkles, label: 'AI Tools', shortcut: 'A' },
   { id: 'collab', icon: Users, label: 'Collaborate', shortcut: 'C' },
+  { id: 'annotations', icon: MessageSquare, label: 'Annotations', shortcut: 'N' },
 ];
 
 const shapes = [
@@ -110,6 +113,7 @@ const colors = [
 
 export default function PDFEditor({ theme = 'dark' }) {
   const { t } = useLanguage();
+  const [user, setUser] = useState(null);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [activeTool, setActiveTool] = useState('select');
   const [zoom, setZoom] = useState(100);
@@ -133,6 +137,9 @@ export default function PDFEditor({ theme = 'dark' }) {
   const [aiSuggestion, setAiSuggestion] = useState(null);
   const [numPages, setNumPages] = useState(null);
   const [pageLoading, setPageLoading] = useState(true);
+  const [versions, setVersions] = useState([]);
+  const [showVersions, setShowVersions] = useState(false);
+  const [annotations, setAnnotations] = useState([]);
 
   const isDark = theme === 'dark';
   const queryClient = useQueryClient();
@@ -142,6 +149,17 @@ export default function PDFEditor({ theme = 'dark' }) {
     setTotalPages(numPages);
     setPageLoading(false);
   };
+
+  // Load user
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await base44.auth.me();
+        setUser(userData);
+      } catch (e) {}
+    };
+    fetchUser();
+  }, []);
 
   // Load document from URL parameter if present
   React.useEffect(() => {
@@ -333,6 +351,112 @@ export default function PDFEditor({ theme = 'dark' }) {
     }
   };
 
+  const createVersion = async () => {
+    if (!uploadedFile) return;
+    
+    try {
+      const versionData = {
+        version: versions.length + 1,
+        author: user?.email || 'Unknown',
+        changes: `${elements.length} elements`,
+        created_at: new Date().toISOString()
+      };
+      
+      const collabRecords = await base44.entities.Collaboration.filter({ document_id: uploadedFile.id });
+      
+      if (collabRecords.length === 0) {
+        await base44.entities.Collaboration.create({
+          document_id: uploadedFile.id,
+          version_history: [versionData]
+        });
+      } else {
+        const existing = collabRecords[0];
+        await base44.entities.Collaboration.update(existing.id, {
+          version_history: [...(existing.version_history || []), versionData]
+        });
+      }
+      
+      await loadVersions();
+      toast.success('Version saved');
+    } catch (error) {
+      toast.error('Failed to save version');
+    }
+  };
+
+  const loadVersions = async () => {
+    if (!uploadedFile) return;
+    
+    try {
+      const collabRecords = await base44.entities.Collaboration.filter({ document_id: uploadedFile.id });
+      if (collabRecords.length > 0) {
+        setVersions(collabRecords[0].version_history || []);
+      }
+    } catch (error) {}
+  };
+
+  const saveAsTemplate = async () => {
+    if (!uploadedFile) return;
+    
+    try {
+      const templateName = prompt('Enter template name:');
+      if (!templateName) return;
+      
+      await base44.entities.Template.create({
+        name: templateName,
+        category: 'custom',
+        template_data: {
+          elements,
+          settings: toolSettings,
+          annotations
+        },
+        is_public: false
+      });
+      
+      toast.success('Template saved');
+    } catch (error) {
+      toast.error('Failed to save template');
+    }
+  };
+
+  const runOCR = async () => {
+    if (!uploadedFile) return;
+    
+    toast.promise(
+      async () => {
+        const result = await base44.functions.invoke('ocrProcess', {
+          documentId: uploadedFile.id,
+          language: 'en',
+          options: {
+            enhance_quality: true,
+            detect_tables: true,
+            preserve_layout: true
+          }
+        });
+        
+        if (result.extracted_text) {
+          addElement('text', { 
+            content: result.extracted_text.substring(0, 500) + '...', 
+            width: 400, 
+            height: 200 
+          });
+        }
+        
+        return result;
+      },
+      {
+        loading: 'Running OCR...',
+        success: 'OCR completed',
+        error: 'OCR failed'
+      }
+    );
+  };
+
+  React.useEffect(() => {
+    if (uploadedFile) {
+      loadVersions();
+    }
+  }, [uploadedFile]);
+
   return (
     <div className="h-[calc(100vh-120px)] flex flex-col">
       <motion.div
@@ -364,6 +488,16 @@ export default function PDFEditor({ theme = 'dark' }) {
               <Button onClick={exportDocument} variant="outline" className={isDark ? 'border-slate-700' : ''}>
                 <Download className="w-4 h-4 mr-2" />
                 Export
+              </Button>
+              <Button onClick={runOCR} variant="outline" className={isDark ? 'border-slate-700' : ''}>
+                <FileText className="w-4 h-4 mr-2" />
+                OCR
+              </Button>
+              <Button onClick={createVersion} variant="outline" className={isDark ? 'border-slate-700' : ''}>
+                Version
+              </Button>
+              <Button onClick={saveAsTemplate} variant="outline" className={isDark ? 'border-slate-700' : ''}>
+                Save Template
               </Button>
             </div>
           )}
@@ -753,6 +887,18 @@ export default function PDFEditor({ theme = 'dark' }) {
                   </Label>
                   <RealtimeEditor documentId={uploadedFile.id} isDark={isDark} />
                 </div>
+              )}
+
+              {/* Annotations */}
+              {activeTool === 'annotations' && (
+                <AdvancedAnnotations
+                  annotations={annotations}
+                  onAddAnnotation={(ann) => setAnnotations([...annotations, ann])}
+                  onDeleteAnnotation={(id) => setAnnotations(annotations.filter(a => a.id !== id))}
+                  onUpdateAnnotation={(updated) => setAnnotations(annotations.map(a => a.id === updated.id ? updated : a))}
+                  currentPage={currentPage}
+                  isDark={isDark}
+                />
               )}
 
               {/* Read Aloud for selected text */}
