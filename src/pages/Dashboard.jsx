@@ -240,6 +240,20 @@ export default function Dashboard({ theme = 'dark' }) {
                 file={file}
                 delay={index * 0.05}
                 onDownload={(f) => window.open(f.file_url, '_blank')}
+                onDelete={async (f) => {
+                  if (confirm('Delete this file?')) {
+                    await base44.entities.Document.delete(f.id);
+                    window.location.reload();
+                  }
+                }}
+                onShare={(f) => {
+                  navigator.clipboard.writeText(f.file_url);
+                  alert('Link copied to clipboard!');
+                }}
+                onToggleFavorite={async (f) => {
+                  await base44.entities.Document.update(f.id, { is_favorite: !f.is_favorite });
+                  window.location.reload();
+                }}
                 isDark={isDark}
               />
             ))}
