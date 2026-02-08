@@ -26,6 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import StatsCard from '@/components/shared/StatsCard';
 import FileCard from '@/components/shared/FileCard';
+import MultiFileSelector from '@/components/shared/MultiFileSelector';
 import ComplianceWidget from '@/components/compliance/ComplianceWidget';
 import DocumentSummarizer from '@/components/ai/DocumentSummarizer';
 
@@ -233,31 +234,23 @@ export default function Dashboard({ theme = 'dark' }) {
         </div>
 
         {documents.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {documents.slice(0, 6).map((file, index) => (
-              <FileCard
-                key={file.id}
-                file={file}
-                delay={index * 0.05}
-                onDownload={(f) => window.open(f.file_url, '_blank')}
-                onDelete={async (f) => {
-                  if (confirm('Delete this file?')) {
-                    await base44.entities.Document.delete(f.id);
-                    window.location.reload();
-                  }
-                }}
-                onShare={(f) => {
-                  navigator.clipboard.writeText(f.file_url);
-                  alert('Link copied to clipboard!');
-                }}
-                onToggleFavorite={async (f) => {
-                  await base44.entities.Document.update(f.id, { is_favorite: !f.is_favorite });
-                  window.location.reload();
-                }}
-                isDark={isDark}
-              />
-            ))}
-          </div>
+          <MultiFileSelector
+            files={documents.slice(0, 6)}
+            onDownload={(f) => window.open(f.file_url, '_blank')}
+            onDelete={async (f) => {
+              await base44.entities.Document.delete(f.id);
+              window.location.reload();
+            }}
+            onShare={(f) => {
+              navigator.clipboard.writeText(f.file_url);
+              alert('Link copied to clipboard!');
+            }}
+            onToggleFavorite={async (f) => {
+              await base44.entities.Document.update(f.id, { is_favorite: !f.is_favorite });
+              window.location.reload();
+            }}
+            isDark={isDark}
+          />
         ) : (
           <motion.div
             initial={{ opacity: 0 }}
