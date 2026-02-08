@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import DropZone from '@/components/shared/DropZone';
 import SideBySideViewer from '@/components/compare/SideBySideViewer';
 import AIComparisonTools from '@/components/compare/AIComparisonTools';
+import RealtimeComparison from '@/components/compare/RealtimeComparison';
 import { useLanguage } from '@/components/shared/LanguageContext';
 
 export default function Compare({ theme = 'dark' }) {
@@ -301,13 +302,28 @@ Be thorough and specific about the differences.`,
 
       {/* AI Comparison Tools */}
       {leftFile && rightFile && comparisonResult && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <AIComparisonTools doc1={leftFile} doc2={rightFile} isDark={isDark} />
-        </motion.div>
+        <>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <AIComparisonTools doc1={leftFile} doc2={rightFile} isDark={isDark} />
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <RealtimeComparison 
+              doc1={leftFile} 
+              doc2={rightFile} 
+              comparisonResult={comparisonResult}
+              isDark={isDark} 
+            />
+          </motion.div>
+        </>
       )}
 
       {/* Comparison Results */}
