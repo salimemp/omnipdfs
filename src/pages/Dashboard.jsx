@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import StatsCard from '@/components/shared/StatsCard';
 import FileCard from '@/components/shared/FileCard';
 import ComplianceWidget from '@/components/compliance/ComplianceWidget';
+import DocumentSummarizer from '@/components/ai/DocumentSummarizer';
 
 import { useAuth } from '@/components/auth/AuthContext';
 
@@ -263,6 +264,16 @@ export default function Dashboard({ theme = 'dark' }) {
           </motion.div>
         )}
       </div>
+
+      {/* AI Document Tools */}
+      {documents.length > 0 && (
+        <div>
+          <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            AI Document Tools
+          </h2>
+          <DocumentSummarizer document={documents[0]} isDark={isDark} />
+        </div>
+      )}
 
       {/* Compliance Widget */}
       <ComplianceWidget isDark={isDark} />

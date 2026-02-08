@@ -12,7 +12,7 @@ export default function CookieConsent() {
   const { t } = useLanguage();
 
   useEffect(() => {
-    const theme = localStorage.getItem('omnipdf-theme') || 'dark';
+    const theme = localStorage.getItem('omnipdfs-theme') || 'light';
     setIsDark(theme === 'dark');
   }, []);
 
