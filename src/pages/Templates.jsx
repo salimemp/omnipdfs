@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TemplateGallery from '@/components/templates/TemplateGallery';
 import TemplateCreator from '@/components/templates/TemplateCreator';
 import ExpandedTemplateLibrary from '@/components/templates/ExpandedTemplateLibrary';
+import AdvancedTemplateEditor from '@/components/templates/AdvancedTemplateEditor';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -32,6 +33,7 @@ export default function Templates({ theme = 'dark' }) {
         <TabsList className={isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'}>
           <TabsTrigger value="library">Browse Library</TabsTrigger>
           <TabsTrigger value="gallery">Template Gallery</TabsTrigger>
+          <TabsTrigger value="editor">Advanced Editor</TabsTrigger>
           <TabsTrigger value="create">Create Template</TabsTrigger>
           <TabsTrigger value="my-templates">My Templates</TabsTrigger>
         </TabsList>
@@ -42,6 +44,10 @@ export default function Templates({ theme = 'dark' }) {
 
         <TabsContent value="gallery">
           <TemplateGallery isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="editor">
+          <AdvancedTemplateEditor isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="create">

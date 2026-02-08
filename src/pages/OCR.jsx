@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DropZone from '@/components/shared/DropZone';
+import OCRWorkflowBuilder from '@/components/ocr/OCRWorkflowBuilder';
 import { toast } from 'sonner';
 
 const languages = [
@@ -262,6 +263,8 @@ export default function OCR({ theme = 'dark' }) {
     setProcessing(false);
   };
 
+  const [showWorkflows, setShowWorkflows] = useState(false);
+
   return (
     <div className="max-w-6xl mx-auto">
       <motion.div
@@ -279,9 +282,30 @@ export default function OCR({ theme = 'dark' }) {
         <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
           Extract text from images, scanned documents, and PDFs with AI-powered accuracy
         </p>
+        <div className="flex justify-center gap-3 mt-6">
+          <Button
+            variant={showWorkflows ? 'outline' : 'default'}
+            onClick={() => setShowWorkflows(false)}
+            className={!showWorkflows ? 'bg-violet-500' : isDark ? 'border-slate-700' : ''}
+          >
+            <ScanText className="w-4 h-4 mr-2" />
+            OCR Processing
+          </Button>
+          <Button
+            variant={showWorkflows ? 'default' : 'outline'}
+            onClick={() => setShowWorkflows(true)}
+            className={showWorkflows ? 'bg-violet-500' : isDark ? 'border-slate-700' : ''}
+          >
+            <Zap className="w-4 h-4 mr-2" />
+            Workflows
+          </Button>
+        </div>
       </motion.div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      {showWorkflows ? (
+        <OCRWorkflowBuilder isDark={isDark} />
+      ) : (
+        <div className="grid lg:grid-cols-2 gap-6">
         {/* Upload & Settings */}
         <div className="space-y-6">
           <motion.div
@@ -577,7 +601,8 @@ export default function OCR({ theme = 'dark' }) {
             </div>
           )}
         </motion.div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
