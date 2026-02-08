@@ -366,11 +366,11 @@ export default function PDFEditor({ theme = 'dark' }) {
               >
                 {/* PDF Viewer */}
                 {uploadedFile?.file_url && (
-                  <iframe
+                  <embed
                     src={`${uploadedFile.file_url}#page=${currentPage}`}
+                    type="application/pdf"
                     className="absolute inset-0 w-full h-full"
                     style={{ pointerEvents: activeTool === 'select' ? 'auto' : 'none' }}
-                    title="PDF Viewer"
                   />
                 )}
                 
