@@ -4,6 +4,7 @@ import WorkflowVisualizer from '@/components/workflows/WorkflowVisualizer';
 import AutomationInsights from '@/components/automation/AutomationInsights';
 import AIWorkflowOptimizer from '@/components/workflows/AIWorkflowOptimizer';
 import AdvancedWorkflowBuilder from '@/components/workflows/AdvancedWorkflowBuilder';
+import AIWorkflowAutomation from '@/components/workflows/AIWorkflowAutomation';
 import { motion } from 'framer-motion';
 import { Bot } from 'lucide-react';
 import AITaskEngine from '@/components/automation/AITaskEngine';
@@ -42,13 +43,18 @@ export default function TaskAutomationPage({ theme = 'dark' }) {
       </motion.div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className={`grid grid-cols-5 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
+        <TabsList className={`grid grid-cols-6 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border overflow-x-auto`}>
+          <TabsTrigger value="automation">AI Automation</TabsTrigger>
           <TabsTrigger value="builder">Advanced Builder</TabsTrigger>
           <TabsTrigger value="engine">Quick Builder</TabsTrigger>
           <TabsTrigger value="visualizer">Visualizer</TabsTrigger>
           <TabsTrigger value="optimizer">AI Optimizer</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="automation">
+          <AIWorkflowAutomation isDark={isDark} />
+        </TabsContent>
 
         <TabsContent value="builder">
           <AdvancedWorkflowBuilder isDark={isDark} />
