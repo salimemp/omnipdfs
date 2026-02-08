@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 import {
   FileText,
   Type,
@@ -126,9 +131,17 @@ export default function PDFEditor({ theme = 'dark' }) {
   });
   const [aiProcessing, setAiProcessing] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState(null);
+  const [numPages, setNumPages] = useState(null);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const isDark = theme === 'dark';
   const queryClient = useQueryClient();
+
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
+    setTotalPages(numPages);
+    setPageLoading(false);
+  };
 
   // Load document from URL parameter if present
   React.useEffect(() => {
@@ -345,37 +358,68 @@ export default function PDFEditor({ theme = 'dark' }) {
                   </Button>
                 </div>
               </div>
-              <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Page {currentPage} of {totalPages}
+              <div className="flex items-center gap-3">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                  className={isDark ? 'text-slate-400' : ''}
+                >
+                  Previous
+                </Button>
+                <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                  className={isDark ? 'text-slate-400' : ''}
+                >
+                  Next
+                </Button>
               </div>
             </div>
 
             {/* Canvas */}
             <div
-              onClick={handleCanvasClick}
-              className={`flex-1 rounded-b-2xl overflow-auto ${isDark ? 'bg-slate-900/50' : 'bg-slate-100'}`}
-              style={{ cursor: activeTool !== 'select' ? 'crosshair' : 'default' }}
+              className={`flex-1 rounded-b-2xl overflow-auto ${isDark ? 'bg-slate-900/50' : 'bg-slate-100'} flex items-center justify-center`}
             >
-              <div
-                className="relative mx-auto my-8 bg-white shadow-2xl"
-                style={{
-                  width: `${(595 * zoom) / 100}px`,
-                  minHeight: `${(842 * zoom) / 100}px`,
-                  transform: `scale(1)`,
-                }}
-              >
+              <div className="relative">
                 {/* PDF Viewer */}
                 {uploadedFile?.file_url && (
-                  <embed
-                    src={`${uploadedFile.file_url}#page=${currentPage}`}
-                    type="application/pdf"
-                    className="absolute inset-0 w-full h-full"
-                    style={{ pointerEvents: activeTool === 'select' ? 'auto' : 'none' }}
-                  />
-                )}
-                
-                {/* Render Elements */}
-                {elements.map((element) => (
+                  <Document
+                    file={uploadedFile.file_url}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    loading={
+                      <div className="flex items-center justify-center p-12">
+                        <Loader2 className="w-8 h-8 animate-spin text-violet-400" />
+                      </div>
+                    }
+                    error={
+                      <div className="flex flex-col items-center justify-center p-12 text-red-400">
+                        <FileText className="w-12 h-12 mb-2" />
+                        <p>Failed to load PDF</p>
+                      </div>
+                    }
+                  >
+                    <div 
+                      className="relative"
+                      onClick={handleCanvasClick}
+                      style={{ cursor: activeTool !== 'select' ? 'crosshair' : 'default' }}
+                    >
+                      <Page
+                        pageNumber={currentPage}
+                        scale={zoom / 100}
+                        renderTextLayer={true}
+                        renderAnnotationLayer={true}
+                      />
+                      
+                      {/* Render Elements Overlay */}
+                      <div className="absolute inset-0 pointer-events-none">
+                        {elements.map((element) => (
                   <div
                     key={element.id}
                     onClick={(e) => {
@@ -447,8 +491,83 @@ export default function PDFEditor({ theme = 'dark' }) {
                         <Trash2 className="w-3 h-3" />
                       </button>
                     )}
-                  </div>
-                ))}
+                        <div
+                          key={element.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedElement(element.id);
+                          }}
+                          className={`absolute cursor-move pointer-events-auto ${selectedElement === element.id ? 'ring-2 ring-violet-500' : ''}`}
+                          style={{
+                            left: element.x,
+                            top: element.y,
+                            opacity: element.opacity / 100,
+                          }}
+                        >
+                          {element.type === 'text' && (
+                            <div
+                              contentEditable
+                              suppressContentEditableWarning
+                              className="outline-none min-w-[50px] p-1"
+                              style={{
+                                color: element.color,
+                                fontSize: element.fontSize,
+                                fontFamily: element.fontFamily,
+                                fontWeight: element.bold ? 'bold' : 'normal',
+                                fontStyle: element.italic ? 'italic' : 'normal',
+                                textDecoration: element.underline ? 'underline' : 'none',
+                              }}
+                            >
+                              {element.content}
+                            </div>
+                          )}
+                          {element.type === 'shape' && (
+                            <div
+                              style={{
+                                width: element.width,
+                                height: element.height,
+                                border: `${element.strokeWidth}px solid ${element.color}`,
+                                borderRadius: element.shapeType === 'circle' ? '50%' : '4px',
+                              }}
+                            />
+                          )}
+                          {element.type === 'highlight' && (
+                            <div
+                              style={{
+                                width: element.width,
+                                height: element.height,
+                                backgroundColor: element.color,
+                                opacity: 0.3,
+                              }}
+                            />
+                          )}
+                          {element.type === 'stamp' && (
+                            <div className={`px-4 py-2 border-2 ${stamps.find(s => s.id === element.stampType)?.color || 'text-slate-500'} font-bold text-lg transform -rotate-12`}>
+                              {stamps.find(s => s.id === element.stampType)?.label || 'STAMP'}
+                            </div>
+                          )}
+                          {element.type === 'signature' && (
+                            <div className="italic text-2xl font-script text-slate-800" style={{ fontFamily: 'cursive' }}>
+                              Signature
+                            </div>
+                          )}
+                          {selectedElement === element.id && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteElement(element.id);
+                              }}
+                              className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      </div>
+                    </div>
+                  </Document>
+                )}
               </div>
             </div>
           </motion.div>
