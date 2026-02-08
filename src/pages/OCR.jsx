@@ -73,6 +73,7 @@ export default function OCR({ theme = 'dark' }) {
   const [showOptions, setShowOptions] = useState(false);
   const [confidence, setConfidence] = useState(null);
   const [activeTab, setActiveTab] = useState('text');
+  const [ocrResults, setOcrResults] = useState(null);
   const [options, setOptions] = useState({
     language: 'auto',
     enhance_quality: true,
@@ -162,6 +163,16 @@ export default function OCR({ theme = 'dark' }) {
 
       setExtractedText(result.extracted_text);
       setConfidence(result.confidence_score);
+      setOcrResults({
+        text: result.extracted_text,
+        confidence: result.confidence_score,
+        language: result.detected_language || options.language,
+        hasTables: result.has_tables,
+        hasHandwriting: result.has_handwriting,
+        pageCount: result.page_count,
+        wordCount: result.word_count,
+        tables: result.tables || []
+      });
 
       await base44.entities.ActivityLog.create({
         action: 'convert',
@@ -450,55 +461,115 @@ export default function OCR({ theme = 'dark' }) {
           </div>
 
           {extractedText ? (
-            <>
-              <Textarea
-                value={extractedText}
-                onChange={(e) => setExtractedText(e.target.value)}
-                className={`min-h-[400px] mb-4 font-mono text-sm ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200'}`}
-              />
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={copyToClipboard}
-                  className={isDark ? 'border-slate-700 text-slate-300' : ''}
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copy
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={downloadText}
-                  className={isDark ? 'border-slate-700 text-slate-300' : ''}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  TXT
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={convertImageToPDF}
-                  disabled={processing}
-                  className={isDark ? 'border-slate-700 text-slate-300' : ''}
-                >
-                  {processing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileOutput className="w-4 h-4 mr-2" />}
-                  To PDF
-                </Button>
-                <Select onValueChange={translateText}>
-                  <SelectTrigger className={`w-32 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : ''}`}>
-                    <SelectValue placeholder="Translate" />
-                  </SelectTrigger>
-                  <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : ''}>
-                    {languages.filter(l => l.code !== 'auto').slice(0, 10).map(lang => (
-                      <SelectItem key={lang.code} value={lang.name} className={isDark ? 'text-white' : ''}>
-                        {lang.name}
-                      </SelectItem>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className={`mb-4 ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}>
+                <TabsTrigger value="text">Extracted Text</TabsTrigger>
+                <TabsTrigger value="analysis">Analysis</TabsTrigger>
+                {ocrResults?.tables?.length > 0 && <TabsTrigger value="tables">Tables</TabsTrigger>}
+              </TabsList>
+
+              <TabsContent value="text">
+                <Textarea
+                  value={extractedText}
+                  onChange={(e) => setExtractedText(e.target.value)}
+                  className={`min-h-[400px] mb-4 font-mono text-sm ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200'}`}
+                />
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={copyToClipboard} className={isDark ? 'border-slate-700 text-slate-300' : ''}>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={downloadText} className={isDark ? 'border-slate-700 text-slate-300' : ''}>
+                    <Download className="w-4 h-4 mr-2" />
+                    TXT
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={convertImageToPDF} disabled={processing} className={isDark ? 'border-slate-700 text-slate-300' : ''}>
+                    {processing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileOutput className="w-4 h-4 mr-2" />}
+                    To PDF
+                  </Button>
+                  <Select onValueChange={translateText}>
+                    <SelectTrigger className={`w-32 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : ''}`}>
+                      <SelectValue placeholder="Translate" />
+                    </SelectTrigger>
+                    <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : ''}>
+                      {languages.filter(l => l.code !== 'auto').slice(0, 10).map(lang => (
+                        <SelectItem key={lang.code} value={lang.name} className={isDark ? 'text-white' : ''}>
+                          {lang.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="analysis">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className={`p-4 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+                      <p className={`text-xs mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Confidence Score</p>
+                      <p className={`text-2xl font-bold ${ocrResults?.confidence > 90 ? 'text-emerald-400' : ocrResults?.confidence > 70 ? 'text-amber-400' : 'text-red-400'}`}>
+                        {ocrResults?.confidence?.toFixed(1)}%
+                      </p>
+                    </div>
+                    <div className={`p-4 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+                      <p className={`text-xs mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Detected Language</p>
+                      <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        {languages.find(l => l.code === ocrResults?.language)?.name || ocrResults?.language}
+                      </p>
+                    </div>
+                    <div className={`p-4 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+                      <p className={`text-xs mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Word Count</p>
+                      <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{ocrResults?.wordCount || 0}</p>
+                    </div>
+                    <div className={`p-4 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+                      <p className={`text-xs mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Pages</p>
+                      <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{ocrResults?.pageCount || 1}</p>
+                    </div>
+                  </div>
+
+                  <div className={`p-4 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+                    <h4 className={`text-sm font-semibold mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>Detected Features</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                          <Table2 className="w-4 h-4 inline mr-2" />
+                          Tables Detected
+                        </span>
+                        <Badge variant={ocrResults?.hasTables ? 'default' : 'secondary'}>
+                          {ocrResults?.hasTables ? 'Yes' : 'No'}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                          <PenTool className="w-4 h-4 inline mr-2" />
+                          Handwriting Detected
+                        </span>
+                        <Badge variant={ocrResults?.hasHandwriting ? 'default' : 'secondary'}>
+                          {ocrResults?.hasHandwriting ? 'Yes' : 'No'}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {ocrResults?.tables?.length > 0 && (
+                <TabsContent value="tables">
+                  <div className="space-y-4">
+                    {ocrResults.tables.map((table, i) => (
+                      <div key={i} className={`p-4 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+                        <h4 className={`text-sm font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                          Table {i + 1} ({table.rows} rows × {table.columns} columns)
+                        </h4>
+                        <pre className={`text-xs p-3 rounded ${isDark ? 'bg-slate-900 text-slate-300' : 'bg-white text-slate-700'} overflow-x-auto`}>
+                          {table.content}
+                        </pre>
+                      </div>
                     ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
+                  </div>
+                </TabsContent>
+              )}
+            </Tabs>
           ) : (
             <div className={`flex flex-col items-center justify-center h-[400px] rounded-xl border-2 border-dashed ${isDark ? 'border-slate-700 text-slate-500' : 'border-slate-200 text-slate-400'}`}>
               <FileSearch className="w-12 h-12 mb-4 opacity-50" />

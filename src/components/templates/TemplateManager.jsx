@@ -52,6 +52,23 @@ export default function TemplateManager({ onSelectTemplate, isDark = true }) {
     },
   });
 
+  const deleteFolderMutation = useMutation({
+    mutationFn: (id) => base44.entities.Folder.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['folders']);
+      setSelectedFolder(null);
+      toast.success('Folder deleted');
+    },
+  });
+
+  const renameFolderMutation = useMutation({
+    mutationFn: ({ id, name }) => base44.entities.Folder.update(id, { name }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['folders']);
+      toast.success('Folder renamed');
+    },
+  });
+
   const updateTemplateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Template.update(id, data),
     onSuccess: () => {
@@ -141,21 +158,54 @@ export default function TemplateManager({ onSelectTemplate, isDark = true }) {
             <span className="ml-auto text-xs">{templates.length}</span>
           </button>
           {folders.map((folder) => (
-            <button
-              key={folder.id}
-              onClick={() => setSelectedFolder(folder.id)}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                selectedFolder === folder.id
-                  ? 'bg-violet-500/20 text-violet-400'
-                  : isDark ? 'text-slate-400 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              <Folder className="w-4 h-4" style={{ color: folder.color }} />
-              <span className="text-sm truncate">{folder.name}</span>
-              <span className="ml-auto text-xs">
-                {templates.filter(t => t.folder_id === folder.id).length}
-              </span>
-            </button>
+            <div key={folder.id} className="group relative">
+              <button
+                onClick={() => setSelectedFolder(folder.id)}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                  selectedFolder === folder.id
+                    ? 'bg-violet-500/20 text-violet-400'
+                    : isDark ? 'text-slate-400 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                <Folder className="w-4 h-4" style={{ color: folder.color }} />
+                <span className="text-sm truncate">{folder.name}</span>
+                <span className="ml-auto text-xs">
+                  {templates.filter(t => t.folder_id === folder.id).length}
+                </span>
+              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className={`absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 rounded transition-opacity ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-200'}`}>
+                    <MoreVertical className="w-3 h-3" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className={isDark ? 'bg-slate-900 border-slate-700' : ''}>
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      const newName = prompt('Rename folder:', folder.name);
+                      if (newName && newName !== folder.name) {
+                        renameFolderMutation.mutate({ id: folder.id, name: newName });
+                      }
+                    }}
+                    className={isDark ? 'text-white' : ''}
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Rename
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      if (confirm(`Delete "${folder.name}"? Templates inside will not be deleted.`)) {
+                        deleteFolderMutation.mutate(folder.id);
+                      }
+                    }}
+                    className="text-red-400"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           ))}
         </div>
       </div>

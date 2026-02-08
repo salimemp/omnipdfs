@@ -76,19 +76,19 @@ import { useLanguage } from '@/components/shared/LanguageContext';
 import { toast } from 'sonner';
 
 const tools = [
-  { id: 'select', icon: MousePointer2, label: 'Select', shortcut: 'V' },
-  { id: 'text', icon: Type, label: 'Add Text', shortcut: 'T' },
-  { id: 'image', icon: Image, label: 'Add Image', shortcut: 'I' },
-  { id: 'draw', icon: PenTool, label: 'Draw', shortcut: 'D' },
-  { id: 'highlight', icon: Highlighter, label: 'Highlight', shortcut: 'H' },
-  { id: 'shape', icon: Shapes, label: 'Shapes', shortcut: 'S' },
-  { id: 'stamp', icon: Stamp, label: 'Stamp', shortcut: 'P' },
-  { id: 'signature', icon: Signature, label: 'Signature', shortcut: 'G' },
-  { id: 'eraser', icon: Eraser, label: 'Eraser', shortcut: 'E' },
-  { id: 'chat', icon: MessageSquare, label: 'AI Chat', shortcut: 'Q' },
-  { id: 'ai', icon: Sparkles, label: 'AI Tools', shortcut: 'A' },
-  { id: 'collab', icon: Users, label: 'Collaborate', shortcut: 'C' },
-  { id: 'annotations', icon: MessageSquare, label: 'Annotations', shortcut: 'N' },
+  { id: 'select', icon: MousePointer2, label: 'Select', shortcut: 'V', tooltip: 'Select and move elements on the canvas' },
+  { id: 'text', icon: Type, label: 'Add Text', shortcut: 'T', tooltip: 'Add editable text boxes with custom fonts and styles' },
+  { id: 'image', icon: Image, label: 'Add Image', shortcut: 'I', tooltip: 'Insert images and logos into your PDF' },
+  { id: 'draw', icon: PenTool, label: 'Draw', shortcut: 'D', tooltip: 'Free-hand drawing with customizable pen styles' },
+  { id: 'highlight', icon: Highlighter, label: 'Highlight', shortcut: 'H', tooltip: 'Highlight important text with transparent colors' },
+  { id: 'shape', icon: Shapes, label: 'Shapes', shortcut: 'S', tooltip: 'Add shapes like rectangles, circles, arrows and lines' },
+  { id: 'stamp', icon: Stamp, label: 'Stamp', shortcut: 'P', tooltip: 'Apply approval stamps like APPROVED, DRAFT, CONFIDENTIAL' },
+  { id: 'signature', icon: Signature, label: 'Signature', shortcut: 'G', tooltip: 'Add digital signatures to sign documents' },
+  { id: 'eraser', icon: Eraser, label: 'Eraser', shortcut: 'E', tooltip: 'Remove unwanted elements from the PDF' },
+  { id: 'chat', icon: MessageSquare, label: 'AI Chat', shortcut: 'Q', tooltip: 'Chat with AI assistant about your document' },
+  { id: 'ai', icon: Sparkles, label: 'AI Tools', shortcut: 'A', tooltip: 'AI-powered analysis, suggestions and text generation' },
+  { id: 'collab', icon: Users, label: 'Collaborate', shortcut: 'C', tooltip: 'Real-time collaboration with team members' },
+  { id: 'annotations', icon: MessageSquare, label: 'Annotations', shortcut: 'N', tooltip: 'Add comments, notes, and bookmarks to pages' },
 ];
 
 const shapes = [
@@ -531,7 +531,7 @@ export default function PDFEditor({ theme = 'dark' }) {
               <button
                 key={tool.id}
                 onClick={() => setActiveTool(tool.id)}
-                className={`p-3 rounded-xl transition-all ${
+                className={`p-3 rounded-xl transition-all relative group ${
                   activeTool === tool.id
                     ? 'bg-violet-500 text-white'
                     : isDark
@@ -541,6 +541,11 @@ export default function PDFEditor({ theme = 'dark' }) {
                 title={`${tool.label} (${tool.shortcut})`}
               >
                 <tool.icon className="w-5 h-5" />
+                <div className={`absolute left-full ml-2 top-1/2 -translate-y-1/2 px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 ${isDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200 shadow-lg'}`}>
+                  <p className={`text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{tool.label}</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{tool.tooltip}</p>
+                  <p className={`text-xs mt-1 ${isDark ? 'text-violet-400' : 'text-violet-600'}`}>Shortcut: {tool.shortcut}</p>
+                </div>
               </button>
             ))}
           </motion.div>
