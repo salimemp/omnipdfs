@@ -220,6 +220,30 @@ Keep it professional and under 100 words.`,
     setProcessing(false);
   };
 
+  const extractText = async () => {
+    setProcessing(true);
+    const lang = getPromptLanguage();
+    
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Extract and structure the main text content from this document in ${lang}. Organize it into clear sections with headings.`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            extracted_text: { type: "string" },
+            sections: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+      
+      onAddElement?.('text', { content: response.extracted_text, width: 500, height: 200 });
+      toast.success('Text extracted successfully');
+    } catch (e) {
+      toast.error('Text extraction failed');
+    }
+    setProcessing(false);
+  };
+
   return (
     <div className="space-y-4" role="region" aria-label="AI Tools">
       <Label className={`text-sm flex items-center gap-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
@@ -292,6 +316,16 @@ Keep it professional and under 100 words.`,
         >
           {processing ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1" />}
           Format
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`text-xs ${isDark ? 'border-slate-700' : ''}`}
+          disabled={processing}
+          onClick={extractText}
+        >
+          {processing ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <FileText className="w-3 h-3 mr-1" />}
+          Extract
         </Button>
       </div>
 
