@@ -341,6 +341,12 @@ export default function PDFEditor({ theme = 'dark' }) {
             <div className={`rounded-t-2xl p-3 flex items-center justify-between ${isDark ? 'glass-light' : 'bg-white border border-slate-200 border-b-0'}`}>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
+                  <FileText className={`w-5 h-5 ${isDark ? 'text-violet-400' : 'text-violet-500'}`} />
+                  <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {uploadedFile?.name || 'Untitled Document'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 ml-4">
                   <Button variant="ghost" size="icon" onClick={() => setZoom(Math.max(25, zoom - 25))} className={isDark ? 'text-slate-400' : ''}>
                     <ZoomOut className="w-4 h-4" />
                   </Button>
@@ -385,9 +391,9 @@ export default function PDFEditor({ theme = 'dark' }) {
 
             {/* Canvas */}
             <div
-              className={`flex-1 rounded-b-2xl overflow-auto ${isDark ? 'bg-slate-900/50' : 'bg-slate-100'} flex items-center justify-center`}
+              className={`flex-1 rounded-b-2xl overflow-y-auto overflow-x-auto ${isDark ? 'bg-slate-900/50' : 'bg-slate-100'}`}
             >
-              <div className="relative">
+              <div className="min-h-full flex items-start justify-center py-8">
                 {uploadedFile?.file_url && (
                   <Document
                     file={uploadedFile.file_url}
@@ -405,7 +411,7 @@ export default function PDFEditor({ theme = 'dark' }) {
                     }
                   >
                     <div 
-                      className="relative"
+                      className="relative shadow-2xl"
                       onClick={handleCanvasClick}
                       style={{ cursor: activeTool !== 'select' ? 'crosshair' : 'default' }}
                     >
