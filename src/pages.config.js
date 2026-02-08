@@ -65,6 +65,8 @@ import FormFiller from './pages/FormFiller';
 import Guide from './pages/Guide';
 import History from './pages/History';
 import LegalDocs from './pages/LegalDocs';
+import OAuthSetupGuide from './pages/OAuthSetupGuide';
+import OAuthTroubleshooting from './pages/OAuthTroubleshooting';
 import OCR from './pages/OCR';
 import Offline from './pages/Offline';
 import PDFEditor from './pages/PDFEditor';
@@ -80,8 +82,8 @@ import TeamDashboard from './pages/TeamDashboard';
 import Templates from './pages/Templates';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
-import OAuthSetupGuide from './pages/OAuthSetupGuide';
-import OAuthTroubleshooting from './pages/OAuthTroubleshooting';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import __Layout from './Layout.jsx';
 
 
@@ -104,6 +106,8 @@ export const PAGES = {
     "Guide": Guide,
     "History": History,
     "LegalDocs": LegalDocs,
+    "OAuthSetupGuide": OAuthSetupGuide,
+    "OAuthTroubleshooting": OAuthTroubleshooting,
     "OCR": OCR,
     "Offline": Offline,
     "PDFEditor": PDFEditor,
@@ -119,8 +123,8 @@ export const PAGES = {
     "Templates": Templates,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
-    "OAuthSetupGuide": OAuthSetupGuide,
-    "OAuthTroubleshooting": OAuthTroubleshooting,
+    "PrivacyPolicy": PrivacyPolicy,
+    "TermsOfService": TermsOfService,
 }
 
 export const pagesConfig = {
