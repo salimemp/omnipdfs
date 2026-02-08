@@ -388,7 +388,6 @@ export default function PDFEditor({ theme = 'dark' }) {
               className={`flex-1 rounded-b-2xl overflow-auto ${isDark ? 'bg-slate-900/50' : 'bg-slate-100'} flex items-center justify-center`}
             >
               <div className="relative">
-                {/* PDF Viewer */}
                 {uploadedFile?.file_url && (
                   <Document
                     file={uploadedFile.file_url}
@@ -420,150 +419,79 @@ export default function PDFEditor({ theme = 'dark' }) {
                       {/* Render Elements Overlay */}
                       <div className="absolute inset-0 pointer-events-none">
                         {elements.map((element) => (
-                  <div
-                    key={element.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedElement(element.id);
-                    }}
-                    className={`absolute cursor-move ${selectedElement === element.id ? 'ring-2 ring-violet-500' : ''}`}
-                    style={{
-                      left: element.x,
-                      top: element.y,
-                      opacity: element.opacity / 100,
-                    }}
-                  >
-                    {element.type === 'text' && (
-                      <div
-                        contentEditable
-                        suppressContentEditableWarning
-                        className="outline-none min-w-[50px] p-1"
-                        style={{
-                          color: element.color,
-                          fontSize: element.fontSize,
-                          fontFamily: element.fontFamily,
-                          fontWeight: element.bold ? 'bold' : 'normal',
-                          fontStyle: element.italic ? 'italic' : 'normal',
-                          textDecoration: element.underline ? 'underline' : 'none',
-                        }}
-                      >
-                        {element.content}
-                      </div>
-                    )}
-                    {element.type === 'shape' && (
-                      <div
-                        style={{
-                          width: element.width,
-                          height: element.height,
-                          border: `${element.strokeWidth}px solid ${element.color}`,
-                          borderRadius: element.shapeType === 'circle' ? '50%' : '4px',
-                        }}
-                      />
-                    )}
-                    {element.type === 'highlight' && (
-                      <div
-                        style={{
-                          width: element.width,
-                          height: element.height,
-                          backgroundColor: element.color,
-                          opacity: 0.3,
-                        }}
-                      />
-                    )}
-                    {element.type === 'stamp' && (
-                      <div className={`px-4 py-2 border-2 ${stamps.find(s => s.id === element.stampType)?.color || 'text-slate-500'} font-bold text-lg transform -rotate-12`}>
-                        {stamps.find(s => s.id === element.stampType)?.label || 'STAMP'}
-                      </div>
-                    )}
-                    {element.type === 'signature' && (
-                      <div className="italic text-2xl font-script text-slate-800" style={{ fontFamily: 'cursive' }}>
-                        Signature
-                      </div>
-                    )}
-                    {selectedElement === element.id && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteElement(element.id);
-                        }}
-                        className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    )}
-                        <div
-                          key={element.id}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedElement(element.id);
-                          }}
-                          className={`absolute cursor-move pointer-events-auto ${selectedElement === element.id ? 'ring-2 ring-violet-500' : ''}`}
-                          style={{
-                            left: element.x,
-                            top: element.y,
-                            opacity: element.opacity / 100,
-                          }}
-                        >
-                          {element.type === 'text' && (
-                            <div
-                              contentEditable
-                              suppressContentEditableWarning
-                              className="outline-none min-w-[50px] p-1"
-                              style={{
-                                color: element.color,
-                                fontSize: element.fontSize,
-                                fontFamily: element.fontFamily,
-                                fontWeight: element.bold ? 'bold' : 'normal',
-                                fontStyle: element.italic ? 'italic' : 'normal',
-                                textDecoration: element.underline ? 'underline' : 'none',
-                              }}
-                            >
-                              {element.content}
-                            </div>
-                          )}
-                          {element.type === 'shape' && (
-                            <div
-                              style={{
-                                width: element.width,
-                                height: element.height,
-                                border: `${element.strokeWidth}px solid ${element.color}`,
-                                borderRadius: element.shapeType === 'circle' ? '50%' : '4px',
-                              }}
-                            />
-                          )}
-                          {element.type === 'highlight' && (
-                            <div
-                              style={{
-                                width: element.width,
-                                height: element.height,
-                                backgroundColor: element.color,
-                                opacity: 0.3,
-                              }}
-                            />
-                          )}
-                          {element.type === 'stamp' && (
-                            <div className={`px-4 py-2 border-2 ${stamps.find(s => s.id === element.stampType)?.color || 'text-slate-500'} font-bold text-lg transform -rotate-12`}>
-                              {stamps.find(s => s.id === element.stampType)?.label || 'STAMP'}
-                            </div>
-                          )}
-                          {element.type === 'signature' && (
-                            <div className="italic text-2xl font-script text-slate-800" style={{ fontFamily: 'cursive' }}>
-                              Signature
-                            </div>
-                          )}
-                          {selectedElement === element.id && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteElement(element.id);
-                              }}
-                              className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          )}
-                        </div>
-                      ))}
+                          <div
+                            key={element.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedElement(element.id);
+                            }}
+                            className={`absolute cursor-move pointer-events-auto ${selectedElement === element.id ? 'ring-2 ring-violet-500' : ''}`}
+                            style={{
+                              left: element.x,
+                              top: element.y,
+                              opacity: element.opacity / 100,
+                            }}
+                          >
+                            {element.type === 'text' && (
+                              <div
+                                contentEditable
+                                suppressContentEditableWarning
+                                className="outline-none min-w-[50px] p-1"
+                                style={{
+                                  color: element.color,
+                                  fontSize: element.fontSize,
+                                  fontFamily: element.fontFamily,
+                                  fontWeight: element.bold ? 'bold' : 'normal',
+                                  fontStyle: element.italic ? 'italic' : 'normal',
+                                  textDecoration: element.underline ? 'underline' : 'none',
+                                }}
+                              >
+                                {element.content}
+                              </div>
+                            )}
+                            {element.type === 'shape' && (
+                              <div
+                                style={{
+                                  width: element.width,
+                                  height: element.height,
+                                  border: `${element.strokeWidth}px solid ${element.color}`,
+                                  borderRadius: element.shapeType === 'circle' ? '50%' : '4px',
+                                }}
+                              />
+                            )}
+                            {element.type === 'highlight' && (
+                              <div
+                                style={{
+                                  width: element.width,
+                                  height: element.height,
+                                  backgroundColor: element.color,
+                                  opacity: 0.3,
+                                }}
+                              />
+                            )}
+                            {element.type === 'stamp' && (
+                              <div className={`px-4 py-2 border-2 ${stamps.find(s => s.id === element.stampType)?.color || 'text-slate-500'} font-bold text-lg transform -rotate-12`}>
+                                {stamps.find(s => s.id === element.stampType)?.label || 'STAMP'}
+                              </div>
+                            )}
+                            {element.type === 'signature' && (
+                              <div className="italic text-2xl font-script text-slate-800" style={{ fontFamily: 'cursive' }}>
+                                Signature
+                              </div>
+                            )}
+                            {selectedElement === element.id && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteElement(element.id);
+                                }}
+                                className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </Document>
