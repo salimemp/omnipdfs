@@ -7,6 +7,8 @@ import { useLanguage } from '@/components/shared/LanguageContext';
 import AdvancedSecurity from '@/components/security/AdvancedSecurity';
 import SecurityDashboard from '@/components/security/SecurityDashboard';
 import SessionManager from '@/components/security/SessionManager';
+import AISignatureIntegration from '@/components/security/AISignatureIntegration';
+import AdvancedDocumentSecurity from '@/components/security/AdvancedDocumentSecurity';
 import EnhancedCollaboration from '@/components/collab/EnhancedCollaboration';
 import DropZone from '@/components/shared/DropZone';
 import { base44 } from '@/api/base44Client';
@@ -111,14 +113,24 @@ export default function Security({ theme = 'dark' }) {
 
           {activeTab === 'security' ? (
             <Tabs value={securityTab} onValueChange={setSecurityTab} className="space-y-6">
-              <TabsList className={`grid grid-cols-3 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border`}>
-                <TabsTrigger value="dashboard">Security Dashboard</TabsTrigger>
+              <TabsList className={`grid grid-cols-5 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'} border overflow-x-auto`}>
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="signatures">AI Signatures</TabsTrigger>
+                <TabsTrigger value="protection">Protection</TabsTrigger>
                 <TabsTrigger value="sessions">Sessions</TabsTrigger>
-                <TabsTrigger value="advanced">Document Security</TabsTrigger>
+                <TabsTrigger value="advanced">Legacy</TabsTrigger>
               </TabsList>
 
               <TabsContent value="dashboard">
                 <SecurityDashboard isDark={isDark} />
+              </TabsContent>
+
+              <TabsContent value="signatures">
+                <AISignatureIntegration document={uploadedFile} isDark={isDark} />
+              </TabsContent>
+
+              <TabsContent value="protection">
+                <AdvancedDocumentSecurity document={uploadedFile} isDark={isDark} />
               </TabsContent>
 
               <TabsContent value="sessions">
