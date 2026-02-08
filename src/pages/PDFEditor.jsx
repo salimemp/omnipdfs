@@ -360,10 +360,20 @@ export default function PDFEditor({ theme = 'dark' }) {
                 className="relative mx-auto my-8 bg-white shadow-2xl"
                 style={{
                   width: `${(595 * zoom) / 100}px`,
-                  height: `${(842 * zoom) / 100}px`,
+                  minHeight: `${(842 * zoom) / 100}px`,
                   transform: `scale(1)`,
                 }}
               >
+                {/* PDF Viewer */}
+                {uploadedFile?.file_url && (
+                  <iframe
+                    src={`${uploadedFile.file_url}#page=${currentPage}`}
+                    className="absolute inset-0 w-full h-full"
+                    style={{ pointerEvents: activeTool === 'select' ? 'auto' : 'none' }}
+                    title="PDF Viewer"
+                  />
+                )}
+                
                 {/* Render Elements */}
                 {elements.map((element) => (
                   <div
