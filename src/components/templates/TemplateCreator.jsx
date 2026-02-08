@@ -106,21 +106,21 @@ export default function TemplateCreator({ isDark }) {
             value={template.name}
             onChange={(e) => setTemplate({ ...template, name: e.target.value })}
             placeholder="e.g., Business Proposal"
-            className={isDark ? 'bg-slate-800 border-slate-700' : ''}
+            className={isDark ? 'bg-slate-800 border-slate-700 text-white' : ''}
           />
         </div>
 
         <div>
           <Label className={isDark ? 'text-slate-300' : 'text-slate-700'}>Category *</Label>
           <Select value={template.category} onValueChange={(v) => setTemplate({ ...template, category: v })}>
-            <SelectTrigger className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
+            <SelectTrigger className={isDark ? 'bg-slate-800 border-slate-700 text-white' : ''}>
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="business">Business</SelectItem>
-              <SelectItem value="personal">Personal</SelectItem>
-              <SelectItem value="education">Education</SelectItem>
-              <SelectItem value="legal">Legal</SelectItem>
+            <SelectContent className={isDark ? 'bg-slate-900 border-slate-700' : ''}>
+              <SelectItem value="business" className={isDark ? 'text-white' : ''}>Business</SelectItem>
+              <SelectItem value="personal" className={isDark ? 'text-white' : ''}>Personal</SelectItem>
+              <SelectItem value="education" className={isDark ? 'text-white' : ''}>Education</SelectItem>
+              <SelectItem value="legal" className={isDark ? 'text-white' : ''}>Legal</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -177,11 +177,11 @@ export default function TemplateCreator({ isDark }) {
         )}
 
         <div className="flex gap-2">
-          <Button onClick={saveTemplate} className="flex-1 bg-violet-500">
+          <Button onClick={saveTemplate} className="flex-1 bg-violet-500 hover:bg-violet-600">
             <Save className="w-4 h-4 mr-2" />
             Save Template
           </Button>
-          <Button variant="outline" className="flex-1">
+          <Button variant="outline" className={`flex-1 ${isDark ? 'border-slate-700 text-slate-300' : ''}`}>
             <Eye className="w-4 h-4 mr-2" />
             Preview
           </Button>
