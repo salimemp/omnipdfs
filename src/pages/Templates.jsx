@@ -99,6 +99,22 @@ export default function Templates({ theme = 'dark' }) {
           )}
         </TabsContent>
 
+        <TabsContent value="marketplace">
+          <TemplateMarketplace isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="optimizer">
+          <AITemplateOptimizer 
+            template={null}
+            onOptimized={() => setSelectedTab('my-templates')}
+            isDark={isDark}
+          />
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <TemplateAnalytics isDark={isDark} />
+        </TabsContent>
+
         <TabsContent value="my-templates">
           <TemplateGallery isDark={isDark} />
         </TabsContent>
