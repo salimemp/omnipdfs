@@ -1,13 +1,56 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Shield, Loader2 } from 'lucide-react';
 
-export default function TurnstileProtection({ onVerify, isDark = true }) {
+export default function TurnstileProtection({ onVerify, isDark = true, siteKey }) {
   const turnstileRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [widgetId, setWidgetId] = useState(null);
+
+  const initializeTurnstile = (key) => {
+    if (!window.turnstile || !turnstileRef.current) return;
+    
+    try {
+      const id = window.turnstile.render(turnstileRef.current, {
+        sitekey: key,
+        theme: isDark ? 'dark' : 'light',
+        callback: (token) => {
+          setLoading(false);
+          onVerify?.(token);
+        },
+        'error-callback': () => {
+          setError(true);
+          setLoading(false);
+        },
+        'expired-callback': () => {
+          setLoading(true);
+          // Auto-refresh on expiry
+          if (widgetId) {
+            window.turnstile.reset(widgetId);
+          }
+        }
+      });
+      setWidgetId(id);
+      setLoading(false);
+    } catch (err) {
+      console.error('Turnstile render error:', err);
+      setError(true);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const siteKey = process.env.CLOUDFLARE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
+    // ISSUE: Environment variables aren't accessible in frontend
+    // Frontend should use the CLOUDFLARE_TURNSTILE_SITE_KEY directly
+    const siteKey = '0x4AAAAAAA3MqhOZ9vvvvvvv'; // Replace with actual site key from Cloudflare dashboard
+    
+    // Check if script already loaded
+    if (document.querySelector('script[src*="challenges.cloudflare.com"]')) {
+      if (window.turnstile && turnstileRef.current) {
+        initializeTurnstile(siteKey);
+      }
+      return;
+    }
 
     // Load Cloudflare Turnstile script
     const script = document.createElement('script');
@@ -16,26 +59,7 @@ export default function TurnstileProtection({ onVerify, isDark = true }) {
     script.defer = true;
     
     script.onload = () => {
-      if (window.turnstile && turnstileRef.current) {
-        try {
-          window.turnstile.render(turnstileRef.current, {
-            sitekey: siteKey,
-            theme: isDark ? 'dark' : 'light',
-            callback: (token) => {
-              setLoading(false);
-              onVerify?.(token);
-            },
-            'error-callback': () => {
-              setError(true);
-              setLoading(false);
-            },
-          });
-        } catch (err) {
-          console.error('Turnstile render error:', err);
-          setError(true);
-          setLoading(false);
-        }
-      }
+      initializeTurnstile(siteKey);
     };
 
     script.onerror = () => {
@@ -46,18 +70,16 @@ export default function TurnstileProtection({ onVerify, isDark = true }) {
     document.body.appendChild(script);
 
     return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-      if (window.turnstile && turnstileRef.current) {
+      // Don't remove script on cleanup to avoid re-downloads
+      if (window.turnstile && widgetId) {
         try {
-          window.turnstile.remove(turnstileRef.current);
+          window.turnstile.remove(widgetId);
         } catch (err) {
           console.error('Turnstile cleanup error:', err);
         }
       }
     };
-  }, [isDark, onVerify]);
+  }, [isDark, onVerify, siteKey]);
 
   if (error) {
     return (

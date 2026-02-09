@@ -71,6 +71,7 @@ import OCR from './pages/OCR';
 import Offline from './pages/Offline';
 import PDFEditor from './pages/PDFEditor';
 import PDFTools from './pages/PDFTools';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import Profile from './pages/Profile';
 import ProjectFiles from './pages/ProjectFiles';
 import Search from './pages/Search';
@@ -80,10 +81,10 @@ import Subscription from './pages/Subscription';
 import TaskAutomation from './pages/TaskAutomation';
 import TeamDashboard from './pages/TeamDashboard';
 import Templates from './pages/Templates';
+import TermsOfService from './pages/TermsOfService';
 import TranslationMemory from './pages/TranslationMemory';
 import Webhooks from './pages/Webhooks';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsOfService from './pages/TermsOfService';
+import TurnstileTest from './pages/TurnstileTest';
 import __Layout from './Layout.jsx';
 
 
@@ -112,6 +113,7 @@ export const PAGES = {
     "Offline": Offline,
     "PDFEditor": PDFEditor,
     "PDFTools": PDFTools,
+    "PrivacyPolicy": PrivacyPolicy,
     "Profile": Profile,
     "ProjectFiles": ProjectFiles,
     "Search": Search,
@@ -121,10 +123,10 @@ export const PAGES = {
     "TaskAutomation": TaskAutomation,
     "TeamDashboard": TeamDashboard,
     "Templates": Templates,
+    "TermsOfService": TermsOfService,
     "TranslationMemory": TranslationMemory,
     "Webhooks": Webhooks,
-    "PrivacyPolicy": PrivacyPolicy,
-    "TermsOfService": TermsOfService,
+    "TurnstileTest": TurnstileTest,
 }
 
 export const pagesConfig = {
