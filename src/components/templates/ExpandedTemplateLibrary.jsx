@@ -61,10 +61,23 @@ export default function ExpandedTemplateLibrary({ isDark = true }) {
     }
   });
 
+  const categoryMapping = {
+    'business': ['invoice', 'contract', 'report', 'letter'],
+    'education': ['certificate', 'report', 'form'],
+    'personal': ['letter', 'certificate'],
+    'real-estate': ['contract', 'form'],
+    'marketing': ['report', 'letter'],
+    'hr': ['contract', 'form', 'certificate'],
+    'legal': ['contract', 'form']
+  };
+
   const filteredTemplates = templates.filter(template => {
-    const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'all' || 
+      categoryMapping[selectedCategory]?.includes(template.category) ||
+      template.category === selectedCategory;
     const matchesSearch = !searchQuery || 
-      template.name.toLowerCase().includes(searchQuery.toLowerCase());
+      template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.description?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 

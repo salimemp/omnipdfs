@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LayoutTemplate } from 'lucide-react';
+import { LayoutTemplate, Plus, Users } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import TemplateGallery from '@/components/templates/TemplateGallery';
-import TemplateCreator from '@/components/templates/TemplateCreator';
 import ExpandedTemplateLibrary from '@/components/templates/ExpandedTemplateLibrary';
 import AdvancedTemplateEditor from '@/components/templates/AdvancedTemplateEditor';
 import VisualTemplateEditor from '@/components/templates/VisualTemplateEditor';
+import EnhancedTemplateCreator from '@/components/templates/EnhancedTemplateCreator';
+import TemplateCollaboration from '@/components/templates/TemplateCollaboration';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
+  const [selectedTab, setSelectedTab] = useState('library');
+  const [showCollaboration, setShowCollaboration] = useState(false);
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -30,15 +34,33 @@ export default function Templates({ theme = 'dark' }) {
         </p>
       </motion.div>
 
-      <Tabs defaultValue="library" className="space-y-6">
-        <TabsList className={`${isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'} overflow-x-auto`}>
-          <TabsTrigger value="library">Browse Library</TabsTrigger>
-          <TabsTrigger value="gallery">Template Gallery</TabsTrigger>
-          <TabsTrigger value="visual">Visual Editor</TabsTrigger>
-          <TabsTrigger value="editor">Advanced Editor</TabsTrigger>
-          <TabsTrigger value="create">Create Template</TabsTrigger>
-          <TabsTrigger value="my-templates">My Templates</TabsTrigger>
-        </TabsList>
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
+        <div className="flex items-center justify-between">
+          <TabsList className={`${isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'}`}>
+            <TabsTrigger value="library">Browse Library</TabsTrigger>
+            <TabsTrigger value="gallery">Gallery</TabsTrigger>
+            <TabsTrigger value="create">Create</TabsTrigger>
+            <TabsTrigger value="visual">Visual Editor</TabsTrigger>
+            <TabsTrigger value="editor">Advanced</TabsTrigger>
+            <TabsTrigger value="my-templates">My Templates</TabsTrigger>
+          </TabsList>
+          
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowCollaboration(!showCollaboration)}
+              className={showCollaboration ? 'bg-violet-500/20' : ''}
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Collaborate
+            </Button>
+            <Button size="sm" onClick={() => setSelectedTab('create')} className="bg-gradient-to-r from-violet-500 to-cyan-500">
+              <Plus className="w-4 h-4 mr-2" />
+              New Template
+            </Button>
+          </div>
+        </div>
 
         <TabsContent value="library">
           <ExpandedTemplateLibrary isDark={isDark} />
@@ -57,7 +79,18 @@ export default function Templates({ theme = 'dark' }) {
         </TabsContent>
 
         <TabsContent value="create">
-          <TemplateCreator isDark={isDark} />
+          {showCollaboration ? (
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <EnhancedTemplateCreator isDark={isDark} onSave={() => setSelectedTab('my-templates')} />
+              </div>
+              <div>
+                <TemplateCollaboration templateId={null} isDark={isDark} />
+              </div>
+            </div>
+          ) : (
+            <EnhancedTemplateCreator isDark={isDark} onSave={() => setSelectedTab('my-templates')} />
+          )}
         </TabsContent>
 
         <TabsContent value="my-templates">
