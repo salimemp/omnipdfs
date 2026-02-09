@@ -37,6 +37,9 @@ export default function TemplateGallery({ isDark }) {
      t.description?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  const [modifyTemplate, setModifyTemplate] = useState(null);
+  const [modifiedContent, setModifiedContent] = useState({});
+
   const useTemplate = async (template) => {
     toast.promise(
       async () => {
@@ -45,6 +48,9 @@ export default function TemplateGallery({ isDark }) {
           action: 'convert',
           details: { type: 'template_used', template_name: template.name }
         });
+        await base44.entities.Template.update(template.id, {
+          usage_count: (template.usage_count || 0) + 1
+        });
       },
       {
         loading: 'Loading template...',
@@ -52,6 +58,54 @@ export default function TemplateGallery({ isDark }) {
         error: 'Failed to load template'
       }
     );
+  };
+
+  const downloadTemplate = async (template) => {
+    const content = generatePDFContent(template);
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${template.name.replace(/\s+/g, '_')}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Template downloaded');
+  };
+
+  const generatePDFContent = (template) => {
+    let content = `${template.name}\n${'='.repeat(template.name.length)}\n\n`;
+    template.template_data?.sections?.forEach((section) => {
+      content += `${section.title}\n${'-'.repeat(section.title.length)}\n${section.content}\n\n`;
+    });
+    return content;
+  };
+
+  const saveModifications = async () => {
+    if (!modifyTemplate) return;
+
+    const updatedSections = modifyTemplate.template_data?.sections?.map((section) => ({
+      ...section,
+      content: modifiedContent[section.title] || section.content
+    }));
+
+    try {
+      await base44.entities.Template.create({
+        name: `${modifyTemplate.name} (Modified)`,
+        description: modifyTemplate.description,
+        category: modifyTemplate.category,
+        template_data: {
+          ...modifyTemplate.template_data,
+          sections: updatedSections
+        },
+        is_public: false
+      });
+      
+      toast.success('Modified template saved');
+      setModifyTemplate(null);
+      setModifiedContent({});
+    } catch (e) {
+      toast.error('Failed to save modifications');
+    }
   };
 
   return (
@@ -114,14 +168,18 @@ export default function TemplateGallery({ isDark }) {
               <p className={`text-xs mb-3 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                 {template.usage_count?.toLocaleString() || 0} downloads
               </p>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="flex-1" onClick={() => setPreviewTemplate(template)}>
-                  <Eye className="w-4 h-4 mr-2" />
-                  Preview
+              <div className="grid grid-cols-3 gap-2">
+                <Button size="sm" variant="outline" onClick={() => setPreviewTemplate(template)}>
+                  <Eye className="w-3 h-3" />
                 </Button>
-                <Button size="sm" onClick={() => useTemplate(template)} className="flex-1 bg-violet-500">
-                  <Download className="w-4 h-4 mr-2" />
-                  Use
+                <Button size="sm" variant="outline" onClick={() => {
+                  setModifyTemplate(template);
+                  setModifiedContent({});
+                }}>
+                  <FileText className="w-3 h-3" />
+                </Button>
+                <Button size="sm" onClick={() => downloadTemplate(template)} className="bg-violet-500">
+                  <Download className="w-3 h-3" />
                 </Button>
               </div>
             </CardContent>
@@ -156,17 +214,63 @@ export default function TemplateGallery({ isDark }) {
             </div>
             <div className="flex gap-3">
               <Button 
+                onClick={() => downloadTemplate(previewTemplate)}
+                className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download
+              </Button>
+              <Button 
                 onClick={() => {
-                  useTemplate(previewTemplate);
+                  setModifyTemplate(previewTemplate);
                   setPreviewTemplate(null);
                 }}
                 className="flex-1 bg-gradient-to-r from-violet-500 to-cyan-500"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Use This Template
+                <FileText className="w-4 h-4 mr-2" />
+                Modify
               </Button>
               <Button variant="outline" onClick={() => setPreviewTemplate(null)}>
                 Close
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modify Modal */}
+      <Dialog open={!!modifyTemplate} onOpenChange={() => setModifyTemplate(null)}>
+        <DialogContent className={`max-w-4xl max-h-[80vh] overflow-y-auto ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white'}`}>
+          <DialogHeader>
+            <DialogTitle className={`flex items-center gap-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              <FileText className="w-5 h-5 text-violet-400" />
+              Modify Template: {modifyTemplate?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {modifyTemplate?.template_data?.sections?.map((section, i) => (
+              <div key={i} className="space-y-2">
+                <label className={`font-semibold text-sm ${isDark ? 'text-violet-400' : 'text-violet-600'}`}>
+                  {section.title}
+                </label>
+                <textarea
+                  className={`w-full min-h-[100px] p-3 rounded-lg ${
+                    isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'
+                  } border`}
+                  defaultValue={section.content}
+                  onChange={(e) => setModifiedContent(prev => ({
+                    ...prev,
+                    [section.title]: e.target.value
+                  }))}
+                />
+              </div>
+            ))}
+            <div className="flex gap-3 pt-4">
+              <Button onClick={saveModifications} className="flex-1 bg-gradient-to-r from-violet-500 to-cyan-500">
+                Save as New Template
+              </Button>
+              <Button variant="outline" onClick={() => setModifyTemplate(null)}>
+                Cancel
               </Button>
             </div>
           </div>
