@@ -19,14 +19,27 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  Grid3x3
+  Grid3x3,
+  Share2,
+  GitBranch,
+  SaveAll,
+  FileDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from 'sonner';
+import TemplateVersioning from './TemplateVersioning';
+import AdvancedSharingDialog from './AdvancedSharingDialog';
 
 const tools = [
   { id: 'text', icon: Type, label: 'Text' },
@@ -44,6 +57,9 @@ export default function AdvancedTemplateEditor({ template, onSave, isDark = true
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showGrid, setShowGrid] = useState(true);
   const [templateName, setTemplateName] = useState(template?.name || '');
+  const [showVersioning, setShowVersioning] = useState(false);
+  const [showSharing, setShowSharing] = useState(false);
+  const [currentTemplateId, setCurrentTemplateId] = useState(template?.id);
 
   const addElement = (type) => {
     const newElement = {
@@ -143,7 +159,7 @@ export default function AdvancedTemplateEditor({ template, onSave, isDark = true
     updateElement(selectedElement, updates);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (saveAs = false) => {
     if (!templateName) {
       toast.error('Please enter a template name');
       return;
@@ -151,16 +167,17 @@ export default function AdvancedTemplateEditor({ template, onSave, isDark = true
 
     try {
       const templateData = {
-        name: templateName,
+        name: saveAs ? `${templateName} (Copy)` : templateName,
         template_data: { elements },
         category: 'custom'
       };
 
-      if (template?.id) {
+      if (template?.id && !saveAs) {
         await base44.entities.Template.update(template.id, templateData);
         toast.success('Template updated');
       } else {
-        await base44.entities.Template.create(templateData);
+        const newTemplate = await base44.entities.Template.create(templateData);
+        setCurrentTemplateId(newTemplate.id);
         toast.success('Template created');
       }
 
@@ -168,6 +185,53 @@ export default function AdvancedTemplateEditor({ template, onSave, isDark = true
     } catch (e) {
       toast.error('Failed to save template');
     }
+  };
+
+  const saveVersion = async () => {
+    if (!currentTemplateId) {
+      toast.error('Save the template first');
+      return;
+    }
+
+    try {
+      const versionNumber = Math.floor(Date.now() / 1000);
+      await base44.entities.ActivityLog.create({
+        action: 'convert',
+        document_id: currentTemplateId,
+        details: {
+          type: 'template_version',
+          version_number: versionNumber,
+          version_data: { elements, name: templateName },
+          change_description: prompt('Describe this version:') || 'Version saved'
+        }
+      });
+
+      toast.success('Version saved successfully');
+    } catch (e) {
+      toast.error('Failed to save version');
+    }
+  };
+
+  const restoreVersion = (versionData) => {
+    if (versionData.elements) {
+      setElements(versionData.elements);
+      addToHistory(versionData.elements);
+    }
+    if (versionData.name) {
+      setTemplateName(versionData.name);
+    }
+  };
+
+  const exportTemplate = () => {
+    const data = JSON.stringify({ name: templateName, elements }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${templateName.replace(/\s+/g, '_')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Template exported');
   };
 
   const generateWithAI = async () => {
@@ -191,7 +255,8 @@ export default function AdvancedTemplateEditor({ template, onSave, isDark = true
   const selectedElementData = elements.find(el => el.id === selectedElement);
 
   return (
-    <div className="grid grid-cols-[280px_1fr_280px] gap-4 h-[700px]">
+    <>
+    <div className={`grid gap-4 h-[700px] ${showVersioning ? 'grid-cols-[280px_1fr_280px_300px]' : 'grid-cols-[280px_1fr_280px]'}`}>
       {/* Left Panel - Tools */}
       <div className={`rounded-2xl p-4 overflow-y-auto ${isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'}`}>
         <h3 className={`font-semibold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -257,9 +322,40 @@ export default function AdvancedTemplateEditor({ template, onSave, isDark = true
             <Button size="sm" variant="outline" onClick={redo} disabled={historyIndex >= history.length - 1}>
               <Redo className="w-4 h-4" />
             </Button>
-            <Button size="sm" onClick={handleSave} className="bg-violet-500">
-              <Save className="w-4 h-4 mr-2" />
-              Save
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" className="bg-violet-500">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className={isDark ? 'bg-slate-900 border-slate-700' : ''}>
+                <DropdownMenuItem onClick={() => handleSave()} className={isDark ? 'text-white' : ''}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSave(true)} className={isDark ? 'text-white' : ''}>
+                  <SaveAll className="w-4 h-4 mr-2" />
+                  Save As Copy
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={saveVersion} className={isDark ? 'text-white' : ''}>
+                  <GitBranch className="w-4 h-4 mr-2" />
+                  Save Version
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className={isDark ? 'bg-slate-700' : ''} />
+                <DropdownMenuItem onClick={exportTemplate} className={isDark ? 'text-white' : ''}>
+                  <FileDown className="w-4 h-4 mr-2" />
+                  Export Template
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button size="sm" variant="outline" onClick={() => setShowSharing(true)}>
+              <Share2 className="w-4 h-4" />
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setShowVersioning(!showVersioning)}>
+              <GitBranch className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -427,6 +523,17 @@ export default function AdvancedTemplateEditor({ template, onSave, isDark = true
         )}
       </div>
 
+      {/* Versioning Panel */}
+      {showVersioning && (
+        <div className={`rounded-2xl p-4 overflow-y-auto ${isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'}`}>
+          <TemplateVersioning
+            templateId={currentTemplateId}
+            onRestoreVersion={restoreVersion}
+            isDark={isDark}
+          />
+        </div>
+      )}
+
       <style>{`
         .bg-grid-pattern {
           background-image: 
@@ -436,5 +543,14 @@ export default function AdvancedTemplateEditor({ template, onSave, isDark = true
         }
       `}</style>
     </div>
+
+    {/* Sharing Dialog */}
+    <AdvancedSharingDialog
+      template={{ id: currentTemplateId, name: templateName, shared_with: template?.shared_with }}
+      open={showSharing}
+      onOpenChange={setShowSharing}
+      isDark={isDark}
+    />
+    </>
   );
 }
