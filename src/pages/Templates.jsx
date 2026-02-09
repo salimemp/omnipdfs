@@ -63,10 +63,13 @@ export default function Templates({ theme = 'dark' }) {
             <TabsTrigger value="personalize">Personalize</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
             <TabsTrigger value="create">Create</TabsTrigger>
+            <TabsTrigger value="search">Search</TabsTrigger>
             <TabsTrigger value="visual">Visual Editor</TabsTrigger>
             <TabsTrigger value="editor">Advanced</TabsTrigger>
             <TabsTrigger value="optimizer">AI Optimizer</TabsTrigger>
             <TabsTrigger value="wizard">AI Wizard</TabsTrigger>
+            <TabsTrigger value="ai-manager">AI Manager</TabsTrigger>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="customize">Customize</TabsTrigger>
             <TabsTrigger value="collaborate">Collaborate+</TabsTrigger>
             <TabsTrigger value="monetize">Monetize</TabsTrigger>
@@ -129,7 +132,15 @@ export default function Templates({ theme = 'dark' }) {
         </TabsContent>
 
         <TabsContent value="marketplace">
-          <TemplateMarketplace isDark={isDark} />
+          <EnhancedMarketplace isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="personalize">
+          <AITemplatePersonalizer template={null} onSave={() => setSelectedTab('my-templates')} isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="search">
+          <TemplateSearchFilter onResults={(results) => console.log(results)} isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="optimizer">
@@ -142,6 +153,14 @@ export default function Templates({ theme = 'dark' }) {
 
         <TabsContent value="wizard">
           <AITemplateWizard onComplete={() => setSelectedTab('my-templates')} isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="ai-manager">
+          <AITemplateManager isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="profile">
+          <UserProfileCustomization isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="customize">
