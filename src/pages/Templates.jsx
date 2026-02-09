@@ -18,6 +18,9 @@ import AITemplateWizard from '@/components/templates/AITemplateWizard';
 import TemplateCollaborationHub from '@/components/templates/TemplateCollaborationHub';
 import AdvancedTemplateCustomizer from '@/components/templates/AdvancedTemplateCustomizer';
 import TemplateMarketplaceMonetization from '@/components/templates/TemplateMarketplaceMonetization';
+import TemplateVersioning from '@/components/templates/TemplateVersioning';
+import AIQualityScorer from '@/components/templates/AIQualityScorer';
+import ComprehensiveAnalyticsDashboard from '@/components/templates/ComprehensiveAnalyticsDashboard';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -57,6 +60,8 @@ export default function Templates({ theme = 'dark' }) {
             <TabsTrigger value="customize">Customize</TabsTrigger>
             <TabsTrigger value="collaborate">Collaborate</TabsTrigger>
             <TabsTrigger value="monetize">Monetize</TabsTrigger>
+            <TabsTrigger value="versioning">Versions</TabsTrigger>
+            <TabsTrigger value="quality">Quality Score</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="usage">Usage Stats</TabsTrigger>
             <TabsTrigger value="my-templates">My Templates</TabsTrigger>
@@ -138,8 +143,16 @@ export default function Templates({ theme = 'dark' }) {
           <TemplateMarketplaceMonetization templateId={null} isDark={isDark} />
         </TabsContent>
 
+        <TabsContent value="versioning">
+          <TemplateVersioning template={null} onRestore={() => toast.success('Restored')} isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="quality">
+          <AIQualityScorer template={null} isDark={isDark} />
+        </TabsContent>
+
         <TabsContent value="analytics">
-          <TemplateAnalytics isDark={isDark} />
+          <ComprehensiveAnalyticsDashboard isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="usage">
