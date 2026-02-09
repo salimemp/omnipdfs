@@ -27,6 +27,9 @@ import AdvancedCollaborationHub from '@/components/templates/AdvancedCollaborati
 import TemplateEmbedding from '@/components/templates/TemplateEmbedding';
 import DetailedUsageTracking from '@/components/templates/DetailedUsageTracking';
 import AIRefinementWizard from '@/components/templates/AIRefinementWizard';
+import UserProfileCustomization from '@/components/templates/UserProfileCustomization';
+import AITemplateManager from '@/components/templates/AITemplateManager';
+import TemplateSearchFilter from '@/components/templates/TemplateSearchFilter';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
