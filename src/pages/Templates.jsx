@@ -12,6 +12,8 @@ import TemplateCollaboration from '@/components/templates/TemplateCollaboration'
 import TemplateAnalytics from '@/components/templates/TemplateAnalytics';
 import TemplateMarketplace from '@/components/templates/TemplateMarketplace';
 import AITemplateOptimizer from '@/components/templates/AITemplateOptimizer';
+import TemplateUsageAnalytics from '@/components/templates/TemplateUsageAnalytics';
+import AITemplateWizard from '@/components/templates/AITemplateWizard';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -47,7 +49,9 @@ export default function Templates({ theme = 'dark' }) {
             <TabsTrigger value="visual">Visual Editor</TabsTrigger>
             <TabsTrigger value="editor">Advanced</TabsTrigger>
             <TabsTrigger value="optimizer">AI Optimizer</TabsTrigger>
+            <TabsTrigger value="wizard">AI Wizard</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="usage">Usage Stats</TabsTrigger>
             <TabsTrigger value="my-templates">My Templates</TabsTrigger>
           </TabsList>
           
@@ -111,8 +115,16 @@ export default function Templates({ theme = 'dark' }) {
           />
         </TabsContent>
 
+        <TabsContent value="wizard">
+          <AITemplateWizard onComplete={() => setSelectedTab('my-templates')} isDark={isDark} />
+        </TabsContent>
+
         <TabsContent value="analytics">
           <TemplateAnalytics isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="usage">
+          <TemplateUsageAnalytics isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="my-templates">
