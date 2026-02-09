@@ -83,8 +83,8 @@ import TeamDashboard from './pages/TeamDashboard';
 import Templates from './pages/Templates';
 import TermsOfService from './pages/TermsOfService';
 import TranslationMemory from './pages/TranslationMemory';
-import Webhooks from './pages/Webhooks';
 import TurnstileTest from './pages/TurnstileTest';
+import Webhooks from './pages/Webhooks';
 import __Layout from './Layout.jsx';
 
 
@@ -125,8 +125,8 @@ export const PAGES = {
     "Templates": Templates,
     "TermsOfService": TermsOfService,
     "TranslationMemory": TranslationMemory,
-    "Webhooks": Webhooks,
     "TurnstileTest": TurnstileTest,
+    "Webhooks": Webhooks,
 }
 
 export const pagesConfig = {

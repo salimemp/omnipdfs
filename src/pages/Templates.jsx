@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { LayoutTemplate, Plus, Users } from 'lucide-react';
+import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import TemplateGallery from '@/components/templates/TemplateGallery';
@@ -14,6 +15,9 @@ import TemplateMarketplace from '@/components/templates/TemplateMarketplace';
 import AITemplateOptimizer from '@/components/templates/AITemplateOptimizer';
 import TemplateUsageAnalytics from '@/components/templates/TemplateUsageAnalytics';
 import AITemplateWizard from '@/components/templates/AITemplateWizard';
+import TemplateCollaborationHub from '@/components/templates/TemplateCollaborationHub';
+import AdvancedTemplateCustomizer from '@/components/templates/AdvancedTemplateCustomizer';
+import TemplateMarketplaceMonetization from '@/components/templates/TemplateMarketplaceMonetization';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -50,6 +54,9 @@ export default function Templates({ theme = 'dark' }) {
             <TabsTrigger value="editor">Advanced</TabsTrigger>
             <TabsTrigger value="optimizer">AI Optimizer</TabsTrigger>
             <TabsTrigger value="wizard">AI Wizard</TabsTrigger>
+            <TabsTrigger value="customize">Customize</TabsTrigger>
+            <TabsTrigger value="collaborate">Collaborate</TabsTrigger>
+            <TabsTrigger value="monetize">Monetize</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="usage">Usage Stats</TabsTrigger>
             <TabsTrigger value="my-templates">My Templates</TabsTrigger>
@@ -117,6 +124,18 @@ export default function Templates({ theme = 'dark' }) {
 
         <TabsContent value="wizard">
           <AITemplateWizard onComplete={() => setSelectedTab('my-templates')} isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="customize">
+          <AdvancedTemplateCustomizer template={null} onSave={() => toast.success('Saved')} isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="collaborate">
+          <TemplateCollaborationHub templateId={null} isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="monetize">
+          <TemplateMarketplaceMonetization templateId={null} isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="analytics">
