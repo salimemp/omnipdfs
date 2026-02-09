@@ -9,6 +9,9 @@ import AdvancedTemplateEditor from '@/components/templates/AdvancedTemplateEdito
 import VisualTemplateEditor from '@/components/templates/VisualTemplateEditor';
 import EnhancedTemplateCreator from '@/components/templates/EnhancedTemplateCreator';
 import TemplateCollaboration from '@/components/templates/TemplateCollaboration';
+import TemplateAnalytics from '@/components/templates/TemplateAnalytics';
+import TemplateMarketplace from '@/components/templates/TemplateMarketplace';
+import AITemplateOptimizer from '@/components/templates/AITemplateOptimizer';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -36,12 +39,15 @@ export default function Templates({ theme = 'dark' }) {
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
         <div className="flex items-center justify-between">
-          <TabsList className={`${isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'}`}>
-            <TabsTrigger value="library">Browse Library</TabsTrigger>
+          <TabsList className={`${isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'} flex-wrap`}>
+            <TabsTrigger value="library">Browse</TabsTrigger>
+            <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
             <TabsTrigger value="create">Create</TabsTrigger>
             <TabsTrigger value="visual">Visual Editor</TabsTrigger>
             <TabsTrigger value="editor">Advanced</TabsTrigger>
+            <TabsTrigger value="optimizer">AI Optimizer</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="my-templates">My Templates</TabsTrigger>
           </TabsList>
           
