@@ -24,6 +24,9 @@ import ComprehensiveAnalyticsDashboard from '@/components/templates/Comprehensiv
 import AITemplatePersonalizer from '@/components/templates/AITemplatePersonalizer';
 import EnhancedMarketplace from '@/components/templates/EnhancedMarketplace';
 import AdvancedCollaborationHub from '@/components/templates/AdvancedCollaborationHub';
+import TemplateEmbedding from '@/components/templates/TemplateEmbedding';
+import DetailedUsageTracking from '@/components/templates/DetailedUsageTracking';
+import AIRefinementWizard from '@/components/templates/AIRefinementWizard';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -66,6 +69,9 @@ export default function Templates({ theme = 'dark' }) {
             <TabsTrigger value="monetize">Monetize</TabsTrigger>
             <TabsTrigger value="versioning">Versions</TabsTrigger>
             <TabsTrigger value="quality">Quality Score</TabsTrigger>
+            <TabsTrigger value="refine">AI Refine</TabsTrigger>
+            <TabsTrigger value="embed">Embed</TabsTrigger>
+            <TabsTrigger value="tracking">Tracking</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="usage">Usage Stats</TabsTrigger>
             <TabsTrigger value="my-templates">My Templates</TabsTrigger>
@@ -153,6 +159,18 @@ export default function Templates({ theme = 'dark' }) {
 
         <TabsContent value="quality">
           <AIQualityScorer template={null} isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="refine">
+          <AIRefinementWizard template={null} onSave={() => toast.success('Saved')} isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="embed">
+          <TemplateEmbedding template={null} isDark={isDark} />
+        </TabsContent>
+
+        <TabsContent value="tracking">
+          <DetailedUsageTracking template={null} isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="analytics">
