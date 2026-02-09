@@ -9,12 +9,31 @@ import { base44 } from '@/api/base44Client';
 export default function RealtimeCollaboration({ documentId, isDark = true }) {
   const [activeUsers, setActiveUsers] = useState([]);
   const [user, setUser] = useState(null);
+  const [cursors, setCursors] = useState({});
 
   useEffect(() => {
     initializeCollaboration();
     const interval = setInterval(updatePresence, 5000);
-    return () => clearInterval(interval);
-  }, [documentId]);
+    
+    // Track mouse movements for live cursors
+    const handleMouseMove = (e) => {
+      if (user && documentId) {
+        const cursorData = {
+          x: e.clientX,
+          y: e.clientY,
+          user: user.email
+        };
+        // Could broadcast cursor position via WebSocket here
+      }
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [documentId, user]);
 
   const initializeCollaboration = async () => {
     try {
