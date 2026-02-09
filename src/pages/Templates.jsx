@@ -21,6 +21,9 @@ import TemplateMarketplaceMonetization from '@/components/templates/TemplateMark
 import TemplateVersioning from '@/components/templates/TemplateVersioning';
 import AIQualityScorer from '@/components/templates/AIQualityScorer';
 import ComprehensiveAnalyticsDashboard from '@/components/templates/ComprehensiveAnalyticsDashboard';
+import AITemplatePersonalizer from '@/components/templates/AITemplatePersonalizer';
+import EnhancedMarketplace from '@/components/templates/EnhancedMarketplace';
+import AdvancedCollaborationHub from '@/components/templates/AdvancedCollaborationHub';
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
@@ -50,7 +53,8 @@ export default function Templates({ theme = 'dark' }) {
         <div className="flex items-center justify-between">
           <TabsList className={`${isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'} flex-wrap`}>
             <TabsTrigger value="library">Browse</TabsTrigger>
-            <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
+            <TabsTrigger value="marketplace">Marketplace+</TabsTrigger>
+            <TabsTrigger value="personalize">Personalize</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
             <TabsTrigger value="create">Create</TabsTrigger>
             <TabsTrigger value="visual">Visual Editor</TabsTrigger>
@@ -58,7 +62,7 @@ export default function Templates({ theme = 'dark' }) {
             <TabsTrigger value="optimizer">AI Optimizer</TabsTrigger>
             <TabsTrigger value="wizard">AI Wizard</TabsTrigger>
             <TabsTrigger value="customize">Customize</TabsTrigger>
-            <TabsTrigger value="collaborate">Collaborate</TabsTrigger>
+            <TabsTrigger value="collaborate">Collaborate+</TabsTrigger>
             <TabsTrigger value="monetize">Monetize</TabsTrigger>
             <TabsTrigger value="versioning">Versions</TabsTrigger>
             <TabsTrigger value="quality">Quality Score</TabsTrigger>
@@ -136,7 +140,7 @@ export default function Templates({ theme = 'dark' }) {
         </TabsContent>
 
         <TabsContent value="collaborate">
-          <TemplateCollaborationHub templateId={null} isDark={isDark} />
+          <AdvancedCollaborationHub templateId={null} isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="monetize">
