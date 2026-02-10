@@ -1,43 +1,47 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LayoutTemplate, Plus, Users } from 'lucide-react';
-import { toast } from 'sonner';
+import { 
+  LayoutTemplate, Plus, Users, Settings, Search, Grid3X3, 
+  Sparkles, Briefcase, GraduationCap, FileText, Heart, Home,
+  TrendingUp, Scale, ChevronDown 
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import TemplateGallery from '@/components/templates/TemplateGallery';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from '@/components/ui/badge';
 import ExpandedTemplateLibrary from '@/components/templates/ExpandedTemplateLibrary';
-import AdvancedTemplateEditor from '@/components/templates/AdvancedTemplateEditor';
-import VisualTemplateEditor from '@/components/templates/VisualTemplateEditor';
 import EnhancedTemplateCreator from '@/components/templates/EnhancedTemplateCreator';
-import TemplateCollaboration from '@/components/templates/TemplateCollaboration';
-import TemplateAnalytics from '@/components/templates/TemplateAnalytics';
-import TemplateMarketplace from '@/components/templates/TemplateMarketplace';
-import AITemplateOptimizer from '@/components/templates/AITemplateOptimizer';
-import TemplateUsageAnalytics from '@/components/templates/TemplateUsageAnalytics';
-import AITemplateWizard from '@/components/templates/AITemplateWizard';
-import TemplateCollaborationHub from '@/components/templates/TemplateCollaborationHub';
-import AdvancedTemplateCustomizer from '@/components/templates/AdvancedTemplateCustomizer';
-import TemplateMarketplaceMonetization from '@/components/templates/TemplateMarketplaceMonetization';
-import TemplateVersioning from '@/components/templates/TemplateVersioning';
-import AIQualityScorer from '@/components/templates/AIQualityScorer';
-import ComprehensiveAnalyticsDashboard from '@/components/templates/ComprehensiveAnalyticsDashboard';
-import AITemplatePersonalizer from '@/components/templates/AITemplatePersonalizer';
-import EnhancedMarketplace from '@/components/templates/EnhancedMarketplace';
-import AdvancedCollaborationHub from '@/components/templates/AdvancedCollaborationHub';
-import TemplateEmbedding from '@/components/templates/TemplateEmbedding';
-import DetailedUsageTracking from '@/components/templates/DetailedUsageTracking';
-import AIRefinementWizard from '@/components/templates/AIRefinementWizard';
-import UserProfileCustomization from '@/components/templates/UserProfileCustomization';
-import AITemplateManager from '@/components/templates/AITemplateManager';
 import TemplateSearchFilter from '@/components/templates/TemplateSearchFilter';
+import EnhancedMarketplace from '@/components/templates/EnhancedMarketplace';
+import AITemplateWizard from '@/components/templates/AITemplateWizard';
+import ComprehensiveAnalyticsDashboard from '@/components/templates/ComprehensiveAnalyticsDashboard';
+import AdvancedTemplateEditor from '@/components/templates/AdvancedTemplateEditor';
+
+const categories = [
+  { id: 'all', label: 'All Templates', icon: Grid3X3, count: 500 },
+  { id: 'business', label: 'Business', icon: Briefcase, count: 120 },
+  { id: 'education', label: 'Education', icon: GraduationCap, count: 85 },
+  { id: 'legal', label: 'Legal', icon: Scale, count: 65 },
+  { id: 'personal', label: 'Personal', icon: Heart, count: 95 },
+  { id: 'real-estate', label: 'Real Estate', icon: Home, count: 45 },
+  { id: 'marketing', label: 'Marketing', icon: TrendingUp, count: 90 },
+];
 
 export default function Templates({ theme = 'dark' }) {
   const isDark = theme === 'dark';
-  const [selectedTab, setSelectedTab] = useState('library');
-  const [showCollaboration, setShowCollaboration] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('browse');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   return (
     <div className="max-w-7xl mx-auto">
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -50,161 +54,164 @@ export default function Templates({ theme = 'dark' }) {
         <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
           Professional PDF Templates
         </h1>
-        <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
-          Choose from hundreds of professionally designed templates for any need
+        <p className={`max-w-2xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          Choose from hundreds of professionally designed templates for any need. Create, customize, and deploy in minutes.
         </p>
       </motion.div>
 
+      {/* Category Filters */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <div className="flex flex-wrap gap-3 justify-center">
+          {categories.map((category) => {
+            const Icon = category.icon;
+            const isActive = selectedCategory === category.id;
+            return (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
+                  isActive
+                    ? 'bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-lg'
+                    : isDark
+                    ? 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'
+                    : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="font-medium">{category.label}</span>
+                <Badge variant="secondary" className={`${isActive ? 'bg-white/20 text-white' : ''} text-xs`}>
+                  {category.count}
+                </Badge>
+              </button>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      {/* Main Navigation */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-        <div className="flex items-center justify-between">
-          <TabsList className={`${isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'} flex-wrap`}>
-            <TabsTrigger value="library">Browse</TabsTrigger>
-            <TabsTrigger value="marketplace">Marketplace+</TabsTrigger>
-            <TabsTrigger value="personalize">Personalize</TabsTrigger>
-            <TabsTrigger value="gallery">Gallery</TabsTrigger>
-            <TabsTrigger value="create">Create</TabsTrigger>
-            <TabsTrigger value="search">Search</TabsTrigger>
-            <TabsTrigger value="visual">Visual Editor</TabsTrigger>
-            <TabsTrigger value="editor">Advanced</TabsTrigger>
-            <TabsTrigger value="optimizer">AI Optimizer</TabsTrigger>
-            <TabsTrigger value="wizard">AI Wizard</TabsTrigger>
-            <TabsTrigger value="ai-manager">AI Manager</TabsTrigger>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="customize">Customize</TabsTrigger>
-            <TabsTrigger value="collaborate">Collaborate+</TabsTrigger>
-            <TabsTrigger value="monetize">Monetize</TabsTrigger>
-            <TabsTrigger value="versioning">Versions</TabsTrigger>
-            <TabsTrigger value="quality">Quality Score</TabsTrigger>
-            <TabsTrigger value="refine">AI Refine</TabsTrigger>
-            <TabsTrigger value="embed">Embed</TabsTrigger>
-            <TabsTrigger value="tracking">Tracking</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="usage">Usage Stats</TabsTrigger>
-            <TabsTrigger value="my-templates">My Templates</TabsTrigger>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <TabsList className={`${isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'}`}>
+            <TabsTrigger value="browse">
+              <Grid3X3 className="w-4 h-4 mr-2" />
+              Browse
+            </TabsTrigger>
+            <TabsTrigger value="create">
+              <Plus className="w-4 h-4 mr-2" />
+              Create
+            </TabsTrigger>
+            <TabsTrigger value="search">
+              <Search className="w-4 h-4 mr-2" />
+              Search
+            </TabsTrigger>
+            <TabsTrigger value="marketplace">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Marketplace
+            </TabsTrigger>
+            <TabsTrigger value="analytics">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Analytics
+            </TabsTrigger>
           </TabsList>
           
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowCollaboration(!showCollaboration)}
-              className={showCollaboration ? 'bg-violet-500/20' : ''}
+            {/* AI Tools Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className={isDark ? 'border-slate-700' : 'border-slate-200'}>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  AI Tools
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className={isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}>
+                <DropdownMenuLabel>AI-Powered Features</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setSelectedTab('ai-wizard')}>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  AI Template Wizard
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedTab('ai-optimizer')}>
+                  AI Optimizer
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedTab('ai-personalizer')}>
+                  AI Personalizer
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedTab('ai-manager')}>
+                  AI Manager
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Advanced Tools Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className={isDark ? 'border-slate-700' : 'border-slate-200'}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Advanced
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className={isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}>
+                <DropdownMenuLabel>Advanced Features</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setSelectedTab('editor')}>
+                  Advanced Editor
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedTab('collaborate')}>
+                  <Users className="w-4 h-4 mr-2" />
+                  Collaboration
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedTab('versioning')}>
+                  Version Control
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedTab('monetize')}>
+                  Monetization
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button 
+              onClick={() => setSelectedTab('create')} 
+              className="bg-gradient-to-r from-violet-500 to-cyan-500"
             >
-              <Users className="w-4 h-4 mr-2" />
-              Collaborate
-            </Button>
-            <Button size="sm" onClick={() => setSelectedTab('create')} className="bg-gradient-to-r from-violet-500 to-cyan-500">
               <Plus className="w-4 h-4 mr-2" />
               New Template
             </Button>
           </div>
         </div>
 
-        <TabsContent value="library">
-          <ExpandedTemplateLibrary isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="gallery">
-          <TemplateGallery isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="visual">
-          <VisualTemplateEditor isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="editor">
-          <AdvancedTemplateEditor isDark={isDark} />
+        {/* Tab Content */}
+        <TabsContent value="browse" className="mt-6">
+          <ExpandedTemplateLibrary isDark={isDark} categoryFilter={selectedCategory} />
         </TabsContent>
 
         <TabsContent value="create">
-          {showCollaboration ? (
-            <div className="grid lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <EnhancedTemplateCreator isDark={isDark} onSave={() => setSelectedTab('my-templates')} />
-              </div>
-              <div>
-                <TemplateCollaboration templateId={null} isDark={isDark} />
-              </div>
-            </div>
-          ) : (
-            <EnhancedTemplateCreator isDark={isDark} onSave={() => setSelectedTab('my-templates')} />
-          )}
-        </TabsContent>
-
-        <TabsContent value="marketplace">
-          <EnhancedMarketplace isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="personalize">
-          <AITemplatePersonalizer template={null} onSave={() => setSelectedTab('my-templates')} isDark={isDark} />
+          <EnhancedTemplateCreator isDark={isDark} onSave={() => setSelectedTab('browse')} />
         </TabsContent>
 
         <TabsContent value="search">
           <TemplateSearchFilter onResults={(results) => console.log(results)} isDark={isDark} />
         </TabsContent>
 
-        <TabsContent value="optimizer">
-          <AITemplateOptimizer 
-            template={null}
-            onOptimized={() => setSelectedTab('my-templates')}
-            isDark={isDark}
-          />
-        </TabsContent>
-
-        <TabsContent value="wizard">
-          <AITemplateWizard onComplete={() => setSelectedTab('my-templates')} isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="ai-manager">
-          <AITemplateManager isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="profile">
-          <UserProfileCustomization isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="customize">
-          <AdvancedTemplateCustomizer template={null} onSave={() => toast.success('Saved')} isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="collaborate">
-          <AdvancedCollaborationHub templateId={null} isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="monetize">
-          <TemplateMarketplaceMonetization templateId={null} isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="versioning">
-          <TemplateVersioning template={null} onRestore={() => toast.success('Restored')} isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="quality">
-          <AIQualityScorer template={null} isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="refine">
-          <AIRefinementWizard template={null} onSave={() => toast.success('Saved')} isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="embed">
-          <TemplateEmbedding template={null} isDark={isDark} />
-        </TabsContent>
-
-        <TabsContent value="tracking">
-          <DetailedUsageTracking template={null} isDark={isDark} />
+        <TabsContent value="marketplace">
+          <EnhancedMarketplace isDark={isDark} />
         </TabsContent>
 
         <TabsContent value="analytics">
           <ComprehensiveAnalyticsDashboard isDark={isDark} />
         </TabsContent>
 
-        <TabsContent value="usage">
-          <TemplateUsageAnalytics isDark={isDark} />
+        <TabsContent value="ai-wizard">
+          <AITemplateWizard onComplete={() => setSelectedTab('browse')} isDark={isDark} />
         </TabsContent>
 
-        <TabsContent value="my-templates">
-          <TemplateGallery isDark={isDark} />
+        <TabsContent value="editor">
+          <AdvancedTemplateEditor isDark={isDark} />
         </TabsContent>
       </Tabs>
     </div>

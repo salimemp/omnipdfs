@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import {
-  FileText, Zap, Shield, Sparkles, CheckCircle2, ArrowRight, X
+  FileText, Zap, Shield, Sparkles, CheckCircle2, ArrowRight, X, Info
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
@@ -12,37 +12,73 @@ const steps = [
   {
     id: 1,
     title: 'Welcome to OmniPDFs',
-    description: 'Your all-in-one PDF management platform',
+    description: 'Your all-in-one PDF management and conversion platform',
     icon: Sparkles,
+    detailedInfo: 'OmniPDFs is an enterprise-grade document management solution trusted by thousands of businesses worldwide. We combine cutting-edge AI technology with robust security to deliver the ultimate PDF experience.',
     features: [
-      'Convert 50+ file formats',
-      'AI-powered tools',
-      'Secure & GDPR compliant',
-      'Real-time collaboration'
+      { title: 'Convert 50+ file formats', detail: 'Support for PDF, Word, Excel, PowerPoint, images, CAD files, and more' },
+      { title: 'AI-powered tools', detail: 'Smart content extraction, auto-formatting, and intelligent document analysis' },
+      { title: 'Enterprise security', detail: 'AES-256 encryption, GDPR/HIPAA compliant, SOC 2 certified' },
+      { title: 'Real-time collaboration', detail: 'Multi-user editing, comments, version control, and team workspaces' }
+    ],
+    stats: [
+      { value: '10M+', label: 'Files processed' },
+      { value: '50+', label: 'File formats' },
+      { value: '99.9%', label: 'Uptime' }
     ]
   },
   {
     id: 2,
-    title: 'Quick Start',
-    description: 'Get started with basic conversions instantly',
+    title: 'Quick Start Guide',
+    description: 'Get started with basic conversions instantly - no account needed',
     icon: Zap,
+    detailedInfo: 'Experience the power of OmniPDFs immediately. Convert files without signing up, or create a free account to unlock advanced features and save your work.',
     features: [
-      'No sign-up needed for basic conversions',
-      'Instant PDF conversion',
-      'Drag & drop support',
-      'Fast processing'
+      { title: 'Instant PDF conversion', detail: 'Convert any file to PDF in seconds with drag & drop' },
+      { title: 'Guest mode available', detail: 'Try basic features without creating an account' },
+      { title: 'Batch processing', detail: 'Convert multiple files at once to save time' },
+      { title: 'Quality presets', detail: 'Choose from web, print, or maximum quality settings' }
+    ],
+    stats: [
+      { value: '<5 sec', label: 'Avg conversion time' },
+      { value: '25MB', label: 'Max file size' },
+      { value: '∞', label: 'Daily conversions' }
     ]
   },
   {
     id: 3,
-    title: 'Unlock Full Features',
-    description: 'Sign up to access advanced tools',
-    icon: Shield,
+    title: 'Professional Templates',
+    description: 'Access 500+ professionally designed templates',
+    icon: FileText,
+    detailedInfo: 'Browse our extensive library of pre-built templates for business, legal, education, and more. Each template is crafted by professionals and optimized for print and digital use.',
     features: [
-      'Save & organize files',
-      'Advanced editing tools',
-      'AI assistant & templates',
-      'Cloud storage integration'
+      { title: 'Business templates', detail: 'Invoices, proposals, contracts, and reports' },
+      { title: 'Legal documents', detail: 'NDAs, agreements, forms, and compliance docs' },
+      { title: 'Educational materials', detail: 'Certificates, transcripts, and course materials' },
+      { title: 'Custom branding', detail: 'Add your logo and colors to any template' }
+    ],
+    stats: [
+      { value: '500+', label: 'Templates' },
+      { value: '20+', label: 'Categories' },
+      { value: '4.9/5', label: 'Avg rating' }
+    ]
+  },
+  {
+    id: 4,
+    title: 'Advanced Features',
+    description: 'Unlock powerful tools for professional document management',
+    icon: Shield,
+    detailedInfo: 'Create an account to access our full suite of professional tools including AI assistant, cloud storage, advanced editing, and team collaboration features.',
+    features: [
+      { title: 'Cloud storage integration', detail: 'Connect Google Drive, Dropbox, OneDrive, and Box' },
+      { title: 'AI document assistant', detail: 'Smart summaries, content generation, and data extraction' },
+      { title: 'Advanced PDF editor', detail: 'Edit text, images, annotations, forms, and signatures' },
+      { title: 'Team collaboration', detail: 'Share, comment, review, and approve documents together' }
+    ],
+    stats: [
+      { value: 'Unlimited', label: 'Storage' },
+      { value: '10+', label: 'Integrations' },
+      { value: '24/7', label: 'Support' }
     ]
   }
 ];
@@ -118,28 +154,61 @@ export default function OnboardingWizard({ onComplete, isDark = true }) {
                 <h2 className={`text-3xl font-bold mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {step.title}
                 </h2>
-                <p className={`text-lg mb-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                <p className={`text-lg mb-4 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   {step.description}
                 </p>
 
-                <div className="space-y-3 mb-8">
+                {step.detailedInfo && (
+                  <div className={`flex gap-3 p-4 rounded-xl mb-6 ${isDark ? 'bg-violet-500/10 border border-violet-500/20' : 'bg-violet-50 border border-violet-200'}`}>
+                    <Info className="w-5 h-5 text-violet-400 shrink-0 mt-0.5" />
+                    <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                      {step.detailedInfo}
+                    </p>
+                  </div>
+                )}
+
+                <div className="space-y-3 mb-6">
                   {step.features.map((feature, i) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.1 }}
-                      className={`flex items-center gap-3 p-3 rounded-lg ${
+                      className={`p-4 rounded-xl ${
                         isDark ? 'bg-slate-800' : 'bg-slate-50'
                       }`}
                     >
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                      <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>
-                        {feature}
-                      </span>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className={`font-medium mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                            {typeof feature === 'string' ? feature : feature.title}
+                          </p>
+                          {typeof feature === 'object' && feature.detail && (
+                            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                              {feature.detail}
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </motion.div>
                   ))}
                 </div>
+
+                {step.stats && (
+                  <div className={`grid grid-cols-3 gap-4 p-4 rounded-xl mb-6 ${isDark ? 'bg-slate-800/50' : 'bg-slate-100'}`}>
+                    {step.stats.map((stat, i) => (
+                      <div key={i} className="text-center">
+                        <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                          {stat.value}
+                        </p>
+                        <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-600'}`}>
+                          {stat.label}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="flex gap-3">
                   {currentStep === steps.length - 1 ? (
