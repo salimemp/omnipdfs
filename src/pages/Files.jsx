@@ -36,9 +36,20 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import FileCard from '@/components/shared/FileCard';
 import DropZone from '@/components/shared/DropZone';
+import AuthPrompt from '@/components/auth/AuthPrompt';
+import { useAuth } from '@/components/auth/AuthContext';
 
 export default function Files({ theme = 'dark' }) {
   const isDark = theme === 'dark';
+  const { user } = useAuth();
+
+  if (!user) {
+    return (
+      <div className="max-w-4xl mx-auto py-20">
+        <AuthPrompt feature="My Files" isDark={isDark} />
+      </div>
+    );
+  }
   const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all');
