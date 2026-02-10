@@ -145,6 +145,7 @@ export default function Convert({ theme = 'dark' }) {
     } catch (e) {
       // Guest mode - store in memory only
       setUploadedFiles(prev => [...prev, { ...fileData, id: Date.now().toString() }]);
+    }
     
     // Set default target format
     const formats = allFormats[fileData.file_type] || ['pdf'];
