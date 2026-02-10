@@ -31,10 +31,19 @@ import ComplianceWidget from '@/components/compliance/ComplianceWidget';
 import DocumentSummarizer from '@/components/ai/DocumentSummarizer';
 
 import { useAuth } from '@/components/auth/AuthContext';
+import OnboardingWizard from '@/components/onboarding/OnboardingWizard';
 
 export default function Dashboard({ theme = 'dark' }) {
   const { user } = useAuth();
   const isDark = theme === 'dark';
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    const hasCompletedOnboarding = localStorage.getItem('omnipdfs-onboarding-complete');
+    if (!hasCompletedOnboarding && !user) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
 
   const { data: documents = [] } = useQuery({
     queryKey: ['documents'],
@@ -102,7 +111,9 @@ export default function Dashboard({ theme = 'dark' }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <>
+      {showOnboarding && <OnboardingWizard onComplete={() => setShowOnboarding(false)} isDark={isDark} />}
+      <div className="max-w-7xl mx-auto space-y-8">
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -323,5 +334,6 @@ export default function Dashboard({ theme = 'dark' }) {
         </div>
       </motion.div>
     </div>
+    </>
   );
 }

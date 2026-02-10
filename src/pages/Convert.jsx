@@ -137,8 +137,14 @@ export default function Convert({ theme = 'dark' }) {
   const queryClient = useQueryClient();
 
   const handleFileUploaded = async (fileData) => {
-    const document = await base44.entities.Document.create(fileData);
-    setUploadedFiles(prev => [...prev, document]);
+    // Allow file upload without authentication for basic conversion
+    try {
+      const user = await base44.auth.me();
+      const document = await base44.entities.Document.create(fileData);
+      setUploadedFiles(prev => [...prev, document]);
+    } catch (e) {
+      // Guest mode - store in memory only
+      setUploadedFiles(prev => [...prev, { ...fileData, id: Date.now().toString() }]);
     
     // Set default target format
     const formats = allFormats[fileData.file_type] || ['pdf'];
