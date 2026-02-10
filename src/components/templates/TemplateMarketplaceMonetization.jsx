@@ -111,6 +111,9 @@ export default function TemplateMarketplaceMonetization({ templateId, isDark = t
       <Tabs defaultValue="pricing" className="space-y-6">
         <TabsList className={isDark ? 'bg-slate-900/50 border border-slate-800' : 'bg-white border border-slate-200'}>
           <TabsTrigger value="pricing">Pricing</TabsTrigger>
+          <TabsTrigger value="bundles">Bundles</TabsTrigger>
+          <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
+          <TabsTrigger value="affiliates">Affiliates</TabsTrigger>
           <TabsTrigger value="earnings">Earnings</TabsTrigger>
           <TabsTrigger value="licensing">Licensing</TabsTrigger>
         </TabsList>
@@ -227,6 +230,77 @@ export default function TemplateMarketplaceMonetization({ templateId, isDark = t
                 <p className={`text-2xl font-bold text-emerald-400 mb-2`}>$49.99</p>
                 <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Extended license</p>
               </button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="bundles" className="space-y-4">
+          <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}>
+            <CardHeader>
+              <CardTitle className={`text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Create Bundle
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Input placeholder="Bundle Name" className={isDark ? 'bg-slate-800 border-slate-700 text-white' : ''} />
+              <Input placeholder="Bundle Price" type="number" className={isDark ? 'bg-slate-800 border-slate-700 text-white' : ''} />
+              <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                Sell multiple templates together at a discounted price
+              </p>
+              <Button className="w-full bg-violet-500">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Bundle
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="subscriptions" className="space-y-4">
+          <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}>
+            <CardHeader>
+              <CardTitle className={`text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Subscription Plans
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-3 gap-4">
+                {[
+                  { name: 'Monthly', price: 9.99, interval: 'month' },
+                  { name: 'Quarterly', price: 24.99, interval: 'quarter' },
+                  { name: 'Yearly', price: 79.99, interval: 'year' }
+                ].map((plan, i) => (
+                  <div key={i} className={`p-4 rounded-lg border-2 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+                    <p className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>{plan.name}</p>
+                    <p className="text-2xl font-bold text-violet-400">${plan.price}</p>
+                    <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>per {plan.interval}</p>
+                  </div>
+                ))}
+              </div>
+              <Button className="w-full bg-cyan-500">Enable Subscriptions</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="affiliates" className="space-y-4">
+          <Card className={isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}>
+            <CardHeader>
+              <CardTitle className={`text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Affiliate Program
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className={isDark ? 'text-slate-300' : 'text-slate-700'}>Commission Rate (%)</Label>
+                <Input type="number" min="0" max="50" defaultValue="20" className={`mt-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : ''}`} />
+              </div>
+              <div>
+                <Label className={isDark ? 'text-slate-300' : 'text-slate-700'}>Cookie Duration (days)</Label>
+                <Input type="number" min="1" max="365" defaultValue="30" className={`mt-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white' : ''}`} />
+              </div>
+              <Button className="w-full bg-emerald-500">
+                <Users className="w-4 h-4 mr-2" />
+                Enable Affiliate Program
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

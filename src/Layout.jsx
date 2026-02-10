@@ -152,6 +152,7 @@ function LayoutContent({ children, currentPageName }) {
             { name: 'API Integration', page: 'APIIntegrations', icon: Webhook },
             { name: 'API Docs', page: 'APIDocs', icon: Webhook },
             { name: 'Security', page: 'Security', icon: Shield },
+            { name: 'SEO Tools', page: 'SEO', icon: TrendingUp },
             { name: 'Profile', page: 'Profile', icon: Users },
             { name: 'Offline Access', page: 'Offline', icon: Cloud },
             { name: 'Settings', page: 'Settings', icon: Settings },

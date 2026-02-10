@@ -85,6 +85,7 @@ import TermsOfService from './pages/TermsOfService';
 import TranslationMemory from './pages/TranslationMemory';
 import TurnstileTest from './pages/TurnstileTest';
 import Webhooks from './pages/Webhooks';
+import SEO from './pages/SEO';
 import __Layout from './Layout.jsx';
 
 
@@ -127,6 +128,7 @@ export const PAGES = {
     "TranslationMemory": TranslationMemory,
     "TurnstileTest": TurnstileTest,
     "Webhooks": Webhooks,
+    "SEO": SEO,
 }
 
 export const pagesConfig = {
