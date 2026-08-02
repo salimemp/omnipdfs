@@ -1,0 +1,102 @@
+{
+  "name": "Document",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Original file name"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL of the uploaded file"
+    },
+    "file_type": {
+      "type": "string",
+      "enum": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "pptx",
+        "jpg",
+        "png",
+        "txt",
+        "html",
+        "epub"
+      ],
+      "description": "File format type"
+    },
+    "file_size": {
+      "type": "number",
+      "description": "File size in bytes"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "uploading",
+        "processing",
+        "ready",
+        "error"
+      ],
+      "default": "ready"
+    },
+    "folder_id": {
+      "type": "string",
+      "description": "ID of the folder this document belongs to"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "User-defined tags"
+    },
+    "is_favorite": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_shared": {
+      "type": "boolean",
+      "default": false
+    },
+    "shared_with": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emails of users this is shared with"
+    },
+    "conversion_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from_format": {
+            "type": "string"
+          },
+          "to_format": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "output_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "is_protected": {
+      "type": "boolean",
+      "default": false
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Auto-delete date"
+    }
+  },
+  "required": [
+    "name",
+    "file_type"
+  ]
+}

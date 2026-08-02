@@ -1,0 +1,46 @@
+{
+  "name": "Webhook",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Webhook name"
+    },
+    "url": {
+      "type": "string",
+      "description": "Webhook endpoint URL"
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Events to trigger webhook: upload, convert, delete, share, download"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "secret_key": {
+      "type": "string",
+      "description": "Secret for signature verification"
+    },
+    "last_triggered": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "failure_count": {
+      "type": "number",
+      "default": 0
+    },
+    "headers": {
+      "type": "object",
+      "description": "Custom headers to send"
+    }
+  },
+  "required": [
+    "name",
+    "url",
+    "events"
+  ]
+}

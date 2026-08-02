@@ -1,0 +1,77 @@
+{
+  "name": "ComplianceLog",
+  "type": "object",
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "data_access",
+        "data_export",
+        "data_deletion",
+        "consent_given",
+        "consent_withdrawn",
+        "data_breach",
+        "security_incident",
+        "audit_event"
+      ],
+      "description": "Type of compliance event"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "User associated with the event"
+    },
+    "resource_type": {
+      "type": "string",
+      "description": "Type of resource accessed (document, user_data, etc)"
+    },
+    "resource_id": {
+      "type": "string",
+      "description": "ID of the resource"
+    },
+    "action_description": {
+      "type": "string",
+      "description": "Detailed description of the action"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "user_agent": {
+      "type": "string"
+    },
+    "compliance_framework": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "GDPR, CCPA, HIPAA, PIPEDA, SOC2"
+    },
+    "data_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Categories of data involved (PII, PHI, financial)"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "low"
+    },
+    "resolved": {
+      "type": "boolean",
+      "default": true
+    },
+    "resolution_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_type",
+    "action_description"
+  ]
+}

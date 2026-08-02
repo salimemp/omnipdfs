@@ -1,0 +1,46 @@
+{
+  "name": "Template",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Template name"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "invoice",
+        "contract",
+        "letter",
+        "report",
+        "resume",
+        "certificate",
+        "form",
+        "custom"
+      ],
+      "default": "custom"
+    },
+    "thumbnail_url": {
+      "type": "string"
+    },
+    "template_data": {
+      "type": "object",
+      "description": "JSON structure of template fields and layout"
+    },
+    "is_public": {
+      "type": "boolean",
+      "default": false
+    },
+    "usage_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "category"
+  ]
+}

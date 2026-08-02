@@ -1,0 +1,74 @@
+{
+  "name": "ConversionJob",
+  "type": "object",
+  "properties": {
+    "document_id": {
+      "type": "string",
+      "description": "Source document ID"
+    },
+    "source_format": {
+      "type": "string"
+    },
+    "target_format": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "processing",
+        "completed",
+        "failed"
+      ],
+      "default": "queued"
+    },
+    "progress": {
+      "type": "number",
+      "default": 0,
+      "description": "Progress percentage 0-100"
+    },
+    "output_url": {
+      "type": "string",
+      "description": "URL of converted file"
+    },
+    "output_size": {
+      "type": "number",
+      "description": "Output file size in bytes"
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "processing_time": {
+      "type": "number",
+      "description": "Time taken in milliseconds"
+    },
+    "options": {
+      "type": "object",
+      "properties": {
+        "quality": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "maximum"
+          ]
+        },
+        "ocr_enabled": {
+          "type": "boolean"
+        },
+        "compress": {
+          "type": "boolean"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "document_id",
+    "source_format",
+    "target_format"
+  ]
+}

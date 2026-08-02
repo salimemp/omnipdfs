@@ -1,0 +1,65 @@
+{
+  "name": "OCRJob",
+  "type": "object",
+  "properties": {
+    "document_id": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "processing",
+        "completed",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "language": {
+      "type": "string",
+      "default": "en"
+    },
+    "extracted_text": {
+      "type": "string"
+    },
+    "confidence_score": {
+      "type": "number"
+    },
+    "page_count": {
+      "type": "number"
+    },
+    "options": {
+      "type": "object",
+      "properties": {
+        "enhance_quality": {
+          "type": "boolean"
+        },
+        "detect_tables": {
+          "type": "boolean"
+        },
+        "detect_handwriting": {
+          "type": "boolean"
+        },
+        "preserve_layout": {
+          "type": "boolean"
+        },
+        "output_format": {
+          "type": "string"
+        }
+      }
+    },
+    "output_url": {
+      "type": "string"
+    },
+    "processing_time": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "document_id",
+    "source_url"
+  ]
+}

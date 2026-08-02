@@ -1,0 +1,35 @@
+{
+  "name": "Folder",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Folder name"
+    },
+    "color": {
+      "type": "string",
+      "description": "Folder accent color"
+    },
+    "parent_id": {
+      "type": "string",
+      "description": "Parent folder ID for nesting"
+    },
+    "is_shared": {
+      "type": "boolean",
+      "default": false
+    },
+    "shared_with": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon identifier"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

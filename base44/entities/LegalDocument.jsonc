@@ -1,0 +1,115 @@
+{
+  "name": "LegalDocument",
+  "type": "object",
+  "properties": {
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "nda",
+        "employment_contract",
+        "service_agreement",
+        "privacy_policy",
+        "terms_of_service",
+        "gdpr_consent",
+        "data_processing_agreement",
+        "contractor_agreement",
+        "lease_agreement",
+        "purchase_agreement"
+      ],
+      "description": "Type of legal document"
+    },
+    "title": {
+      "type": "string",
+      "description": "Document title"
+    },
+    "parties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Parties involved in the document"
+    },
+    "content": {
+      "type": "string",
+      "description": "Document content/template"
+    },
+    "jurisdiction": {
+      "type": "string",
+      "description": "Legal jurisdiction (e.g., US-CA, EU, UK)"
+    },
+    "effective_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "pending_review",
+        "pending_signature",
+        "executed",
+        "expired",
+        "terminated"
+      ],
+      "default": "draft"
+    },
+    "signatures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "party_email": {
+            "type": "string"
+          },
+          "signed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ip_address": {
+            "type": "string"
+          },
+          "signature_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "compliance_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "GDPR, CCPA, HIPAA, etc."
+    },
+    "template_id": {
+      "type": "string",
+      "description": "Reference to template used"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional legal metadata"
+    }
+  },
+  "required": [
+    "document_type",
+    "title"
+  ]
+}
